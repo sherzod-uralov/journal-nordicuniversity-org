@@ -1,0 +1,59 @@
+<div class="phone-wrapper" (appClickOutside)="closeDropdown()">
+  <!-- Country selector -->
+  <button
+    type="button"
+    class="country-btn"
+    [disabled]="isDisabled()"
+    (click)="toggleDropdown()"
+  >
+    <span class="flag">{{ selectedCountry().flag }}</span>
+    <span class="dial-code">{{ selectedCountry().dialCode }}</span>
+    <svg class="chevron" [class.open]="dropdownOpen()" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+    </svg>
+  </button>
+
+  <!-- Phone number input -->
+  <input
+    type="tel"
+    [value]="phoneLocal()"
+    (input)="onPhoneInput($event)"
+    (blur)="onBlur()"
+    [disabled]="isDisabled()"
+    placeholder="90 123 45 67"
+    maxlength="12"
+    class="phone-field"
+  />
+
+  <!-- Country dropdown -->
+  @if (dropdownOpen()) {
+    <div class="dropdown">
+      <div class="dropdown-search">
+        <input
+          type="text"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          placeholder="Search countries..."
+          class="search-input"
+        />
+      </div>
+      <div class="dropdown-list">
+        @for (country of filteredCountries; track country.code) {
+          <button
+            type="button"
+            class="dropdown-item"
+            [class.active]="country.code === selectedCountry().code"
+            (click)="selectCountry(country)"
+          >
+            <span class="item-flag">{{ country.flag }}</span>
+            <span class="item-name">{{ country.name }}</span>
+            <span class="item-dial">{{ country.dialCode }}</span>
+          </button>
+        }
+        @if (filteredCountries.length === 0) {
+          <div class="dropdown-empty">No countries found</div>
+        }
+      </div>
+    </div>
+  }
+</div>

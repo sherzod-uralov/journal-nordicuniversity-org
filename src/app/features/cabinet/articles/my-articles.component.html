@@ -1,0 +1,134 @@
+<div>
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="font-heading text-2xl font-bold text-ink">{{ 'cabinet.articles.title' | translate }}</h1>
+      @if (cabinetStore.myArticles().length > 0) {
+        <p class="text-sm text-lavender mt-1">{{ cabinetStore.myArticles().length }} {{ 'articles.results' | translate }}</p>
+      }
+    </div>
+    <a routerLink="/cabinet/articles/new"
+       class="inline-flex items-center gap-2 px-4 py-2.5 bg-dusk text-white text-sm font-medium rounded-lg hover:bg-prussian transition-colors">
+      <i class="pi pi-plus text-xs"></i>
+      {{ 'cabinet.articles.new' | translate }}
+    </a>
+  </div>
+
+  <!-- Loading skeleton -->
+  @if (cabinetStore.loading()) {
+    <div class="space-y-4">
+      @for (i of [1, 2, 3]; track i) {
+        <div class="bg-white rounded-xl border border-alabaster/60 p-6 animate-pulse">
+          <div class="flex items-start justify-between mb-4">
+            <div class="flex-1 space-y-2">
+              <div class="h-5 bg-alabaster rounded w-3/5"></div>
+              <div class="h-3 bg-alabaster rounded w-2/5"></div>
+            </div>
+            <div class="h-6 bg-alabaster rounded-full w-20 ml-4"></div>
+          </div>
+          <div class="space-y-2 mb-4">
+            <div class="h-3 bg-alabaster rounded w-full"></div>
+            <div class="h-3 bg-alabaster rounded w-4/5"></div>
+          </div>
+          <div class="flex gap-2">
+            <div class="h-5 bg-alabaster rounded-full w-14"></div>
+            <div class="h-5 bg-alabaster rounded-full w-18"></div>
+            <div class="h-5 bg-alabaster rounded-full w-16"></div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Empty state -->
+  @if (cabinetStore.myArticles().length === 0 && !cabinetStore.loading()) {
+    <app-empty-state
+      [title]="'cabinet.articles.no_articles' | translate"
+      [message]="'cabinet.articles.no_articles_desc' | translate">
+      <a routerLink="/cabinet/articles/new"
+         class="inline-flex items-center gap-2 px-5 py-2.5 bg-dusk text-white text-sm font-medium rounded-lg hover:bg-prussian transition-colors">
+        <i class="pi pi-plus text-xs"></i>
+        {{ 'cabinet.articles.new' | translate }}
+      </a>
+    </app-empty-state>
+  }
+
+  <!-- Articles list -->
+  @if (cabinetStore.myArticles().length > 0 && !cabinetStore.loading()) {
+    <div class="space-y-4">
+      @for (article of cabinetStore.myArticles(); track article.id) {
+        <a [routerLink]="['/cabinet/articles', article.id]"
+           class="block bg-white rounded-xl border border-alabaster/60 overflow-hidden transition-shadow hover:shadow-md hover:shadow-dusk/5">
+          <div class="p-6">
+            <!-- Title + Status -->
+            <div class="flex items-start justify-between gap-4 mb-3">
+              <h3 class="font-heading text-lg font-bold text-ink leading-snug flex-1 min-w-0">
+                {{ article.title }}
+              </h3>
+              <app-article-status-badge [status]="article.status" class="shrink-0 mt-0.5" />
+            </div>
+
+            <!-- Category -->
+            @if (article.category || article.SubCategory) {
+              <div class="flex items-center gap-1.5 mb-3">
+                @if (article.category) {
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-dusk/8 text-dusk">
+                    {{ article.category.name }}
+                  </span>
+                }
+                @if (article.category && article.SubCategory) {
+                  <i class="pi pi-chevron-right text-[9px] text-lavender/60"></i>
+                }
+                @if (article.SubCategory) {
+                  <span class="text-[11px] font-medium text-lavender">{{ article.SubCategory.name }}</span>
+                }
+              </div>
+            }
+
+            <!-- Abstract (clamped) -->
+            @if (article.abstract) {
+              <p class="text-sm text-dusk/80 leading-relaxed line-clamp-2 mb-3">{{ article.abstract }}</p>
+            }
+
+            <!-- Keywords -->
+            @if (article.keyword) {
+              <div class="flex flex-wrap gap-1.5">
+                @for (kw of article.keyword.split(','); track kw) {
+                  @if (kw.trim()) {
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-alabaster/80 text-prussian">
+                      {{ kw.trim() }}
+                    </span>
+                  }
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Footer -->
+          <div class="flex items-center justify-between gap-4 px-6 py-3 bg-[#fafaf8] border-t border-alabaster/40">
+            <div class="flex items-center gap-4 text-xs text-lavender">
+              <span class="inline-flex items-center gap-1.5">
+                <i class="pi pi-calendar text-[10px]"></i>
+                {{ article.createdAt | dateLocale }}
+              </span>
+              <span class="inline-flex items-center gap-1.5">
+                <i class="pi pi-eye text-[10px]"></i>
+                {{ article.viewsCount }}
+              </span>
+              @if (article.coAuthors && article.coAuthors.length > 0) {
+                <span class="inline-flex items-center gap-1.5">
+                  <i class="pi pi-users text-[10px]"></i>
+                  {{ article.coAuthors.length }}
+                </span>
+              }
+            </div>
+            <span class="inline-flex items-center gap-1 text-xs text-dusk font-medium">
+              {{ 'common.view' | translate }}
+              <i class="pi pi-arrow-right text-[10px]"></i>
+            </span>
+          </div>
+        </a>
+      }
+    </div>
+  }
+</div>

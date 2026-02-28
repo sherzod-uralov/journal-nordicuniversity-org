@@ -1,0 +1,46 @@
+<div class="min-h-[80vh] flex items-center justify-center px-4 py-12">
+  <div class="w-full max-w-[440px]">
+    <!-- Header -->
+    <div class="text-center mb-10">
+      <h1 class="font-heading text-3xl font-bold text-ink mb-2">{{ 'auth.login.title' | translate }}</h1>
+      <p class="text-sm text-lavender">{{ 'auth.login.no_account' | translate }}
+        <a routerLink="/auth/register" class="text-dusk font-semibold hover:text-ink transition-colors">
+          {{ 'nav.register' | translate }}
+        </a>
+      </p>
+    </div>
+
+    <!-- Card -->
+    <div class="bg-white rounded-2xl shadow-xl shadow-ink/5 border border-alabaster/40 p-8">
+      @if (authStore.error()) {
+        <div class="mb-5 flex items-center gap-3 p-3.5 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm">
+          <i class="pi pi-exclamation-circle text-lg"></i>
+          <span>{{ authStore.error() }}</span>
+        </div>
+      }
+
+      <form (ngSubmit)="onSubmit()" class="space-y-6">
+        <!-- Phone -->
+        <div>
+          <label class="block text-sm font-medium text-ink mb-2">{{ 'auth.login.phone' | translate }} <span class="text-red-500">*</span></label>
+          <app-phone-input [(ngModel)]="phone" name="phone" />
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="block text-sm font-medium text-ink mb-2">{{ 'auth.login.password' | translate }} <span class="text-red-500">*</span></label>
+          <app-password-input [(ngModel)]="password" name="password" />
+        </div>
+
+        <!-- Submit -->
+        <p-button
+          type="submit"
+          [label]="'auth.login.submit' | translate"
+          styleClass="w-full"
+          [loading]="authStore.loading()"
+          icon="pi pi-sign-in"
+        />
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,374 @@
+/* ── Search Bar ── */
+.search-bar-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid var(--color-alabaster);
+  border-radius: 0.75rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-bar-wrapper:hover {
+  border-color: var(--color-lavender);
+}
+
+.search-bar-wrapper.is-focused {
+  border-color: var(--color-dusk);
+  box-shadow: 0 0 0 3px rgba(65, 90, 119, 0.1);
+}
+
+.search-bar-icon {
+  position: absolute;
+  left: 0.875rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--color-lavender);
+  transition: color 0.2s ease;
+  pointer-events: none;
+}
+
+.is-focused .search-bar-icon {
+  color: var(--color-dusk);
+}
+
+.search-bar-input {
+  width: 100%;
+  padding: 0.8rem 2.75rem 0.8rem 2.75rem;
+  background: transparent;
+  border: none;
+  font-size: 0.875rem;
+  color: var(--color-ink);
+  outline: none;
+}
+
+.search-bar-input::placeholder {
+  color: var(--color-lavender);
+}
+
+.search-bar-clear {
+  position: absolute;
+  right: 0.625rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  color: var(--color-lavender);
+  border-radius: 0.375rem;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.search-bar-clear:hover {
+  color: var(--color-ink);
+  background-color: rgba(224, 225, 221, 0.5);
+}
+
+/* ── Filter Cards ── */
+.filter-card {
+  background: white;
+  border: 1px solid var(--color-alabaster);
+  border-radius: 0.625rem;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.filter-card:hover {
+  border-color: rgba(119, 141, 169, 0.3);
+}
+
+.filter-card-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  gap: 0.5rem;
+  transition: background-color 0.15s ease;
+}
+
+.filter-card-header:hover {
+  background-color: rgba(224, 225, 221, 0.15);
+}
+
+.filter-card-title {
+  flex: 1;
+  text-align: left;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+.filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.125rem;
+  height: 1.125rem;
+  padding: 0 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: white;
+  background-color: var(--color-dusk);
+  border-radius: 999px;
+}
+
+.filter-chevron {
+  width: 0.875rem;
+  height: 0.875rem;
+  color: var(--color-lavender);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+/* ── Accordion animation ── */
+.filter-card-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.filter-card-body.is-open {
+  grid-template-rows: 1fr;
+}
+
+.filter-card-content {
+  overflow: hidden;
+  padding: 0 0.75rem;
+}
+
+.filter-card-body.is-open .filter-card-content {
+  padding-bottom: 0.625rem;
+}
+
+/* ── Filter Options ── */
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3125rem 0;
+  cursor: pointer;
+}
+
+.filter-option:hover .filter-option-label {
+  color: var(--color-ink);
+}
+
+.filter-option-label {
+  font-size: 0.8125rem;
+  color: rgba(13, 27, 42, 0.7);
+  transition: color 0.15s ease;
+  line-height: 1.4;
+}
+
+/* ── Checkbox ── */
+.filter-checkbox {
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border: 1.5px solid var(--color-lavender);
+  border-radius: 3px;
+  background: white;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.filter-checkbox:checked {
+  background: var(--color-dusk);
+  border-color: var(--color-dusk);
+  animation: checkbox-pop 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.filter-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 3.5px;
+  top: 0.5px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+  animation: check-draw 0.15s ease-out 0.05s both;
+}
+
+.filter-checkbox:hover:not(:checked) {
+  border-color: var(--color-dusk);
+  background: rgba(65, 90, 119, 0.04);
+}
+
+.filter-checkbox:focus-visible {
+  outline: 2px solid var(--color-dusk);
+  outline-offset: 2px;
+}
+
+/* ── Radio ── */
+.filter-radio {
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border: 1.5px solid var(--color-lavender);
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.filter-radio:checked {
+  border-color: var(--color-dusk);
+  animation: checkbox-pop 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.filter-radio:checked::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-dusk);
+  animation: radio-fill 0.15s ease-out;
+}
+
+.filter-radio:hover:not(:checked) {
+  border-color: var(--color-dusk);
+  background: rgba(65, 90, 119, 0.04);
+}
+
+.filter-radio:focus-visible {
+  outline: 2px solid var(--color-dusk);
+  outline-offset: 2px;
+}
+
+/* ── Toggle Switch ── */
+.toggle-switch {
+  position: relative;
+  cursor: pointer;
+}
+
+.toggle-track {
+  width: 2.25rem;
+  height: 1.25rem;
+  background: var(--color-alabaster);
+  border-radius: 999px;
+  transition: background-color 0.2s ease;
+  position: relative;
+}
+
+.toggle-switch.is-on .toggle-track {
+  background: var(--color-dusk);
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 0.875rem;
+  height: 0.875rem;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle-switch.is-on .toggle-thumb {
+  transform: translateX(1rem);
+}
+
+/* ── Date Input ── */
+.date-input {
+  width: 100%;
+  padding: 0.4375rem 0.625rem;
+  background: rgba(224, 225, 221, 0.2);
+  border: 1px solid var(--color-alabaster);
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  color: var(--color-ink);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+
+.date-input:focus {
+  border-color: var(--color-dusk);
+  box-shadow: 0 0 0 2px rgba(65, 90, 119, 0.1);
+  background: white;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+/* ── Filter Chips ── */
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  border-radius: 999px;
+  background: rgba(65, 90, 119, 0.08);
+  color: var(--color-dusk);
+  transition: background-color 0.15s ease;
+  animation: chip-enter 0.2s ease-out;
+}
+
+.filter-chip:hover {
+  background: rgba(65, 90, 119, 0.15);
+}
+
+.filter-chip--volume {
+  background: rgba(27, 38, 59, 0.08);
+  color: var(--color-prussian);
+}
+
+.filter-chip--volume:hover {
+  background: rgba(27, 38, 59, 0.15);
+}
+
+.filter-chip--doi {
+  background: rgba(16, 185, 129, 0.08);
+  color: #047857;
+}
+
+.filter-chip--doi:hover {
+  background: rgba(16, 185, 129, 0.15);
+}
+
+.filter-chip--date {
+  background: rgba(119, 141, 169, 0.1);
+  color: var(--color-lavender);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+}
+
+.filter-chip--date:hover {
+  background: rgba(119, 141, 169, 0.2);
+}
+
+/* ── Animations ── */
+@keyframes checkbox-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.85); }
+  100% { transform: scale(1); }
+}
+
+@keyframes check-draw {
+  from { opacity: 0; transform: rotate(45deg) scale(0.5); }
+  to { opacity: 1; transform: rotate(45deg) scale(1); }
+}
+
+@keyframes radio-fill {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+
+@keyframes chip-enter {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}

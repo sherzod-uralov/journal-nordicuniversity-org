@@ -1,0 +1,182 @@
+<div>
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="font-heading text-2xl font-bold text-ink">{{ 'cabinet.submit.title' | translate }}</h1>
+    <p class="text-sm text-lavender mt-1">{{ 'cabinet.submit.subtitle' | translate }}</p>
+  </div>
+
+  <form (ngSubmit)="submit()" class="space-y-6">
+
+    <!-- ═══════ Text Fields ═══════ -->
+    <div class="bg-white rounded-xl border border-alabaster/60 p-6 space-y-5">
+      <app-form-field
+        [label]="'cabinet.submit.article_title' | translate"
+        fieldId="title"
+        [required]="true"
+        [error]="errors()['title'] ?? ''">
+        <app-text-input
+          [(ngModel)]="title"
+          name="title"
+          fieldId="title"
+          [placeholder]="'cabinet.submit.placeholder.title' | translate" />
+      </app-form-field>
+
+      <app-form-field
+        [label]="'cabinet.submit.abstract' | translate"
+        fieldId="abstract"
+        [required]="true"
+        [error]="errors()['abstract'] ?? ''">
+        <app-textarea-input
+          [(ngModel)]="abstract"
+          name="abstract"
+          fieldId="abstract"
+          [rows]="4"
+          [autoResize]="true"
+          [placeholder]="'cabinet.submit.placeholder.abstract' | translate" />
+      </app-form-field>
+
+      <app-form-field
+        [label]="'cabinet.submit.description' | translate"
+        fieldId="desc"
+        [required]="true"
+        [error]="errors()['description'] ?? ''">
+        <app-textarea-input
+          [(ngModel)]="description"
+          name="description"
+          fieldId="desc"
+          [rows]="6"
+          [autoResize]="true"
+          [placeholder]="'cabinet.submit.placeholder.description' | translate" />
+      </app-form-field>
+    </div>
+
+    <!-- ═══════ Keywords ═══════ -->
+    <div class="bg-white rounded-xl border border-alabaster/60 p-6">
+      <app-form-field
+        [label]="'cabinet.submit.keywords' | translate"
+        fieldId="keywords"
+        [required]="true"
+        [hint]="'cabinet.submit.keywords_hint' | translate"
+        [error]="errors()['keywords'] ?? ''">
+        <app-tag-input
+          [ngModel]="keywords()"
+          (ngModelChange)="keywords.set($event)"
+          name="keywords"
+          fieldId="keywords"
+          [placeholder]="'cabinet.submit.placeholder.keyword' | translate" />
+      </app-form-field>
+    </div>
+
+    <!-- ═══════ Category & Subcategory ═══════ -->
+    <div class="bg-white rounded-xl border border-alabaster/60 p-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <app-form-field
+          [label]="'cabinet.submit.category' | translate"
+          [required]="true"
+          [error]="errors()['categoryId'] ?? ''">
+          <app-select-input
+            [options]="categoryOptions"
+            [ngModel]="selectedCategory()"
+            (ngModelChange)="onCategoryChange($event)"
+            name="category"
+            [placeholder]="'cabinet.submit.placeholder.category' | translate"
+            [filter]="true" />
+        </app-form-field>
+
+        <app-form-field
+          [label]="'cabinet.submit.subcategory' | translate"
+          [required]="true"
+          [error]="errors()['subcategoryId'] ?? ''">
+          <app-select-input
+            [options]="subcategoryOptions"
+            [ngModel]="selectedSubcategory()"
+            (ngModelChange)="selectedSubcategory.set($event)"
+            name="subcategory"
+            [placeholder]="'cabinet.submit.placeholder.subcategory' | translate"
+            [filter]="true" />
+        </app-form-field>
+      </div>
+    </div>
+
+    <!-- ═══════ Files ═══════ -->
+    <div class="bg-white rounded-xl border border-alabaster/60 p-6 space-y-5">
+      <app-form-field
+        [label]="'cabinet.submit.file' | translate"
+        [required]="true"
+        [error]="errors()['articleFile'] ?? ''">
+        <app-file-input
+          [ngModel]="articleFile"
+          (ngModelChange)="onArticleFileChange($event)"
+          name="articleFile"
+          accept=".pdf,.doc,.docx"
+          [maxSize]="10"
+          [label]="'cabinet.submit.placeholder.file' | translate"
+          hint="PDF, DOC, DOCX — max 10 MB" />
+        @if (uploadingArticle()) {
+          <p class="text-xs text-dusk mt-1.5 flex items-center gap-1.5">
+            <i class="pi pi-spinner pi-spin text-xs"></i>
+            {{ 'cabinet.submit.uploading' | translate }}
+          </p>
+        }
+        @if (articleFileId()) {
+          <p class="text-xs text-emerald-600 mt-1.5 flex items-center gap-1.5">
+            <i class="pi pi-check-circle text-xs"></i>
+            {{ 'cabinet.submit.file_ready' | translate }}
+          </p>
+        }
+      </app-form-field>
+
+      <app-form-field
+        [label]="'cabinet.submit.image' | translate">
+        <app-file-input
+          [ngModel]="imageFile"
+          (ngModelChange)="onImageFileChange($event)"
+          name="imageFile"
+          accept=".jpg,.jpeg,.png,.webp"
+          [maxSize]="5"
+          [label]="'cabinet.submit.placeholder.image' | translate"
+          hint="JPG, PNG, WEBP — max 5 MB" />
+        @if (uploadingImage()) {
+          <p class="text-xs text-dusk mt-1.5 flex items-center gap-1.5">
+            <i class="pi pi-spinner pi-spin text-xs"></i>
+            {{ 'cabinet.submit.uploading' | translate }}
+          </p>
+        }
+        @if (imageFileId()) {
+          <p class="text-xs text-emerald-600 mt-1.5 flex items-center gap-1.5">
+            <i class="pi pi-check-circle text-xs"></i>
+            {{ 'cabinet.submit.file_ready' | translate }}
+          </p>
+        }
+      </app-form-field>
+    </div>
+
+    <!-- ═══════ References ═══════ -->
+    <div class="bg-white rounded-xl border border-alabaster/60 p-6">
+      <app-form-field
+        [label]="'cabinet.submit.references' | translate"
+        fieldId="refs"
+        [hint]="'cabinet.submit.references_hint' | translate">
+        <app-tag-input
+          [ngModel]="referenceItems()"
+          (ngModelChange)="referenceItems.set($event)"
+          name="references"
+          fieldId="refs"
+          [placeholder]="'cabinet.submit.placeholder.reference' | translate" />
+      </app-form-field>
+    </div>
+
+    <!-- ═══════ Submit ═══════ -->
+    <button
+      type="submit"
+      [disabled]="loading() || uploadingArticle() || uploadingImage()"
+      class="w-full flex items-center justify-center gap-2.5 px-5 py-3.5 bg-dusk text-white text-sm font-semibold rounded-xl hover:bg-prussian transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm">
+      @if (loading()) {
+        <i class="pi pi-spinner pi-spin text-sm"></i>
+      } @else {
+        <i class="pi pi-send text-sm"></i>
+      }
+      {{ 'cabinet.submit.submit' | translate }}
+    </button>
+  </form>
+</div>

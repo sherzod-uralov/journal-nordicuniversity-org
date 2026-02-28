@@ -1,0 +1,39 @@
+<a
+  [routerLink]="['/volumes', volume().id]"
+  class="block bg-white rounded-xl border border-alabaster/60 overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-dusk/5 hover:-translate-y-0.5 group"
+>
+  <!-- Cover Image -->
+  <div class="aspect-[3/4] overflow-hidden bg-alabaster relative">
+    @if (volume().image?.file_path) {
+      <img
+        [src]="volume().image!.file_path | fileUrl"
+        [alt]="volume().title"
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      />
+    } @else {
+      <div class="w-full h-full bg-gradient-to-br from-prussian to-dusk flex items-center justify-center">
+        <div class="text-center text-white">
+          <div class="font-heading font-bold text-2xl mb-1">{{ volume().title }}</div>
+          <div class="text-sm text-white/60">Nordic University</div>
+        </div>
+      </div>
+    }
+
+    <!-- Article Count Badge -->
+    @if (volume().articleCount) {
+      <div class="absolute bottom-3 right-3 px-2.5 py-1 bg-ink/80 text-white text-xs font-medium rounded-lg backdrop-blur-sm">
+        {{ volume().articleCount }} {{ 'volumes.articles_count' | translate }}
+      </div>
+    }
+  </div>
+
+  <!-- Info -->
+  <div class="p-4">
+    <h3 class="font-heading font-bold text-ink text-base group-hover:text-dusk transition-colors">
+      {{ volume().title }}
+    </h3>
+    @if (volume().description) {
+      <p class="text-xs text-lavender mt-1 line-clamp-2">{{ volume().description }}</p>
+    }
+  </div>
+</a>

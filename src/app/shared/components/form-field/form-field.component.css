@@ -1,0 +1,72 @@
+:host {
+  display: block;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  letter-spacing: 0.01em;
+  transition: color 0.2s ease;
+}
+
+.has-error .form-label {
+  color: #dc2626;
+}
+
+/* Make projected inputs inherit error state */
+.form-input-wrapper :ng-deep input,
+.form-input-wrapper :ng-deep textarea,
+.form-input-wrapper :ng-deep select {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.has-error .form-input-wrapper :ng-deep input,
+.has-error .form-input-wrapper :ng-deep textarea,
+.has-error .form-input-wrapper :ng-deep select {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08) !important;
+}
+
+.has-error .form-input-wrapper :ng-deep input:focus,
+.has-error .form-input-wrapper :ng-deep textarea:focus,
+.has-error .form-input-wrapper :ng-deep select:focus {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15) !important;
+}
+
+.form-message-slot {
+  min-height: 1.125rem;
+}
+
+.form-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: #dc2626;
+  animation: form-error-enter 0.25s ease-out;
+}
+
+.form-hint {
+  font-size: 0.75rem;
+  color: var(--color-lavender);
+}
+
+@keyframes form-error-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

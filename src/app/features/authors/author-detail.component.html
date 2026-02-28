@@ -1,0 +1,44 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <app-breadcrumb [items]="breadcrumbs" />
+
+  @if (authorStore.loading()) {
+    <div class="mt-8 space-y-4">
+      <div class="flex items-center gap-4">
+        <p-skeleton shape="circle" size="3rem" />
+        <div class="space-y-2 flex-1"><p-skeleton width="33%" height="1.75rem" /><p-skeleton width="25%" height="1rem" /></div>
+      </div>
+    </div>
+  } @else if (authorStore.selectedAuthor(); as author) {
+    <!-- Profile -->
+    <div class="mt-6 bg-white rounded-xl border border-alabaster/60 p-6 md:p-8 mb-8">
+      <div class="flex flex-col sm:flex-row items-start gap-6">
+        <app-avatar [name]="author.full_name" [src]="author.file?.file_path ?? null" size="lg" />
+        <div>
+          <h1 class="font-heading text-2xl sm:text-3xl font-bold text-ink mb-2">{{ author.full_name }}</h1>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-sm">
+            @if (author.science_degree) {
+              <div><span class="text-lavender">{{ 'author.degree' | translate }}:</span> <span class="text-ink font-medium">{{ author.science_degree }}</span></div>
+            }
+            @if (author.job) {
+              <div><span class="text-lavender">{{ 'author.workplace' | translate }}:</span> <span class="text-ink font-medium">{{ author.job }}</span></div>
+            }
+            @if (author.place_position) {
+              <div><span class="text-lavender">{{ 'author.position' | translate }}:</span> <span class="text-ink font-medium">{{ author.place_position }}</span></div>
+            }
+            @if (author.OrcID) {
+              <div><span class="text-lavender">{{ 'author.orcid' | translate }}:</span> <span class="text-ink font-mono text-xs">{{ author.OrcID }}</span></div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Articles -->
+    <h2 class="font-heading text-xl font-bold text-ink mb-6">{{ 'author.articles' | translate }}</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (article of articles(); track article.id) {
+        <app-article-card [article]="article" />
+      }
+    </div>
+  }
+</div>

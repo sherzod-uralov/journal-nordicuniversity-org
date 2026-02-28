@@ -1,0 +1,169 @@
+<div class="min-h-[80vh] flex items-center justify-center px-4 py-12">
+  <div class="w-full max-w-[480px]">
+    <!-- Header -->
+    <div class="text-center mb-10">
+      <h1 class="font-heading text-3xl font-bold text-ink mb-2">{{ 'auth.register.title' | translate }}</h1>
+      <p class="text-sm text-lavender">{{ 'auth.register.has_account' | translate }}
+        <a routerLink="/auth/login" class="text-dusk font-semibold hover:text-ink transition-colors">{{ 'nav.login' | translate }}</a>
+      </p>
+    </div>
+
+    <!-- Step Indicator -->
+    <div class="flex items-center justify-center gap-3 mb-8">
+      @for (s of [1, 2, 3]; track s) {
+        <div class="flex items-center gap-3">
+          <div
+            [class]="'w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ' +
+              (step() >= s ? 'bg-ink text-white shadow-md shadow-ink/20' : 'bg-alabaster text-lavender')"
+          >
+            @if (step() > s) {
+              <i class="pi pi-check text-xs"></i>
+            } @else {
+              {{ s }}
+            }
+          </div>
+          @if (s < 3) {
+            <div [class]="'w-12 h-0.5 rounded-full transition-all duration-300 ' + (step() > s ? 'bg-ink' : 'bg-alabaster')"></div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Card -->
+    <div class="bg-white rounded-2xl shadow-xl shadow-ink/5 border border-alabaster/40 p-8">
+      <!-- Step 1: Phone -->
+      @if (step() === 1) {
+        <form (ngSubmit)="sendOtp()" class="space-y-6">
+          <div class="text-center mb-2">
+            <div class="w-12 h-12 bg-dusk/10 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <i class="pi pi-phone text-xl text-dusk"></i>
+            </div>
+            <h2 class="text-lg font-semibold text-ink mb-1">{{ 'auth.otp.title' | translate }}</h2>
+            <p class="text-sm text-lavender">{{ 'auth.register.phone' | translate }}</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-ink mb-2">{{ 'auth.register.phone' | translate }} <span class="text-red-500">*</span></label>
+            <app-phone-input [(ngModel)]="phone" name="phone" />
+          </div>
+
+          <p-button
+            type="submit"
+            [label]="'auth.register.verify' | translate"
+            styleClass="w-full"
+            [loading]="loading()"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+          />
+        </form>
+      }
+
+      <!-- Step 2: OTP Verification -->
+      @if (step() === 2) {
+        <div class="space-y-6">
+          <div class="text-center mb-2">
+            <div class="w-14 h-14 bg-dusk/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <i class="pi pi-shield text-2xl text-dusk"></i>
+            </div>
+            <h2 class="text-xl font-bold text-ink mb-2">{{ 'auth.otp.title' | translate }}</h2>
+            <p class="text-sm text-lavender leading-relaxed">
+              {{ 'auth.otp.sent' | translate }}
+            </p>
+            <p class="text-base font-semibold text-ink mt-1 tracking-wide">{{ phone }}</p>
+          </div>
+
+          <app-otp-input [(ngModel)]="otp" name="otp" (completed)="onOtpComplete($event)" />
+
+          @if (loading()) {
+            <div class="flex justify-center py-2">
+              <i class="pi pi-spin pi-spinner text-2xl text-dusk"></i>
+            </div>
+          }
+
+          <div class="text-center">
+            <button
+              type="button"
+              (click)="resendOtp()"
+              [disabled]="resendTimer() > 0"
+              [class]="'text-sm font-medium transition-colors ' + (resendTimer() > 0 ? 'text-lavender cursor-not-allowed' : 'text-dusk hover:text-ink')"
+            >
+              @if (resendTimer() > 0) {
+                {{ 'auth.otp.resend' | translate }} ({{ resendTimer() }}s)
+              } @else {
+                {{ 'auth.otp.resend' | translate }}
+              }
+            </button>
+          </div>
+
+          <div class="pt-2">
+            <button
+              type="button"
+              (click)="goBackToPhone()"
+              class="text-sm text-lavender hover:text-ink transition-colors font-medium flex items-center gap-1.5 mx-auto"
+            >
+              <i class="pi pi-arrow-left text-xs"></i>
+              {{ 'common.back' | translate }}
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Step 3: Profile -->
+      @if (step() === 3) {
+        <form (ngSubmit)="register()" class="space-y-5">
+          <div class="text-center mb-2">
+            <div class="w-12 h-12 bg-dusk/10 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <i class="pi pi-user text-xl text-dusk"></i>
+            </div>
+            <h2 class="text-lg font-semibold text-ink mb-1">{{ 'auth.register.title' | translate }}</h2>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.name' | translate }} <span class="text-red-500">*</span></label>
+            <app-text-input [(ngModel)]="full_name" name="name" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.password' | translate }} <span class="text-red-500">*</span></label>
+            <app-password-input [(ngModel)]="password" name="password" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.degree' | translate }} <span class="text-red-500">*</span></label>
+              <app-text-input [(ngModel)]="science_degree" name="degree" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.job' | translate }} <span class="text-red-500">*</span></label>
+              <app-text-input [(ngModel)]="job" name="job" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.position' | translate }} <span class="text-red-500">*</span></label>
+              <app-text-input [(ngModel)]="place_position" name="position" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.birthday' | translate }} <span class="text-red-500">*</span></label>
+              <app-date-input [(ngModel)]="birthdayDate" name="birthday" [maxDate]="maxDate" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.orcid' | translate }}</label>
+            <app-text-input [(ngModel)]="OrcID" name="orcid" placeholder="0000-0000-0000-0000" />
+          </div>
+
+          <p-button
+            type="submit"
+            [label]="'auth.register.submit' | translate"
+            styleClass="w-full"
+            [loading]="loading()"
+            icon="pi pi-check"
+          />
+        </form>
+      }
+    </div>
+  </div>
+</div>

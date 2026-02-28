@@ -1,0 +1,7 @@
+@if (src()) {
+  <img [src]="src()! | fileUrl" [alt]="name()" [class]="sizeClasses() + ' rounded-full object-cover'" />
+} @else {
+  <div [class]="sizeClasses() + ' rounded-full bg-dusk/10 flex items-center justify-center text-dusk font-semibold'">
+    {{ initials() }}
+  </div>
+}

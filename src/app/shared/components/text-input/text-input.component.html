@@ -1,0 +1,12 @@
+<input
+  [type]="type()"
+  [id]="fieldId()"
+  [value]="value()"
+  [placeholder]="placeholder()"
+  [attr.maxlength]="maxlength()"
+  [autocomplete]="autocomplete()"
+  [disabled]="isDisabled()"
+  (input)="onInput($event)"
+  (blur)="onBlur()"
+  class="input-base"
+/>

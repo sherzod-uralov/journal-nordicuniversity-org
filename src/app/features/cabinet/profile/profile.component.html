@@ -1,0 +1,76 @@
+<div>
+  <h1 class="font-heading text-2xl font-bold text-ink mb-8">{{ 'cabinet.profile.title' | translate }}</h1>
+
+  <!-- Loading -->
+  @if (!profile()) {
+    <div class="bg-white rounded-xl border border-alabaster/60 p-6 animate-pulse">
+      <div class="flex items-center gap-5 mb-6">
+        <div class="w-16 h-16 bg-alabaster rounded-2xl"></div>
+        <div class="flex-1 space-y-2">
+          <div class="h-5 bg-alabaster rounded w-1/3"></div>
+          <div class="h-3 bg-alabaster rounded w-1/4"></div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="h-12 bg-alabaster rounded"></div>
+        <div class="h-12 bg-alabaster rounded"></div>
+        <div class="h-12 bg-alabaster rounded"></div>
+        <div class="h-12 bg-alabaster rounded"></div>
+      </div>
+    </div>
+  }
+
+  <!-- Profile View -->
+  @if (profile(); as p) {
+    <div class="bg-white rounded-xl border border-alabaster/60 overflow-hidden">
+      <!-- Header with avatar -->
+      <div class="px-6 py-5 border-b border-alabaster/40">
+        <div class="flex items-center gap-5">
+          <div class="profile-avatar">
+            {{ avatarLetter() }}
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-ink">{{ p.full_name }}</h2>
+            <p class="text-sm text-lavender mt-0.5">{{ p.phone_number }}</p>
+            @if (p.createdAt) {
+              <p class="text-xs text-lavender/70 mt-1 inline-flex items-center gap-1.5">
+                <i class="pi pi-calendar text-[10px]"></i>
+                {{ p.createdAt | dateLocale: 'long' }}
+              </p>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Grid -->
+      <div class="p-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="info-item">
+            <span class="text-[11px] font-semibold uppercase tracking-wider text-lavender">{{ 'auth.register.degree' | translate }}</span>
+            <span class="text-sm font-medium text-ink mt-1">{{ p.science_degree || ('cabinet.profile.not_specified' | translate) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="text-[11px] font-semibold uppercase tracking-wider text-lavender">{{ 'auth.register.job' | translate }}</span>
+            <span class="text-sm font-medium text-ink mt-1">{{ p.job || ('cabinet.profile.not_specified' | translate) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="text-[11px] font-semibold uppercase tracking-wider text-lavender">{{ 'auth.register.position' | translate }}</span>
+            <span class="text-sm font-medium text-ink mt-1">{{ p.place_position || ('cabinet.profile.not_specified' | translate) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="text-[11px] font-semibold uppercase tracking-wider text-lavender">{{ 'auth.register.birthday' | translate }}</span>
+            <span class="text-sm font-medium text-ink mt-1">{{ (p.birthday | dateLocale) || ('cabinet.profile.not_specified' | translate) }}</span>
+          </div>
+          <div class="info-item sm:col-span-2">
+            <span class="text-[11px] font-semibold uppercase tracking-wider text-lavender">{{ 'auth.register.orcid' | translate }}</span>
+            @if (p.OrcID) {
+              <span class="text-sm font-medium text-ink mt-1 font-mono tracking-wider">{{ p.OrcID }}</span>
+            } @else {
+              <span class="text-sm text-lavender/70 mt-1">{{ 'cabinet.profile.not_specified' | translate }}</span>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

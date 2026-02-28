@@ -1,0 +1,40 @@
+:host {
+  display: block;
+}
+
+.otp-container {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+}
+
+.otp-box {
+  width: 60px;
+  height: 64px;
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center;
+  border: 2px solid #c8c9c5;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--color-ink, #0d1b2a);
+  caret-color: var(--color-dusk, #415a77);
+  padding: 0;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.otp-box:hover:not(:disabled) {
+  border-color: var(--color-lavender, #778da9);
+}
+
+.otp-box:focus {
+  border-color: var(--color-dusk, #415a77);
+  box-shadow: 0 0 0 3px rgba(65, 90, 119, 0.1);
+}
+
+.otp-box:disabled {
+  background: #f5f5f4;
+  color: var(--color-lavender, #778da9);
+  cursor: not-allowed;
+}

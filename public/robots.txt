@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Disallow: /cabinet/
+Disallow: /auth/
+
+Sitemap: https://journal.nordicun.uz/sitemap.xml

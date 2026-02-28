@@ -1,0 +1,90 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <app-breadcrumb [items]="breadcrumbs" />
+
+  @if (aboutStore.loading()) {
+    <div class="mt-8 space-y-6">
+      <p-skeleton width="50%" height="2rem" />
+      <p-skeleton height="1rem" />
+      <p-skeleton width="66%" height="1rem" />
+    </div>
+  } @else if (aboutStore.data(); as data) {
+    <!-- Info -->
+    <div class="mt-6 mb-12">
+      <h1 class="font-heading text-3xl sm:text-4xl font-bold text-ink mb-6">{{ 'about.title' | translate }}</h1>
+      @if (data.info?.text) {
+        <div class="prose prose-slate max-w-none text-dusk leading-relaxed" [innerHTML]="data.info!.text | safeHtml"></div>
+      }
+    </div>
+
+    <!-- Directors / Editorial Board -->
+    @if (data.directors?.length) {
+      <section class="mb-12">
+        <h2 class="font-heading text-2xl font-bold text-ink mb-6">{{ 'about.directors' | translate }}</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (dir of data.directors; track dir.id) {
+            <app-card>
+              <div class="flex items-center gap-4">
+                @if (dir.image?.file_path) {
+                  <img [src]="dir.image!.file_path | fileUrl" [alt]="dir.full_name" class="w-16 h-16 rounded-full object-cover shrink-0" />
+                } @else {
+                  <app-avatar [name]="dir.full_name" size="lg" />
+                }
+                <div>
+                  <h3 class="font-semibold text-ink">{{ dir.full_name }}</h3>
+                  <p class="text-sm text-dusk">{{ dir.position }}</p>
+                  <p class="text-xs text-lavender">{{ dir.identity }}</p>
+                </div>
+              </div>
+            </app-card>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- FAQ -->
+    @if (data.faqs?.length) {
+      <section class="mb-12">
+        <h2 class="font-heading text-2xl font-bold text-ink mb-6">{{ 'about.faq' | translate }}</h2>
+        <div class="max-w-3xl">
+          <p-accordion>
+            @for (faq of data.faqs; track faq.id) {
+              <p-accordion-panel>
+                <p-accordion-header>{{ faq.question }}</p-accordion-header>
+                <p-accordion-content>
+                  <p class="text-sm text-dusk leading-relaxed">{{ faq.answer }}</p>
+                </p-accordion-content>
+              </p-accordion-panel>
+            }
+          </p-accordion>
+        </div>
+      </section>
+    }
+
+    <!-- Members -->
+    @if (data.members?.length) {
+      <section class="mb-12">
+        <h2 class="font-heading text-2xl font-bold text-ink mb-6">{{ 'about.members' | translate }}</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-alabaster">
+                <th class="text-left py-3 px-4 font-medium text-lavender">Name</th>
+                <th class="text-left py-3 px-4 font-medium text-lavender">Direction</th>
+                <th class="text-left py-3 px-4 font-medium text-lavender">Country</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (member of data.members; track member.id) {
+                <tr class="border-b border-alabaster/40 hover:bg-alabaster/20 transition-colors">
+                  <td class="py-3 px-4 font-medium text-ink">{{ member.full_name }}</td>
+                  <td class="py-3 px-4 text-dusk">{{ member.direction }}</td>
+                  <td class="py-3 px-4 text-dusk">{{ member.country }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+  }
+</div>

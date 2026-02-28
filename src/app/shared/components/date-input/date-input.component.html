@@ -1,0 +1,11 @@
+<input
+  type="date"
+  [id]="fieldId()"
+  [value]="value()"
+  [max]="maxDateStr"
+  [min]="minDateStr"
+  [disabled]="isDisabled()"
+  (input)="onInput($event)"
+  (blur)="onBlur()"
+  class="input-base"
+/>

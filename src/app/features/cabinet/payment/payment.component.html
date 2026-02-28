@@ -1,0 +1,43 @@
+<div>
+  <h1 class="font-heading text-2xl font-bold text-ink mb-8">{{ 'cabinet.payment.title' | translate }}</h1>
+
+  @if (loading()) {
+    <div class="bg-white rounded-xl border border-alabaster/60 p-6 animate-pulse">
+      <div class="flex flex-col items-center gap-3 py-6">
+        <div class="h-4 bg-alabaster rounded w-24"></div>
+        <div class="h-10 bg-alabaster rounded w-40"></div>
+      </div>
+      <div class="border-t border-alabaster/40 pt-4 mt-4">
+        <div class="h-4 bg-alabaster rounded w-3/5"></div>
+      </div>
+      <div class="grid grid-cols-2 gap-3 mt-6">
+        <div class="h-11 bg-alabaster rounded-lg"></div>
+        <div class="h-11 bg-alabaster rounded-lg"></div>
+      </div>
+    </div>
+  } @else if (transaction(); as t) {
+    <div class="bg-white rounded-xl border border-alabaster/60 overflow-hidden">
+      <div class="text-center py-8 px-6">
+        <p class="text-sm text-lavender mb-2">{{ 'cabinet.payment.amount' | translate }}</p>
+        <p class="text-4xl font-heading font-bold text-ink">{{ t.amount | number }} UZS</p>
+      </div>
+
+      <div class="text-sm text-dusk border-t border-alabaster/40 px-6 py-4">
+        <p><span class="text-lavender">Article:</span> {{ t.article?.title }}</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 px-6 py-5 bg-[#fafaf8] border-t border-alabaster/40">
+        <button
+          (click)="payWithClick()"
+          class="flex items-center justify-center px-5 py-3 bg-white rounded-lg border border-alabaster hover:border-[#0065FF] hover:shadow-md transition-all cursor-pointer">
+          <img src="/logos/click.svg" alt="Click" class="h-8">
+        </button>
+        <button
+          (click)="payWithPayme()"
+          class="flex items-center justify-center px-5 py-3 bg-white rounded-lg border border-alabaster hover:border-[#33cccc] hover:shadow-md transition-all cursor-pointer">
+          <img src="/logos/payme.svg" alt="Payme" class="h-8">
+        </button>
+      </div>
+    </div>
+  }
+</div>

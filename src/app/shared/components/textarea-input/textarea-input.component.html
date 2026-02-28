@@ -1,0 +1,11 @@
+<textarea
+  [id]="fieldId()"
+  [value]="value()"
+  [placeholder]="placeholder()"
+  [rows]="rows()"
+  [attr.maxlength]="maxlength()"
+  [disabled]="isDisabled()"
+  (input)="onInput($event)"
+  (blur)="onBlur()"
+  class="input-base"
+></textarea>

@@ -1,0 +1,44 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <app-breadcrumb [items]="breadcrumbs" />
+
+  @if (categoryStore.loading()) {
+    <div class="mt-8 space-y-4">
+      <p-skeleton width="50%" height="2rem" />
+      <p-skeleton height="1rem" />
+    </div>
+  } @else if (categoryStore.selectedCategory(); as category) {
+    <div class="mt-6">
+      <h1 class="font-heading text-3xl font-bold text-ink mb-4">{{ category.name }}</h1>
+
+      @if (category.subCategories?.length) {
+        <div class="mb-8">
+          <h3 class="text-sm font-medium text-lavender mb-2">{{ 'category.subcategories' | translate }}</h3>
+          <div class="flex flex-wrap gap-2">
+            @for (sub of category.subCategories; track sub.id) {
+              <p-tag [value]="sub.name" severity="info" />
+            }
+          </div>
+        </div>
+      }
+
+      <h2 class="font-heading text-xl font-bold text-ink mb-6">{{ 'category.articles' | translate }}</h2>
+
+      @if (articlesLoading()) {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (i of [1,2,3]; track i) { <p-skeleton height="200px" borderRadius="12px" /> }
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (article of articles(); track article.id) {
+            <app-article-card [article]="article" />
+          }
+        </div>
+        @if (totalPages() > 1) {
+          <div class="mt-8">
+            <p-paginator [first]="first" [rows]="12" [totalRecords]="totalRecords()" (onPageChange)="onPageChange($event)" />
+          </div>
+        }
+      }
+    </div>
+  }
+</div>

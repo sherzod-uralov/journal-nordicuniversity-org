@@ -1,0 +1,43 @@
+<a
+  [routerLink]="['/news', slug]"
+  class="block bg-white rounded-xl border border-alabaster/60 overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-dusk/5 hover:-translate-y-0.5 group"
+>
+  <!-- Image -->
+  @if (news().source?.file_path) {
+    <div class="aspect-[16/9] overflow-hidden bg-alabaster">
+      <img
+        [src]="news().source!.file_path | fileUrl"
+        [alt]="news() | localize:'news_title'"
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      />
+    </div>
+  }
+
+  <div class="p-5">
+    <!-- Date & Hashtags -->
+    <div class="flex items-center gap-2 mb-2">
+      <span class="text-xs text-lavender">{{ news().createdAt | dateLocale }}</span>
+      @if (news().news_hashtags) {
+        <span class="text-xs text-dusk">#{{ news().news_hashtags }}</span>
+      }
+    </div>
+
+    <!-- Title -->
+    <h3 class="font-heading font-bold text-ink text-lg leading-snug mb-2 group-hover:text-dusk transition-colors">
+      {{ news() | localize:'news_title' | truncate:100 }}
+    </h3>
+
+    <!-- Description -->
+    <p class="text-sm text-dusk leading-relaxed mb-3">
+      {{ news() | localize:'news_description' | truncate:120 }}
+    </p>
+
+    <!-- Read More -->
+    <span class="inline-flex items-center gap-1 text-sm font-medium text-dusk group-hover:text-ink transition-colors">
+      {{ 'news.read_more' | translate }}
+      <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </span>
+  </div>
+</a>

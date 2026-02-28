@@ -1,0 +1,14 @@
+<div class="min-h-[70vh] flex items-center justify-center px-4">
+  <div class="text-center">
+    <div class="font-heading text-8xl sm:text-9xl font-bold text-alabaster mb-4">404</div>
+    <h1 class="font-heading text-2xl sm:text-3xl font-bold text-ink mb-3">
+      {{ 'not_found.title' | translate }}
+    </h1>
+    <p class="text-dusk mb-8 max-w-md mx-auto">
+      {{ 'not_found.message' | translate }}
+    </p>
+    <a routerLink="/">
+      <p-button [label]="'not_found.home' | translate" size="large" />
+    </a>
+  </div>
+</div>

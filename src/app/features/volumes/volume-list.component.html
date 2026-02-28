@@ -1,0 +1,18 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <app-breadcrumb [items]="breadcrumbs" />
+  <h1 class="font-heading text-3xl sm:text-4xl font-bold text-ink mt-6 mb-8">{{ 'volumes.title' | translate }}</h1>
+
+  @if (volumeStore.loading()) {
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+      @for (i of [1,2,3,4,5,6,7,8,9,10]; track i) {
+        <p-skeleton height="200px" borderRadius="12px" />
+      }
+    </div>
+  } @else {
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+      @for (volume of volumeStore.volumes(); track volume.id) {
+        <app-volume-card [volume]="volume" />
+      }
+    </div>
+  }
+</div>

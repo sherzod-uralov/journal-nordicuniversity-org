@@ -1,0 +1,49 @@
+<div>
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="font-heading text-2xl font-bold text-ink">{{ 'cabinet.dashboard.title' | translate }}</h1>
+    <a routerLink="/cabinet/articles/new"
+       class="inline-flex items-center gap-2 px-4 py-2.5 bg-dusk text-white text-sm font-medium rounded-lg hover:bg-prussian transition-colors">
+      <i class="pi pi-plus text-xs"></i>
+      {{ 'cabinet.articles.new' | translate }}
+    </a>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+    <app-stat-card [value]="cabinetStore.totalArticles()" [label]="'cabinet.dashboard.total' | translate" />
+    <app-stat-card [value]="cabinetStore.acceptedArticles()" [label]="'cabinet.dashboard.accepted' | translate" />
+    <app-stat-card [value]="cabinetStore.reviewArticles()" [label]="'cabinet.dashboard.review' | translate" />
+    <app-stat-card [value]="cabinetStore.rejectedArticles()" [label]="'cabinet.dashboard.rejected' | translate" />
+  </div>
+
+  <!-- Recent Articles -->
+  @if (cabinetStore.myArticles().length) {
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-heading text-lg font-bold text-ink">{{ 'cabinet.articles.title' | translate }}</h2>
+      <a routerLink="/cabinet/articles"
+         class="text-sm font-medium text-dusk hover:text-ink transition-colors inline-flex items-center gap-1">
+        {{ 'common.view' | translate }}
+        <i class="pi pi-arrow-right text-[10px]"></i>
+      </a>
+    </div>
+    <div class="space-y-3">
+      @for (article of cabinetStore.myArticles().slice(0, 5); track article.id) {
+        <div class="flex items-center gap-4 px-5 py-4 bg-white rounded-xl border border-alabaster/60 hover:shadow-sm transition-shadow">
+          <!-- Left: article info -->
+          <div class="flex-1 min-w-0">
+            <h3 class="text-sm font-semibold text-ink truncate">{{ article.title }}</h3>
+            <div class="flex items-center gap-3 mt-1">
+              @if (article.category) {
+                <span class="text-[11px] text-lavender">{{ article.category.name }}</span>
+              }
+              <span class="text-[11px] text-lavender/60">{{ article.createdAt | dateLocale }}</span>
+            </div>
+          </div>
+          <!-- Right: status -->
+          <app-article-status-badge [status]="article.status" />
+        </div>
+      }
+    </div>
+  }
+</div>

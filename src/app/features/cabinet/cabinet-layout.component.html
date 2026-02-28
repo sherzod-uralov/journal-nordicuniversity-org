@@ -1,0 +1,37 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex flex-col lg:flex-row gap-8">
+    <!-- Sidebar -->
+    <aside class="lg:w-64 shrink-0">
+      <nav class="bg-white rounded-xl border border-alabaster/60 p-2 space-y-1 lg:sticky lg:top-24">
+        @for (link of sidebarLinks; track link.path) {
+          <a
+            [routerLink]="link.path"
+            routerLinkActive="bg-ink text-white"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-dusk hover:bg-alabaster/50 rounded-lg transition-colors"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="link.icon"/>
+            </svg>
+            {{ link.label | translate }}
+          </a>
+        }
+
+        <button
+          (click)="authStore.logout()"
+          class="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+        >
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          {{ 'nav.logout' | translate }}
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Content -->
+    <div class="flex-1 min-w-0">
+      <router-outlet />
+    </div>
+  </div>
+</div>

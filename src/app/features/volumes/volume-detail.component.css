@@ -1,0 +1,12 @@
+:host {
+  display: block;
+}
+
+:host ::ng-deep .breadcrumb-light a,
+:host ::ng-deep .breadcrumb-light span {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+:host ::ng-deep .breadcrumb-light a:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
