@@ -1,0 +1,5188 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Nordic University Journal API",
+    "version": "1.0.0",
+    "description": "Nordic University ilmiy jurnal platformasi API hujjatlari"
+  },
+  "servers": [
+    {
+      "url": "https://journal2.nordicun.uz",
+      "description": "Production server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "AdminAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "authorization",
+        "description": "Admin JWT token"
+      },
+      "AuthorAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "authorization",
+        "description": "Author JWT token"
+      }
+    },
+    "schemas": {
+      "FileUpload": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "file_path": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Director": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "full_name": {
+            "type": "string"
+          },
+          "position": {
+            "type": "string"
+          },
+          "identity": {
+            "type": "string"
+          },
+          "image_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "resume_file_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer"
+          },
+          "image": {
+            "$ref": "#/components/schemas/FileUpload"
+          },
+          "resume_file": {
+            "$ref": "#/components/schemas/FileUpload"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Faq": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "question": {
+            "type": "string"
+          },
+          "answer": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Info": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "text": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Member": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "full_name": {
+            "type": "string"
+          },
+          "direction": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AboutAll": {
+        "type": "object",
+        "properties": {
+          "info": {
+            "$ref": "#/components/schemas/Info"
+          },
+          "directors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Director"
+            }
+          },
+          "faqs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Faq"
+            }
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Member"
+            }
+          }
+        }
+      },
+      "ArticleStatus": {
+        "type": "string",
+        "enum": [
+          "NEW",
+          "PLAGIARISM",
+          "REVIEW",
+          "PAYMENT",
+          "ACCEPT",
+          "REJECTED"
+        ]
+      },
+      "OrderEnum": {
+        "type": "string",
+        "enum": [
+          "ASC",
+          "DESC"
+        ]
+      },
+      "AuthorShort": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "full_name": {
+            "type": "string"
+          },
+          "phone_number": {
+            "type": "string"
+          },
+          "science_degree": {
+            "type": "string"
+          },
+          "job": {
+            "type": "string"
+          },
+          "OrcID": {
+            "type": "string"
+          }
+        }
+      },
+      "CategoryShort": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "SubCategoryShort": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "VolumeShort": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "Article": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "author_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "author": {
+            "$ref": "#/components/schemas/AuthorShort"
+          },
+          "categoryId": {
+            "type": "integer"
+          },
+          "category": {
+            "$ref": "#/components/schemas/CategoryShort"
+          },
+          "SubCategoryId": {
+            "type": "integer"
+          },
+          "SubCategory": {
+            "$ref": "#/components/schemas/SubCategoryShort"
+          },
+          "plagiarist_file_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "plagiarist_file": {
+            "$ref": "#/components/schemas/FileUpload"
+          },
+          "review_file_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "review_file": {
+            "$ref": "#/components/schemas/FileUpload"
+          },
+          "source_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "file": {
+            "$ref": "#/components/schemas/FileUpload"
+          },
+          "image_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "image": {
+            "$ref": "#/components/schemas/FileUpload"
+          },
+          "title": {
+            "type": "string"
+          },
+          "abstract": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "doi": {
+            "type": "string",
+            "nullable": true
+          },
+          "slug": {
+            "type": "string"
+          },
+          "tg_source": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/ArticleStatus"
+          },
+          "last_status": {
+            "$ref": "#/components/schemas/ArticleStatus"
+          },
+          "reason_for_rejection": {
+            "type": "string",
+            "nullable": true
+          },
+          "viewsCount": {
+            "type": "integer"
+          },
+          "volume_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "volume": {
+            "$ref": "#/components/schemas/VolumeShort"
+          },
+          "publish_date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "transaction_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "references": {
+            "type": "string",
+            "nullable": true
+          },
+          "first_page_in_volume": {
+            "type": "integer",
+            "nullable": true
+          },
+          "last_page_in_volume": {
+            "type": "integer",
+            "nullable": true
+          },
+          "isPaid": {
+            "type": "boolean"
+          },
+          "coAuthors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuthorShort"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ArticlePaginatedResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Article"
+            }
+          },
+          "count": {
+            "type": "integer"
+          },
+          "currentPage": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        }
+      },
+      "KanbanGroup": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Article"
+            }
+          }
+        }
+      },
+      "KanbanResponse": {
+        "type": "object",
+        "properties": {
+          "Yangi kelib tushgan": {
+            "$ref": "#/components/schemas/KanbanGroup"
+          },
+          "Antiplagiat tekshiruvida": {
+            "$ref": "#/components/schemas/KanbanGroup"
+          },
+          "Taqrizda": {
+            "$ref": "#/components/schemas/KanbanGroup"
+          },
+          "To'lov kutilmoqda": {
+            "$ref": "#/components/schemas/KanbanGroup"
+          },
+          "Qabul qilingan": {
+            "$ref": "#/components/schemas/KanbanGroup"
+          },
+          "Rad etilgan": {
+            "$ref": "#/components/schemas/KanbanGroup"
+          }
+        }
+      },
+      "MultiArticlesResponse": {
+        "type": "object",
+        "properties": {
+          "articles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Article"
+            }
+          },
+          "topArticles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Article"
+            }
+          },
+          "lastArticles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Article"
+            }
+          }
+        }
+      },
+      "MultiSearchPaginatedResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Article"
+            }
+          },
+          "currentPage": {
+            "type": "integer"
+          },
+          "allItems": {
+            "type": "integer"
+          },
+          "filterItems": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        }
+      },
+      "Author": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "full_name": {
+            "type": "string"
+          },
+          "science_degree": {
+            "type": "string"
+          },
+          "phone_number": {
+            "type": "string"
+          },
+          "birthday": {
+            "type": "string"
+          },
+          "job": {
+            "type": "string"
+          },
+          "OrcID": {
+            "type": "string"
+          },
+          "place_position": {
+            "type": "string"
+          },
+          "source_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "file": {
+            "$ref": "#/components/schemas/FileUpload"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AuthorLoginResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "login_data": {
+            "type": "object",
+            "properties": {
+              "access_token": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "BillingStatusEnum": {
+        "type": "string",
+        "enum": [
+          "NEW",
+          "COMPLETE",
+          "CANCELLED",
+          "ERROR",
+          "PREPARE",
+          "AwaitingConfirm",
+          "TransactionConfirmed",
+          "TransactionCancelled",
+          "TransactionCancelledAfterConfirmed"
+        ]
+      },
+      "BillingPaymentSystemEnum": {
+        "type": "string",
+        "enum": [
+          "PAYME",
+          "CLICK"
+        ]
+      },
+      "Transaction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "author_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "author": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "full_name": {
+                "type": "string"
+              },
+              "phone_number": {
+                "type": "string"
+              }
+            }
+          },
+          "article_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "article": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "title": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              }
+            }
+          },
+          "amount": {
+            "type": "number"
+          },
+          "status": {
+            "$ref": "#/components/schemas/BillingStatusEnum"
+          },
+          "isFailed": {
+            "type": "boolean"
+          },
+          "failed_note": {
+            "type": "string",
+            "nullable": true
+          },
+          "transactions_link": {
+            "type": "object",
+            "properties": {
+              "click_link": {
+                "type": "string"
+              },
+              "payme_link": {
+                "type": "string"
+              }
+            }
+          },
+          "payment_system": {
+            "$ref": "#/components/schemas/BillingPaymentSystemEnum"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "BillingDashboardResponse": {
+        "type": "object",
+        "properties": {
+          "stats": {
+            "type": "object",
+            "properties": {
+              "totalAmount": {
+                "type": "number"
+              },
+              "totalCount": {
+                "type": "integer"
+              },
+              "byStatus": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "totalAmount": {
+                      "type": "number"
+                    }
+                  }
+                }
+              },
+              "byPaymentSystem": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "payment_system": {
+                      "type": "string"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "totalAmount": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "transactions": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Transaction"
+                }
+              },
+              "totalCount": {
+                "type": "integer"
+              },
+              "currentPage": {
+                "type": "integer"
+              },
+              "totalPages": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "file_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "file": {
+            "$ref": "#/components/schemas/FileUpload"
+          },
+          "subCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubCategory"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AdminUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "username": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "News": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source": {
+            "$ref": "#/components/schemas/FileUpload"
+          },
+          "news_title_uz": {
+            "type": "string"
+          },
+          "news_title_ru": {
+            "type": "string"
+          },
+          "news_title_en": {
+            "type": "string"
+          },
+          "slug_uz": {
+            "type": "string"
+          },
+          "slug_ru": {
+            "type": "string"
+          },
+          "slug_en": {
+            "type": "string"
+          },
+          "news_time": {
+            "type": "string"
+          },
+          "news_data": {
+            "type": "integer"
+          },
+          "news_hashtags": {
+            "type": "string"
+          },
+          "news_description_uz": {
+            "type": "string"
+          },
+          "news_description_ru": {
+            "type": "string"
+          },
+          "news_description_en": {
+            "type": "string"
+          },
+          "news_body_uz": {
+            "type": "string"
+          },
+          "news_body_ru": {
+            "type": "string"
+          },
+          "news_body_en": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "NewsPaginatedResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/News"
+            }
+          },
+          "TotalCount": {
+            "type": "integer"
+          },
+          "currentPage": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        }
+      },
+      "NewsFilterPaginatedResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/News"
+            }
+          },
+          "count": {
+            "type": "integer"
+          },
+          "currentPage": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        }
+      },
+      "StatisticsResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "example": "SUCCESS"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "articles": {
+                "type": "object",
+                "properties": {
+                  "articlesCount": {
+                    "type": "object",
+                    "properties": {
+                      "articlesCount": {
+                        "type": "integer"
+                      },
+                      "acceptedArticlesCount": {
+                        "type": "integer"
+                      },
+                      "rejectedArticlesCount": {
+                        "type": "integer"
+                      }
+                    }
+                  },
+                  "mostViewedArticles": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Article"
+                    }
+                  }
+                }
+              },
+              "volumes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "articlesCount": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              },
+              "authors": {
+                "type": "object",
+                "properties": {
+                  "authorsCount": {
+                    "type": "integer"
+                  },
+                  "mostActiveAuthors": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Author"
+                    }
+                  }
+                }
+              },
+              "news": {
+                "type": "object",
+                "properties": {
+                  "newsCount": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "viewsByDevice": {
+                "type": "object",
+                "properties": {
+                  "mobile": {
+                    "type": "integer"
+                  },
+                  "desktop": {
+                    "type": "integer"
+                  },
+                  "other": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "SubCategory": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Volume": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "image_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "image": {
+            "$ref": "#/components/schemas/FileUpload"
+          },
+          "source_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source": {
+            "$ref": "#/components/schemas/FileUpload"
+          },
+          "articleCount": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Category",
+      "description": "Kategoriyalar boshqaruvi"
+    },
+    {
+      "name": "SubCategory",
+      "description": "Sub-kategoriyalar boshqaruvi"
+    },
+    {
+      "name": "Article",
+      "description": "Maqolalar boshqaruvi"
+    },
+    {
+      "name": "Author",
+      "description": "Mualliflar boshqaruvi"
+    },
+    {
+      "name": "Volume",
+      "description": "Jild (nashr) boshqaruvi"
+    },
+    {
+      "name": "News",
+      "description": "Yangiliklar boshqaruvi"
+    },
+    {
+      "name": "File",
+      "description": "Fayl yuklash"
+    },
+    {
+      "name": "Admin",
+      "description": "Admin boshqaruvi"
+    },
+    {
+      "name": "Billing",
+      "description": "To'lov tizimi"
+    },
+    {
+      "name": "SMS",
+      "description": "SMS xizmati"
+    },
+    {
+      "name": "Statistics",
+      "description": "Statistika"
+    },
+    {
+      "name": "About",
+      "description": "Jurnal haqida ma'lumotlar"
+    }
+  ],
+  "paths": {
+    "/about": {
+      "get": {
+        "summary": "Jurnal haqida barcha ma'lumotlarni olish",
+        "tags": [
+          "About"
+        ],
+        "responses": {
+          "200": {
+            "description": "Info, directors, faqs, members hammasi birgalikda",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AboutAll"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/about/director": {
+      "get": {
+        "summary": "Barcha direktorlarni olish",
+        "tags": [
+          "About"
+        ],
+        "responses": {
+          "200": {
+            "description": "Direktorlar ro'yxati (order bo'yicha DESC)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Director"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Yangi direktor qo'shish",
+        "tags": [
+          "About"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "full_name",
+                  "position",
+                  "identity",
+                  "image_id"
+                ],
+                "properties": {
+                  "full_name": {
+                    "type": "string",
+                    "example": "Alimov Sardor"
+                  },
+                  "position": {
+                    "type": "string",
+                    "example": "Bosh muharrir"
+                  },
+                  "identity": {
+                    "type": "string",
+                    "example": "PhD, professor"
+                  },
+                  "image_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "resume_file_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yaratilgan direktor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Director"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Direktorlar tartibini o'zgartirish",
+        "tags": [
+          "About"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "items"
+                ],
+                "properties": {
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "order"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "order": {
+                          "type": "integer",
+                          "example": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tartib muvaffaqiyatli yangilandi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Directors orders updated successfully."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/about/director/{id}": {
+      "put": {
+        "summary": "Direktorni yangilash",
+        "tags": [
+          "About"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Direktor ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "full_name": {
+                    "type": "string"
+                  },
+                  "position": {
+                    "type": "string"
+                  },
+                  "identity": {
+                    "type": "string"
+                  },
+                  "image_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "resume_file_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yangilangan direktor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Director"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Direktor topilmadi"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Direktorni o'chirish",
+        "tags": [
+          "About"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Direktor ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O'chirildi",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Deleted"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Direktor topilmadi"
+          }
+        }
+      }
+    },
+    "/about/faq": {
+      "get": {
+        "summary": "Barcha FAQ larni olish",
+        "tags": [
+          "About"
+        ],
+        "responses": {
+          "200": {
+            "description": "FAQ ro'yxati (createdAt bo'yicha DESC)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Faq"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Yangi FAQ qo'shish",
+        "tags": [
+          "About"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "question",
+                  "answer"
+                ],
+                "properties": {
+                  "question": {
+                    "type": "string",
+                    "example": "Maqola qanday yuboriladi?"
+                  },
+                  "answer": {
+                    "type": "string",
+                    "example": "Platformaga ro'yxatdan o'tib, maqolani yuklang."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yaratilgan FAQ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Faq"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/about/faq/{id}": {
+      "put": {
+        "summary": "FAQ ni yangilash",
+        "tags": [
+          "About"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "FAQ ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "question": {
+                    "type": "string"
+                  },
+                  "answer": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yangilangan FAQ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Faq"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "FAQ topilmadi"
+          }
+        }
+      },
+      "delete": {
+        "summary": "FAQ ni o'chirish",
+        "tags": [
+          "About"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "FAQ ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O'chirildi",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Deleted"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "FAQ topilmadi"
+          }
+        }
+      }
+    },
+    "/about/info": {
+      "get": {
+        "summary": "Jurnal info ma'lumotini olish",
+        "tags": [
+          "About"
+        ],
+        "responses": {
+          "200": {
+            "description": "Info obyekti",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Info"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Jurnal info ma'lumotini yangilash",
+        "tags": [
+          "About"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "example": "Nordic University ilmiy jurnali..."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yangilangan info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Info"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Info topilmadi"
+          }
+        }
+      }
+    },
+    "/about/member": {
+      "get": {
+        "summary": "Barcha a'zolarni olish",
+        "tags": [
+          "About"
+        ],
+        "responses": {
+          "200": {
+            "description": "A'zolar ro'yxati (createdAt bo'yicha DESC)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Member"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Yangi a'zo qo'shish",
+        "tags": [
+          "About"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "full_name",
+                  "direction",
+                  "country"
+                ],
+                "properties": {
+                  "full_name": {
+                    "type": "string",
+                    "example": "John Smith"
+                  },
+                  "direction": {
+                    "type": "string",
+                    "example": "Computer Science"
+                  },
+                  "country": {
+                    "type": "string",
+                    "example": "USA"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yaratilgan a'zo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Member"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/about/member/{id}": {
+      "put": {
+        "summary": "A'zoni yangilash",
+        "tags": [
+          "About"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "A'zo ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "full_name": {
+                    "type": "string"
+                  },
+                  "direction": {
+                    "type": "string"
+                  },
+                  "country": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yangilangan a'zo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Member"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "A'zo topilmadi"
+          }
+        }
+      },
+      "delete": {
+        "summary": "A'zoni o'chirish",
+        "tags": [
+          "About"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "A'zo ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O'chirildi",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Deleted"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "A'zo topilmadi"
+          }
+        }
+      }
+    },
+    "/article": {
+      "get": {
+        "summary": "Barcha maqolalarni olish (user side, ACCEPT statusdagilar)",
+        "tags": [
+          "Article"
+        ],
+        "responses": {
+          "200": {
+            "description": "Maqolalar ro'yxati",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Article"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Maqolalarni filter bilan olish (admin/user)",
+        "tags": [
+          "Article"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          },
+          {
+            "AuthorAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Sahifa raqami"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Har sahifada nechta"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "Umumiy qidiruv (title, author, keyword)"
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "Sarlavha bo'yicha filter"
+                  },
+                  "authorName": {
+                    "type": "string",
+                    "description": "Muallif ismi bo'yicha filter"
+                  },
+                  "authors": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Muallif ID lari ro'yxati"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Tavsif bo'yicha filter"
+                  },
+                  "keyword": {
+                    "type": "string",
+                    "description": "Kalit so'z bo'yicha filter"
+                  },
+                  "abstract": {
+                    "type": "string",
+                    "description": "Annotatsiya bo'yicha filter"
+                  },
+                  "volume_id": {
+                    "type": "string",
+                    "description": "Nashr ID si"
+                  },
+                  "status": {
+                    "$ref": "#/components/schemas/ArticleStatus"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Filterlangan maqolalar (pagination bilan)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticlePaginatedResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/article/export/excel": {
+      "get": {
+        "summary": "Maqolalarni Excel formatida yuklab olish",
+        "tags": [
+          "Article"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "volume",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nashr ID si (ixtiyoriy, berilmasa barcha maqolalar)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Excel fayl (xlsx)",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nashr topilmadi"
+          }
+        }
+      }
+    },
+    "/article/multi-search": {
+      "post": {
+        "summary": "Kengaytirilgan qidiruv (multi filter + sort + pagination)",
+        "tags": [
+          "Article"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "mainFilter"
+                ],
+                "properties": {
+                  "mainFilter": {
+                    "type": "object",
+                    "properties": {
+                      "title": {
+                        "type": "string",
+                        "description": "Sarlavha bo'yicha qidiruv"
+                      },
+                      "volume": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer"
+                        },
+                        "description": "Nashr ID lari"
+                      },
+                      "subCategory": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer"
+                        },
+                        "description": "Sub-kategoriya ID lari"
+                      },
+                      "Category": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer"
+                        },
+                        "description": "Kategoriya ID lari"
+                      },
+                      "author": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Muallif ID lari"
+                      }
+                    }
+                  },
+                  "extraFilter": {
+                    "type": "object",
+                    "properties": {
+                      "existDoi": {
+                        "type": "boolean",
+                        "description": "DOI mavjudligi bo'yicha filter"
+                      }
+                    }
+                  },
+                  "dateFilter": {
+                    "type": "object",
+                    "properties": {
+                      "start": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Boshlanish sanasi",
+                        "example": "2024-01-01"
+                      },
+                      "end": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Tugash sanasi",
+                        "example": "2025-12-31"
+                      }
+                    }
+                  },
+                  "sort": {
+                    "type": "object",
+                    "properties": {
+                      "createdAt": {
+                        "$ref": "#/components/schemas/OrderEnum"
+                      },
+                      "viewsCount": {
+                        "$ref": "#/components/schemas/OrderEnum"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Qidiruv natijalari",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultiSearchPaginatedResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Validation xatosi"
+          }
+        }
+      }
+    },
+    "/article/necessary": {
+      "get": {
+        "summary": "Asosiy sahifa uchun maqolalar (articles + top + last)",
+        "tags": [
+          "Article"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "articles",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Umumiy maqolalar limiti"
+          },
+          {
+            "in": "query",
+            "name": "topArticles",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Top maqolalar limiti"
+          },
+          {
+            "in": "query",
+            "name": "lastArticles",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Oxirgi maqolalar limiti"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Uch turdagi maqolalar",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultiArticlesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/article/create": {
+      "post": {
+        "summary": "Admin tomonidan maqola yaratish",
+        "tags": [
+          "Article"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "author_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "categoryId": {
+                    "type": "integer"
+                  },
+                  "SubCategoryId": {
+                    "type": "integer"
+                  },
+                  "plagiarist_file_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "review_file_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "source_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "image_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "abstract": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "keyword": {
+                    "type": "string"
+                  },
+                  "doi": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "$ref": "#/components/schemas/ArticleStatus"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "minimum": 1000,
+                    "description": "To'lov narxi (min 1000)"
+                  },
+                  "reason_for_rejection": {
+                    "type": "string"
+                  },
+                  "volume_id": {
+                    "type": "integer"
+                  },
+                  "coAuthorIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  },
+                  "references": {
+                    "type": "string"
+                  },
+                  "first_page_in_volume": {
+                    "type": "integer"
+                  },
+                  "last_page_in_volume": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yaratilgan maqola",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Article"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/article/update/{id}": {
+      "post": {
+        "summary": "Admin tomonidan maqolani yangilash",
+        "tags": [
+          "Article"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Maqola ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "author_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "categoryId": {
+                    "type": "integer"
+                  },
+                  "SubCategoryId": {
+                    "type": "integer"
+                  },
+                  "plagiarist_file_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "review_file_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "source_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "image_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "abstract": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "keyword": {
+                    "type": "string"
+                  },
+                  "doi": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "$ref": "#/components/schemas/ArticleStatus"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "minimum": 1000
+                  },
+                  "reason_for_rejection": {
+                    "type": "string"
+                  },
+                  "volume_id": {
+                    "type": "integer"
+                  },
+                  "coAuthorIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  },
+                  "references": {
+                    "type": "string"
+                  },
+                  "first_page_in_volume": {
+                    "type": "integer"
+                  },
+                  "last_page_in_volume": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yangilangan maqola",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Article"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Maqola topilmadi"
+          }
+        }
+      }
+    },
+    "/article/delete": {
+      "post": {
+        "summary": "Maqolani o'chirish",
+        "tags": [
+          "Article"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "O'chiriladigan maqola ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "O'chirildi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "Article deleted"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Maqola topilmadi"
+          }
+        }
+      }
+    },
+    "/article/kanban": {
+      "post": {
+        "summary": "Kanban board uchun maqolalar (status bo'yicha guruhlangan)",
+        "tags": [
+          "Article"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "authorName": {
+                    "type": "string"
+                  },
+                  "volume_id": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "$ref": "#/components/schemas/ArticleStatus"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Status bo'yicha guruhlangan maqolalar",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KanbanResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/article/top": {
+      "get": {
+        "summary": "Eng ko'p ko'rilgan maqolalar",
+        "tags": [
+          "Article"
+        ],
+        "responses": {
+          "200": {
+            "description": "Top maqolalar ro'yxati",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Article"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/article/user/create": {
+      "post": {
+        "summary": "Muallif tomonidan maqola yaratish",
+        "tags": [
+          "Article"
+        ],
+        "security": [
+          {
+            "AuthorAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "author_id",
+                  "categoryId",
+                  "SubCategoryId",
+                  "source_id",
+                  "title",
+                  "abstract",
+                  "description"
+                ],
+                "properties": {
+                  "author_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "categoryId": {
+                    "type": "integer"
+                  },
+                  "SubCategoryId": {
+                    "type": "integer"
+                  },
+                  "source_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "Yuklangan fayl ID"
+                  },
+                  "title": {
+                    "type": "string",
+                    "example": "Ilmiy maqola sarlavhasi"
+                  },
+                  "abstract": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "keyword": {
+                    "type": "string"
+                  },
+                  "coAuthorIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  },
+                  "references": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yaratilgan maqola",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Article"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/article/user/update/{slug}": {
+      "put": {
+        "summary": "Muallif tomonidan maqolani yangilash (slug bo'yicha)",
+        "tags": [
+          "Article"
+        ],
+        "security": [
+          {
+            "AuthorAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Maqola slug"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "source_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "abstract": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "keyword": {
+                    "type": "string"
+                  },
+                  "coAuthorIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  },
+                  "references": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yangilangan maqola",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Article"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Maqola topilmadi"
+          }
+        }
+      }
+    },
+    "/article/user/sort": {
+      "get": {
+        "summary": "Maqolalarni saralangan holda olish",
+        "tags": [
+          "Article"
+        ],
+        "responses": {
+          "200": {
+            "description": "Saralangan maqolalar",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Article"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/article/user/volume/{id}": {
+      "get": {
+        "summary": "Nashr bo'yicha maqolalarni olish",
+        "tags": [
+          "Article"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Volume ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Nashrga tegishli maqolalar",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Article"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/article/user/category/{id}": {
+      "get": {
+        "summary": "Kategoriya bo'yicha maqolalarni olish",
+        "tags": [
+          "Article"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Category ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kategoriyaga tegishli maqolalar",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Article"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/article/user/slug/{slug}": {
+      "get": {
+        "summary": "Slug bo'yicha maqolani olish (user side, viewsCount oshadi)",
+        "tags": [
+          "Article"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          },
+          {
+            "AuthorAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Maqola slug"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Maqola to'liq ma'lumotlari",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Article"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Maqola topilmadi"
+          }
+        }
+      }
+    },
+    "/article/user/{id}": {
+      "get": {
+        "summary": "ID bo'yicha maqolani olish (user side, viewsCount oshadi)",
+        "tags": [
+          "Article"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Maqola ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Maqola to'liq ma'lumotlari",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Article"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Maqola topilmadi"
+          }
+        }
+      }
+    },
+    "/article/{id}": {
+      "get": {
+        "summary": "Admin uchun ID bo'yicha maqolani olish",
+        "tags": [
+          "Article"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Maqola ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Maqola to'liq ma'lumotlari",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Article"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Maqola topilmadi"
+          }
+        }
+      }
+    },
+    "/author": {
+      "get": {
+        "summary": "Barcha mualliflarni olish (user side)",
+        "tags": [
+          "Author"
+        ],
+        "responses": {
+          "200": {
+            "description": "Mualliflar ro'yxati",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Author"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/author/list": {
+      "get": {
+        "summary": "Barcha mualliflarni olish (admin)",
+        "tags": [
+          "Author"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mualliflar ro'yxati",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Author"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/author/create": {
+      "post": {
+        "summary": "Muallif ro'yxatdan o'tish",
+        "tags": [
+          "Author"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "phone_number",
+                  "password",
+                  "full_name",
+                  "science_degree",
+                  "job",
+                  "place_position"
+                ],
+                "properties": {
+                  "phone_number": {
+                    "type": "string",
+                    "example": "+998901234567",
+                    "description": "+998 bilan boshlanuvchi 12 raqamli telefon"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "full_name": {
+                    "type": "string",
+                    "example": "Alimov Sardor"
+                  },
+                  "science_degree": {
+                    "type": "string",
+                    "example": "PhD"
+                  },
+                  "birthday": {
+                    "type": "string",
+                    "example": "1990-01-15"
+                  },
+                  "job": {
+                    "type": "string",
+                    "example": "Nordic University"
+                  },
+                  "place_position": {
+                    "type": "string",
+                    "example": "Professor"
+                  },
+                  "source_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "OrcID": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ro'yxatdan o'tdi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Author"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Telefon raqami allaqachon mavjud"
+          }
+        }
+      }
+    },
+    "/author/login": {
+      "post": {
+        "summary": "Muallif tizimga kirish",
+        "tags": [
+          "Author"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "phone_number",
+                  "password"
+                ],
+                "properties": {
+                  "phone_number": {
+                    "type": "string",
+                    "example": "+998901234567"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Muvaffaqiyatli kirdi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorLoginResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Telefon raqam yoki parol noto'g'ri"
+          }
+        }
+      }
+    },
+    "/author/article_author": {
+      "post": {
+        "summary": "Muallifning maqolalarini olish (author token bilan)",
+        "tags": [
+          "Author"
+        ],
+        "security": [
+          {
+            "AuthorAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Muallifning maqolalari",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Article"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/author/article_author_user": {
+      "post": {
+        "summary": "Muallifning maqolalarini olish (user side)",
+        "tags": [
+          "Author"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Muallifning maqolalari",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Article"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/author/update/{id}": {
+      "post": {
+        "summary": "Muallifni yangilash",
+        "tags": [
+          "Author"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "full_name": {
+                    "type": "string"
+                  },
+                  "science_degree": {
+                    "type": "string"
+                  },
+                  "phone_number": {
+                    "type": "string"
+                  },
+                  "birthday": {
+                    "type": "string"
+                  },
+                  "job": {
+                    "type": "string"
+                  },
+                  "OrcID": {
+                    "type": "string"
+                  },
+                  "place_position": {
+                    "type": "string"
+                  },
+                  "source_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yangilangan muallif",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Author"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/author/profile": {
+      "get": {
+        "summary": "Muallif profilini olish (token orqali)",
+        "tags": [
+          "Author"
+        ],
+        "security": [
+          {
+            "AuthorAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Muallif ma'lumotlari",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Author"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/author/{id}": {
+      "get": {
+        "summary": "ID bo'yicha muallifni olish (admin)",
+        "tags": [
+          "Author"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Muallif",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Author"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Muallifni o'chirish",
+        "tags": [
+          "Author"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O'chirildi"
+          },
+          "404": {
+            "description": "Muallif topilmadi"
+          }
+        }
+      }
+    },
+    "/dashboard": {
+      "get": {
+        "summary": "To'lovlar bo'yicha dashboard statistikasi",
+        "tags": [
+          "Billing"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "$ref": "#/components/schemas/BillingStatusEnum"
+            },
+            "description": "Status bo'yicha filter"
+          },
+          {
+            "in": "query",
+            "name": "payment_system",
+            "schema": {
+              "$ref": "#/components/schemas/BillingPaymentSystemEnum"
+            },
+            "description": "To'lov tizimi bo'yicha filter"
+          },
+          {
+            "in": "query",
+            "name": "isFailed",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Muvaffaqiyatsiz tranzaksiyalar (true/false)"
+          },
+          {
+            "in": "query",
+            "name": "author_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Muallif bo'yicha filter"
+          },
+          {
+            "in": "query",
+            "name": "date_from",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Boshlanish sanasi",
+            "example": "2024-01-01"
+          },
+          {
+            "in": "query",
+            "name": "date_to",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Tugash sanasi",
+            "example": "2025-12-31"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dashboard statistikasi va tranzaksiyalar",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingDashboardResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prepare": {
+      "post": {
+        "summary": "Click Prepare so'rovi (Click tizimi tomonidan chaqiriladi)",
+        "tags": [
+          "Billing"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Click prepare javobi"
+          }
+        }
+      }
+    },
+    "/complete": {
+      "post": {
+        "summary": "Click Complete so'rovi (Click tizimi tomonidan chaqiriladi)",
+        "tags": [
+          "Billing"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Click complete javobi"
+          }
+        }
+      }
+    },
+    "/confirm": {
+      "post": {
+        "summary": "Payme JSON-RPC so'rovi (Payme tizimi tomonidan chaqiriladi)",
+        "tags": [
+          "Billing"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "jsonrpc": {
+                    "type": "string",
+                    "example": "2.0"
+                  },
+                  "method": {
+                    "type": "string",
+                    "enum": [
+                      "CheckPerformTransaction",
+                      "CreateTransaction",
+                      "PerformTransaction",
+                      "CancelTransaction",
+                      "CheckTransaction",
+                      "GetStatement"
+                    ]
+                  },
+                  "params": {
+                    "type": "object"
+                  },
+                  "id": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payme JSON-RPC javobi"
+          }
+        }
+      }
+    },
+    "/category": {
+      "get": {
+        "summary": "Barcha kategoriyalarni olish",
+        "tags": [
+          "Category"
+        ],
+        "responses": {
+          "200": {
+            "description": "Kategoriyalar ro'yxati",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Category"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/category/create": {
+      "post": {
+        "summary": "Yangi kategoriya yaratish",
+        "tags": [
+          "Category"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "file_id"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Informatika"
+                  },
+                  "file_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yaratilgan kategoriya",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/category/update/{id}": {
+      "post": {
+        "summary": "Kategoriyani yangilash",
+        "tags": [
+          "Category"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "file_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yangilangan kategoriya",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID kiritilmagan"
+          }
+        }
+      }
+    },
+    "/category/delete/{id}": {
+      "post": {
+        "summary": "Kategoriyani o'chirish",
+        "tags": [
+          "Category"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O'chirildi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID kiritilmagan"
+          }
+        }
+      }
+    },
+    "/category/{id}": {
+      "get": {
+        "summary": "ID bo'yicha kategoriya olish",
+        "tags": [
+          "Category"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kategoriya",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID kiritilmagan"
+          }
+        }
+      }
+    },
+    "/file/upload": {
+      "post": {
+        "summary": "Fayl yuklash (admin)",
+        "tags": [
+          "File"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yuklangan fayl ma'lumotlari",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "link": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "file_path": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fayl yuborilmagan"
+          }
+        }
+      }
+    },
+    "/file/uploadFile": {
+      "post": {
+        "summary": "Fayl yuklash (muallif)",
+        "tags": [
+          "File"
+        ],
+        "security": [
+          {
+            "AuthorAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yuklangan fayl ma'lumotlari",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "link": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "file_path": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fayl yuborilmagan"
+          }
+        }
+      }
+    },
+    "/file/{id}": {
+      "get": {
+        "summary": "ID bo'yicha fayl ma'lumotini olish",
+        "tags": [
+          "File"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fayl ma'lumotlari",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileUpload"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/list": {
+      "get": {
+        "summary": "Barcha adminlarni olish",
+        "tags": [
+          "Admin"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Adminlar ro'yxati",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AdminUser"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/create": {
+      "post": {
+        "summary": "Admin ro'yxatdan o'tkazish",
+        "tags": [
+          "Admin"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "username",
+                  "password",
+                  "firstName",
+                  "lastName"
+                ],
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Admin yaratildi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AdminUser"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/login": {
+      "post": {
+        "summary": "Admin tizimga kirish",
+        "tags": [
+          "Admin"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "username",
+                  "password"
+                ],
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Muvaffaqiyatli kirdi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "access_token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Login yoki parol noto'g'ri"
+          }
+        }
+      }
+    },
+    "/admin/profile": {
+      "get": {
+        "summary": "Admin profilini olish (token orqali)",
+        "tags": [
+          "Admin"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Admin ma'lumotlari",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AdminUser"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/news": {
+      "get": {
+        "summary": "Yangilikni slug va til bo'yicha olish (user side)",
+        "tags": [
+          "News"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "slug",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Yangilik slug"
+          },
+          {
+            "in": "query",
+            "name": "lang",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "uz",
+                "ru",
+                "en"
+              ],
+              "default": "uz"
+            },
+            "description": "Til"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Yangilik yoki null",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/News"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/news/create": {
+      "post": {
+        "summary": "Yangi yangilik yaratish",
+        "tags": [
+          "News"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "source_id",
+                  "news_title_uz",
+                  "news_time",
+                  "news_data",
+                  "news_hashtags",
+                  "news_description_uz",
+                  "news_body_uz"
+                ],
+                "properties": {
+                  "source_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "news_title_uz": {
+                    "type": "string"
+                  },
+                  "news_title_ru": {
+                    "type": "string"
+                  },
+                  "news_title_en": {
+                    "type": "string"
+                  },
+                  "news_time": {
+                    "type": "string",
+                    "example": "5 min"
+                  },
+                  "news_data": {
+                    "type": "integer",
+                    "description": "Timestamp"
+                  },
+                  "news_hashtags": {
+                    "type": "string",
+                    "example": "#ilm #fan"
+                  },
+                  "news_description_uz": {
+                    "type": "string"
+                  },
+                  "news_description_ru": {
+                    "type": "string"
+                  },
+                  "news_description_en": {
+                    "type": "string"
+                  },
+                  "news_body_uz": {
+                    "type": "string"
+                  },
+                  "news_body_ru": {
+                    "type": "string"
+                  },
+                  "news_body_en": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yaratilgan yangilik",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/News"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/news/filter": {
+      "post": {
+        "summary": "Yangiliklar filter bilan (admin)",
+        "tags": [
+          "News"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Filterlangan yangiliklar",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsFilterPaginatedResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/news/list": {
+      "post": {
+        "summary": "Yangiliklar ro'yxati (user side, til bilan)",
+        "tags": [
+          "News"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "in": "query",
+            "name": "lang",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "uz",
+                "ru",
+                "en"
+              ],
+              "default": "uz"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yangiliklar",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsPaginatedResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/news/{id}": {
+      "put": {
+        "summary": "Yangilikni yangilash",
+        "tags": [
+          "News"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "source_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "news_title_uz": {
+                    "type": "string"
+                  },
+                  "news_title_ru": {
+                    "type": "string"
+                  },
+                  "news_title_en": {
+                    "type": "string"
+                  },
+                  "news_time": {
+                    "type": "string"
+                  },
+                  "news_hashtags": {
+                    "type": "string"
+                  },
+                  "news_description_uz": {
+                    "type": "string"
+                  },
+                  "news_description_ru": {
+                    "type": "string"
+                  },
+                  "news_description_en": {
+                    "type": "string"
+                  },
+                  "news_body_uz": {
+                    "type": "string"
+                  },
+                  "news_body_ru": {
+                    "type": "string"
+                  },
+                  "news_body_en": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yangilangan yangilik",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/News"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Admin uchun yangilikni ID bo'yicha olish",
+        "tags": [
+          "News"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Yangilik",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/News"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Yangilikni o'chirish",
+        "tags": [
+          "News"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O'chirildi"
+          }
+        }
+      }
+    },
+    "/sms/check-number": {
+      "post": {
+        "summary": "Telefon raqamni tekshirish va SMS kod yuborish",
+        "tags": [
+          "SMS"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "phone_number"
+                ],
+                "properties": {
+                  "phone_number": {
+                    "type": "string",
+                    "example": "+998901234567",
+                    "description": "+998 bilan boshlanuvchi 12 raqamli telefon"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tasdiqlash ID qaytariladi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "verifyID": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Telefon raqami allaqachon mavjud"
+          },
+          "429": {
+            "description": "Juda ko'p so'rov (1 daqiqa kutish kerak)"
+          }
+        }
+      }
+    },
+    "/sms/verify-number": {
+      "post": {
+        "summary": "SMS kodni tasdiqlash",
+        "tags": [
+          "SMS"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "code"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "checkNumber dan qaytgan verifyID"
+                  },
+                  "code": {
+                    "type": "integer",
+                    "example": 1234,
+                    "description": "SMS orqali yuborilgan 4 xonali kod"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tasdiqlash natijasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "matched": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statistics": {
+      "get": {
+        "summary": "Umumiy statistikani olish",
+        "tags": [
+          "Statistics"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dashboard statistikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statistics/views": {
+      "post": {
+        "summary": "Vaqt oralig'ida maqola ko'rishlar sonini olish",
+        "tags": [
+          "Statistics"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "startTime",
+                  "endTime"
+                ],
+                "properties": {
+                  "startTime": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2024-01-01"
+                  },
+                  "endTime": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2025-12-31"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Kunlik ko'rishlar soni",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "SUCCESS"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "oneOf": [
+                            {
+                              "type": "string",
+                              "description": "Sana (YYYY-MM-DD)"
+                            },
+                            {
+                              "type": "integer",
+                              "description": "Ko'rishlar soni"
+                            }
+                          ]
+                        },
+                        "example": [
+                          "2024-06-15",
+                          42
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subcategory": {
+      "get": {
+        "summary": "Barcha sub-kategoriyalarni olish",
+        "tags": [
+          "SubCategory"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sub-kategoriyalar ro'yxati",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubCategory"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subcategory/create": {
+      "post": {
+        "summary": "Yangi sub-kategoriya yaratish",
+        "tags": [
+          "SubCategory"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "categoryId"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Sun'iy intellekt"
+                  },
+                  "categoryId": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yaratilgan sub-kategoriya",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubCategory"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subcategory/update/{id}": {
+      "post": {
+        "summary": "Sub-kategoriyani yangilash",
+        "tags": [
+          "SubCategory"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "categoryId": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yangilangan sub-kategoriya",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubCategory"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID kiritilmagan"
+          }
+        }
+      }
+    },
+    "/subcategory/delete/{id}": {
+      "delete": {
+        "summary": "Sub-kategoriyani o'chirish",
+        "tags": [
+          "SubCategory"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O'chirildi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID kiritilmagan"
+          }
+        }
+      }
+    },
+    "/subcategory/sub": {
+      "post": {
+        "summary": "Kategoriya ID lari bo'yicha sub-kategoriyalarni olish",
+        "tags": [
+          "SubCategory"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id_list"
+                ],
+                "properties": {
+                  "id_list": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "example": [
+                      1,
+                      2,
+                      3
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sub-kategoriyalar",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubCategory"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subcategory/sub/{id}": {
+      "get": {
+        "summary": "Kategoriya ID bo'yicha sub-kategoriyalarni olish",
+        "tags": [
+          "SubCategory"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Kategoriya ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sub-kategoriyalar",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubCategory"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subcategory/{id}": {
+      "get": {
+        "summary": "ID bo'yicha sub-kategoriya olish",
+        "tags": [
+          "SubCategory"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sub-kategoriya",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubCategory"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID kiritilmagan"
+          }
+        }
+      }
+    },
+    "/volume": {
+      "get": {
+        "summary": "Barcha nashrlarni olish",
+        "tags": [
+          "Volume"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          },
+          {
+            "AuthorAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Nashrlar ro'yxati",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Volume"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/volume/create": {
+      "post": {
+        "summary": "Yangi nashr yaratish",
+        "tags": [
+          "Volume"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "image_id",
+                  "source_id",
+                  "description"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "example": "Vol 1, Issue 2"
+                  },
+                  "image_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "source_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yaratilgan nashr",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Volume"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/volume/{id}": {
+      "post": {
+        "summary": "Nashrni yangilash",
+        "tags": [
+          "Volume"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "image_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "source_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yangilangan nashr",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Volume"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "ID bo'yicha nashrni olish",
+        "tags": [
+          "Volume"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Nashr",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Volume"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/volume/delete/{id}": {
+      "delete": {
+        "summary": "Nashrni o'chirish",
+        "tags": [
+          "Volume"
+        ],
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O'chirildi"
+          },
+          "404": {
+            "description": "Nashr topilmadi"
+          }
+        }
+      }
+    }
+  }
+}

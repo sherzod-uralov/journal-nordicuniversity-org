@@ -1,1 +1,92 @@
-/* You can add global styles to this file, and also import other style files */
+@layer tailwind, primeng;
+
+@import "tailwindcss";
+@import "primeicons/primeicons.css";
+
+@plugin "tailwindcss-primeui";
+
+@theme {
+  --color-ink: #0d1b2a;
+  --color-prussian: #1b263b;
+  --color-dusk: #415a77;
+  --color-lavender: #778da9;
+  --color-alabaster: #e0e1dd;
+
+  --font-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+}
+
+/* Base styles */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background-color: #fafaf8;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+code, pre, .font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-alabaster);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-lavender);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-dusk);
+}
+
+/* PrimeNG Toast — fix padding */
+.p-toast-message-content {
+  padding: 0.875rem 1rem;
+  gap: 0.625rem;
+}
+
+.p-toast-message-text {
+  margin: 0;
+}
+
+.p-toast-summary {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.p-toast-detail {
+  font-size: 0.8125rem;
+  margin-top: 0.125rem;
+}
+
+/* Focus — disable browser outline on PrimeNG, theme handles it via tokens */
+[class*="p-"] :focus-visible,
+[class*="p-"]:focus-visible {
+  outline: none;
+}
+
+/* Selection */
+::selection {
+  background-color: var(--color-dusk);
+  color: white;
+}
