@@ -244,40 +244,6 @@
   outline-offset: 2px;
 }
 
-/* ── Toggle Switch ── */
-.toggle-switch {
-  position: relative;
-  cursor: pointer;
-}
-
-.toggle-track {
-  width: 2.25rem;
-  height: 1.25rem;
-  background: var(--color-alabaster);
-  border-radius: 999px;
-  transition: background-color 0.2s ease;
-  position: relative;
-}
-
-.toggle-switch.is-on .toggle-track {
-  background: var(--color-dusk);
-}
-
-.toggle-thumb {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 0.875rem;
-  height: 0.875rem;
-  background: white;
-  border-radius: 50%;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.toggle-switch.is-on .toggle-thumb {
-  transform: translateX(1rem);
-}
 
 /* ── Date Input ── */
 .date-input {

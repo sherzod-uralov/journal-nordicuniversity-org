@@ -25,7 +25,7 @@ export class HeaderComponent {
     { path: '/articles', label: 'nav.articles', exact: false },
     { path: '/volumes', label: 'nav.volumes', exact: false },
     { path: '/categories', label: 'nav.categories', exact: false },
-    { path: '/authors', label: 'nav.authors', exact: false },
+    { path: '/guidelines', label: 'nav.guidelines', exact: false },
     { path: '/news', label: 'nav.news', exact: false },
     { path: '/about', label: 'nav.about', exact: false },
   ];

@@ -1,0 +1,20 @@
+<div class="collapsible" [class.collapsible--open]="expanded()">
+  <button class="collapsible-header" (click)="toggle()">
+    <div class="collapsible-label">
+      @if (icon()) {
+        <ng-container *ngTemplateOutlet="icon()!" />
+      }
+      <span>{{ title() }}</span>
+    </div>
+    <svg class="collapsible-chevron" [class.collapsible-chevron--open]="expanded()" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  </button>
+  <div class="collapsible-body-wrapper" [class.collapsible-body-wrapper--open]="expanded()">
+    <div class="collapsible-body-inner">
+      <div class="collapsible-body">
+        <ng-content />
+      </div>
+    </div>
+  </div>
+</div>

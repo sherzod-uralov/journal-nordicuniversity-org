@@ -1,6 +1,6 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <app-breadcrumb [items]="breadcrumbs" />
-  <h1 class="font-heading text-3xl sm:text-4xl font-bold text-ink mt-6 mb-8">{{ 'news.title' | translate }}</h1>
+<app-page-header [breadcrumbs]="breadcrumbs" [titleKey]="'news.title'" />
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
 
   @if (newsStore.loading()) {
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -14,7 +14,7 @@
     </div>
     @if (newsStore.totalPages() > 1) {
       <div class="mt-8">
-        <p-paginator [first]="first" [rows]="12" [totalRecords]="newsStore.totalPages() * 12" (onPageChange)="onPageChange($event)" />
+        <p-paginator [first]="first" [rows]="12" [totalRecords]="newsStore.totalCount()" (onPageChange)="onPageChange($event)" />
       </div>
     }
   }

@@ -1,90 +1,126 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <app-breadcrumb [items]="breadcrumbs" />
+<app-page-header [breadcrumbs]="breadcrumbs" [titleKey]="'about.title'" />
 
-  @if (aboutStore.loading()) {
-    <div class="mt-8 space-y-6">
-      <p-skeleton width="50%" height="2rem" />
+@if (aboutStore.loading()) {
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="space-y-6">
+      <p-skeleton width="60%" height="2rem" />
       <p-skeleton height="1rem" />
-      <p-skeleton width="66%" height="1rem" />
+      <p-skeleton width="80%" height="1rem" />
+      <p-skeleton width="45%" height="1rem" />
     </div>
-  } @else if (aboutStore.data(); as data) {
-    <!-- Info -->
-    <div class="mt-6 mb-12">
-      <h1 class="font-heading text-3xl sm:text-4xl font-bold text-ink mb-6">{{ 'about.title' | translate }}</h1>
-      @if (data.info?.text) {
-        <div class="prose prose-slate max-w-none text-dusk leading-relaxed" [innerHTML]="data.info!.text | safeHtml"></div>
-      }
-    </div>
+  </div>
+} @else if (aboutStore.data(); as data) {
 
-    <!-- Directors / Editorial Board -->
-    @if (data.directors?.length) {
-      <section class="mb-12">
-        <h2 class="font-heading text-2xl font-bold text-ink mb-6">{{ 'about.directors' | translate }}</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          @for (dir of data.directors; track dir.id) {
-            <app-card>
-              <div class="flex items-center gap-4">
-                @if (dir.image?.file_path) {
-                  <img [src]="dir.image!.file_path | fileUrl" [alt]="dir.full_name" class="w-16 h-16 rounded-full object-cover shrink-0" />
-                } @else {
-                  <app-avatar [name]="dir.full_name" size="lg" />
-                }
-                <div>
-                  <h3 class="font-semibold text-ink">{{ dir.full_name }}</h3>
-                  <p class="text-sm text-dusk">{{ dir.position }}</p>
-                  <p class="text-xs text-lavender">{{ dir.identity }}</p>
+  <!-- ══ Info Section ══ -->
+  @if (data.info?.text) {
+    <section class="about-info-section">
+      <div class="about-container">
+        <div class="info-content" appScrollAnimate="fade-up">
+          <div class="info-accent"></div>
+          <div class="info-text" [innerHTML]="data.info!.text | safeHtml"></div>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- ══ Editorial Board ══ -->
+  @if (data.directors?.length) {
+    <section class="about-section">
+      <div class="about-container">
+        <div class="section-heading" appScrollAnimate="fade-up">
+          <span class="section-tag">{{ 'about.directors' | translate }}</span>
+          <div class="section-line"></div>
+        </div>
+
+        <!-- Featured director (first one) -->
+        @if (data.directors![0]; as lead) {
+          <div class="director-featured" appScrollAnimate="fade-up">
+            <div class="director-featured-img">
+              @if (lead.image?.file_path) {
+                <img [src]="lead.image!.file_path | fileUrl" [alt]="lead.full_name" />
+              } @else {
+                <app-avatar [name]="lead.full_name" size="lg" />
+              }
+            </div>
+            <div class="director-featured-info">
+              <h3 class="director-featured-name font-heading">{{ lead.full_name }}</h3>
+              <p class="director-featured-position">{{ lead.position }}</p>
+              <p class="director-featured-identity">{{ lead.identity }}</p>
+            </div>
+          </div>
+        }
+
+        <!-- Rest of directors -->
+        @if (data.directors!.length > 1) {
+          <div class="directors-grid">
+            @for (dir of data.directors!.slice(1); track dir.id) {
+              <div class="director-card" appScrollAnimate="fade-up">
+                <div class="director-card-img">
+                  @if (dir.image?.file_path) {
+                    <img [src]="dir.image!.file_path | fileUrl" [alt]="dir.full_name" />
+                  } @else {
+                    <app-avatar [name]="dir.full_name" size="lg" />
+                  }
+                </div>
+                <div class="director-card-info">
+                  <h3 class="director-card-name font-heading">{{ dir.full_name }}</h3>
+                  <p class="director-card-position">{{ dir.position }}</p>
+                  <p class="director-card-identity">{{ dir.identity }}</p>
                 </div>
               </div>
-            </app-card>
+            }
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- ══ FAQ ══ -->
+  @if (data.faqs?.length) {
+    <section class="about-section about-section--alt">
+      <div class="about-container">
+        <div class="section-heading" appScrollAnimate="fade-up">
+          <span class="section-tag">{{ 'about.faq' | translate }}</span>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="faq-list">
+          @for (faq of data.faqs; track faq.id; let i = $index) {
+            <div appScrollAnimate="fade-up">
+              <app-collapsible [title]="faq.question">
+                <p class="faq-answer">{{ faq.answer }}</p>
+              </app-collapsible>
+            </div>
           }
         </div>
-      </section>
-    }
-
-    <!-- FAQ -->
-    @if (data.faqs?.length) {
-      <section class="mb-12">
-        <h2 class="font-heading text-2xl font-bold text-ink mb-6">{{ 'about.faq' | translate }}</h2>
-        <div class="max-w-3xl">
-          <p-accordion>
-            @for (faq of data.faqs; track faq.id) {
-              <p-accordion-panel>
-                <p-accordion-header>{{ faq.question }}</p-accordion-header>
-                <p-accordion-content>
-                  <p class="text-sm text-dusk leading-relaxed">{{ faq.answer }}</p>
-                </p-accordion-content>
-              </p-accordion-panel>
-            }
-          </p-accordion>
-        </div>
-      </section>
-    }
-
-    <!-- Members -->
-    @if (data.members?.length) {
-      <section class="mb-12">
-        <h2 class="font-heading text-2xl font-bold text-ink mb-6">{{ 'about.members' | translate }}</h2>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="border-b border-alabaster">
-                <th class="text-left py-3 px-4 font-medium text-lavender">Name</th>
-                <th class="text-left py-3 px-4 font-medium text-lavender">Direction</th>
-                <th class="text-left py-3 px-4 font-medium text-lavender">Country</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (member of data.members; track member.id) {
-                <tr class="border-b border-alabaster/40 hover:bg-alabaster/20 transition-colors">
-                  <td class="py-3 px-4 font-medium text-ink">{{ member.full_name }}</td>
-                  <td class="py-3 px-4 text-dusk">{{ member.direction }}</td>
-                  <td class="py-3 px-4 text-dusk">{{ member.country }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      </section>
-    }
+      </div>
+    </section>
   }
-</div>
+
+  <!-- ══ International Advisory Board ══ -->
+  @if (data.members?.length) {
+    <section class="about-section">
+      <div class="about-container">
+        <div class="section-heading" appScrollAnimate="fade-up">
+          <span class="section-tag">{{ 'about.members' | translate }}</span>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="members-grid">
+          @for (member of data.members; track member.id) {
+            <div class="member-card" appScrollAnimate="fade-up">
+              <div class="member-flag">
+                <svg class="member-flag-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.75 21h16.5M4 3h16M5.625 3v18M18.375 3v18M7.5 6.75h9M7.5 9.75h9M7.5 12.75h6"/>
+                </svg>
+              </div>
+              <h4 class="member-name font-heading">{{ member.full_name }}</h4>
+              <p class="member-direction">{{ member.direction }}</p>
+              <span class="member-country">{{ member.country }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+}

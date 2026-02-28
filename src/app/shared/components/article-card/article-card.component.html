@@ -1,6 +1,6 @@
 <a
   [routerLink]="['/articles', article().slug]"
-  class="block bg-white rounded-xl border border-alabaster/60 overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-dusk/5 hover:-translate-y-0.5 group"
+  class="flex flex-col h-full bg-white rounded-xl border border-alabaster/60 overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-dusk/5 hover:-translate-y-0.5 group"
 >
   @if (!compact() && article().image?.file_path) {
     <div class="aspect-[16/9] overflow-hidden bg-alabaster">
@@ -12,11 +12,13 @@
     </div>
   }
 
-  <div class="p-5">
+  <div class="p-5 flex-1 flex flex-col">
     <!-- Category & Date -->
     <div class="flex items-center gap-2 mb-3">
       @if (article().category?.name) {
-        <p-tag [value]="article().category!.name" severity="info" [rounded]="true" />
+        <span class="inline-block px-2.5 py-1 bg-dusk/8 text-dusk text-[11px] font-semibold rounded-md">
+          {{ article().category!.name }}
+        </span>
       }
       @if (article().publish_date) {
         <span class="text-xs text-lavender">{{ article().publish_date | dateLocale }}</span>
@@ -37,7 +39,7 @@
     }
 
     <!-- Footer -->
-    <div class="flex items-center justify-between pt-3 border-t border-alabaster/40">
+    <div class="flex items-center justify-between pt-3 border-t border-alabaster/40 mt-auto">
       <div class="flex items-center gap-2">
         <div class="w-7 h-7 rounded-full bg-dusk/10 flex items-center justify-center">
           <span class="text-xs font-semibold text-dusk">

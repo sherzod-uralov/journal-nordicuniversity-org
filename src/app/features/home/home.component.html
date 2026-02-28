@@ -1,9 +1,6 @@
 <!-- Hero Section -->
-<section class="relative bg-ink overflow-hidden">
-  <!-- Subtle academic pattern -->
+<section class="relative bg-prussian overflow-hidden">
   <div class="absolute inset-0 hero-grid-pattern opacity-[0.03]"></div>
-
-  <!-- Decorative bottom line -->
   <div class="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-lavender/20 to-transparent"></div>
 
   <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
@@ -69,10 +66,9 @@
               <a [routerLink]="['/articles', article.slug]"
                  class="hero-card"
                  [attr.data-pos]="getCardPos(i)">
-                <!-- Category & Date -->
                 <div class="flex items-center gap-2 mb-3">
                   @if (article.category?.name) {
-                    <span class="px-2 py-0.5 bg-dusk/8 text-dusk text-[10px] font-semibold rounded">
+                    <span class="px-2.5 py-1 bg-dusk/8 text-dusk text-[10px] font-semibold rounded-md">
                       {{ article.category!.name }}
                     </span>
                   }
@@ -80,18 +76,12 @@
                     <span class="text-[10px] text-lavender">{{ article.publish_date | dateLocale }}</span>
                   }
                 </div>
-
-                <!-- Title -->
                 <h3 class="font-heading text-lg font-bold text-ink leading-snug mb-2 line-clamp-2">
                   {{ article.title }}
                 </h3>
-
-                <!-- Abstract -->
                 @if (article.abstract) {
                   <p class="text-[13px] text-dusk/70 leading-relaxed line-clamp-3 mb-4">{{ article.abstract }}</p>
                 }
-
-                <!-- Footer -->
                 <div class="mt-auto pt-3 border-t border-alabaster/50 flex items-center gap-2.5">
                   <span class="w-7 h-7 rounded-full bg-gradient-to-br from-dusk to-prussian text-white text-[10px] font-bold flex items-center justify-center shrink-0">
                     {{ article.author?.full_name?.charAt(0) || 'A' }}
@@ -111,8 +101,6 @@
                 </div>
               </a>
             }
-
-            <!-- Slide indicators -->
             <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 flex gap-2">
               @for (article of sliderArticles(); track article.id; let i = $index) {
                 <button (click)="currentSlide.set(i)"
@@ -123,7 +111,6 @@
             </div>
           </div>
         } @else {
-          <!-- Skeleton while loading -->
           <div class="hero-card-stack">
             <div class="hero-card-skeleton"></div>
             <div class="hero-card-skeleton" style="transform: translateY(16px) translateX(12px) scale(0.97); opacity: 0.5;"></div>
@@ -155,7 +142,7 @@
   </div>
 </section>
 
-<!-- Top Articles (2 ta katta card) -->
+<!-- Featured: Newspaper Layout (1 big + 3 sidebar) -->
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
   <div class="flex items-end justify-between mb-10" appScrollAnimate="fade-up">
     <div>
@@ -169,18 +156,30 @@
   </div>
 
   @if (articleStore.loading()) {
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      @for (i of [1,2]; track i) {
-        <p-skeleton height="320px" borderRadius="12px" />
-      }
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      <div class="lg:col-span-3">
+        <p-skeleton height="420px" borderRadius="12px" />
+      </div>
+      <div class="lg:col-span-2 flex flex-col gap-4">
+        @for (i of [1,2,3]; track i) {
+          <p-skeleton height="124px" borderRadius="12px" />
+        }
+      </div>
     </div>
   } @else {
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      @for (article of articleStore.featuredArticles(); track article.id) {
-        <div appScrollAnimate="fade-up">
-          <app-article-card [article]="article" />
+    <div class="featured-layout" appScrollAnimate="fade-up">
+      <!-- Big featured card -->
+      @if (featuredMain(); as mainArticle) {
+        <div class="featured-main">
+          <app-article-card [article]="mainArticle" />
         </div>
       }
+      <!-- Sidebar compact cards -->
+      <div class="featured-sidebar">
+        @for (article of featuredSidebar(); track article.id) {
+          <app-article-card [article]="article" [compact]="true" />
+        }
+      </div>
     </div>
   }
 </section>
@@ -217,7 +216,7 @@
   </div>
 </section>
 
-<!-- Latest Articles -->
+<!-- Latest Articles (2 col compact) -->
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
   <div class="flex items-end justify-between mb-10" appScrollAnimate="fade-up">
     <div>
@@ -247,8 +246,39 @@
   }
 </section>
 
+<!-- Indexed In -->
+<section class="py-16 lg:py-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-10" appScrollAnimate="fade-up">
+      <span class="text-dusk text-xs font-medium tracking-[0.15em] uppercase">{{ 'home.indexed_label' | translate }}</span>
+      <h2 class="font-heading text-2xl sm:text-3xl font-bold text-ink mt-1">{{ 'home.indexed' | translate }}</h2>
+    </div>
+
+    <div class="grid grid-cols-3 sm:grid-cols-6 items-center justify-items-center gap-y-10 gap-x-6" appScrollAnimate="fade-up">
+      <a href="https://scholar.google.com" target="_blank" rel="noopener noreferrer" class="indexed-item">
+        <img src="/logos/google-scholar.svg" alt="Google Scholar" class="indexed-logo" />
+      </a>
+      <a href="https://orcid.org" target="_blank" rel="noopener noreferrer" class="indexed-item">
+        <img src="/logos/orcid.svg" alt="ORCID" class="indexed-logo" />
+      </a>
+      <a href="https://www.crossref.org" target="_blank" rel="noopener noreferrer" class="indexed-item">
+        <img src="/logos/crossref.svg" alt="Crossref" class="indexed-logo" />
+      </a>
+      <a href="https://www.doi.org" target="_blank" rel="noopener noreferrer" class="indexed-item">
+        <img src="/logos/doi.svg" alt="DOI" class="indexed-logo" />
+      </a>
+      <a href="https://www.semanticscholar.org" target="_blank" rel="noopener noreferrer" class="indexed-item">
+        <img src="/logos/semantic-scholar.svg" alt="Semantic Scholar" class="indexed-logo" />
+      </a>
+      <a href="https://journals.indexcopernicus.com" target="_blank" rel="noopener noreferrer" class="indexed-item">
+        <img src="/logos/index-copernicus.svg" alt="Index Copernicus" class="indexed-logo" />
+      </a>
+    </div>
+  </div>
+</section>
+
 <!-- Volumes -->
-<section class="bg-alabaster/30 border-y border-alabaster/60 py-16 lg:py-20">
+<section class="py-16 lg:py-20">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-end justify-between mb-10" appScrollAnimate="fade-up">
       <div>

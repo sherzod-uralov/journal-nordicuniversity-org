@@ -1,7 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthorStore } from '@store/author.store';
-import { BreadcrumbComponent, BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
+import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
+import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
 import { CardComponent } from '@shared/components/card/card.component';
 import { AvatarComponent } from '@shared/components/avatar/avatar.component';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
@@ -12,7 +13,7 @@ import { Skeleton } from 'primeng/skeleton';
 @Component({
   selector: 'app-author-list',
   standalone: true,
-  imports: [RouterLink, BreadcrumbComponent, CardComponent, AvatarComponent, TranslatePipe, Paginator, Skeleton],
+  imports: [RouterLink, PageHeaderComponent, CardComponent, AvatarComponent, TranslatePipe, Paginator, Skeleton],
   templateUrl: './author-list.component.html',
   styleUrl: './author-list.component.css',
 })

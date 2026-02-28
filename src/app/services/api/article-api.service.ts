@@ -41,11 +41,8 @@ export class ArticleApiService {
     return this.http.get<Article[]>(`${this.baseUrl}/user/volume/${volumeId}`);
   }
 
-  getByCategory(categoryId: number, params?: { page?: number; limit?: number }): Observable<PaginatedResponse<Article>> {
-    let httpParams = new HttpParams();
-    if (params?.page) httpParams = httpParams.set('page', params.page);
-    if (params?.limit) httpParams = httpParams.set('limit', params.limit);
-    return this.http.get<PaginatedResponse<Article>>(`${this.baseUrl}/category/${categoryId}`, { params: httpParams });
+  getByCategory(categoryId: number): Observable<Article[]> {
+    return this.http.get<Article[]>(`${this.baseUrl}/user/category/${categoryId}`);
   }
 
   getByAuthor(authorId: string): Observable<Article[]> {

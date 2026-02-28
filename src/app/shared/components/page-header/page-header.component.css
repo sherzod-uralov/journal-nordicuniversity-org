@@ -1,0 +1,108 @@
+.page-hero {
+  position: relative;
+  background: linear-gradient(135deg, #1b3352 0%, #1b4b80 40%, #2a6aab 100%);
+  padding: 1.25rem 1rem 4rem;
+  text-align: center;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .page-hero {
+    padding: 1.5rem 1.5rem 4.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page-hero {
+    padding: 1.5rem 2rem 4.5rem;
+  }
+}
+
+.page-hero-pattern {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+.page-hero-breadcrumb {
+  position: relative;
+  max-width: 80rem;
+  margin: 0 auto 0.75rem;
+  text-align: left;
+}
+
+.page-hero-title {
+  position: relative;
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 640px) {
+  .page-hero-title {
+    font-size: 1.625rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page-hero-title {
+    font-size: 1.875rem;
+  }
+}
+
+/* ── Projected content area ── */
+.page-hero-content {
+  position: relative;
+  max-width: 80rem;
+  margin: 0 auto;
+}
+
+.page-hero-content:empty {
+  display: none;
+}
+
+/* Light breadcrumb on dark hero */
+:host ::ng-deep .breadcrumb-light a,
+:host ::ng-deep .breadcrumb-light span {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+:host ::ng-deep .breadcrumb-light a:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ═══════ Layered waves ═══════ */
+.page-hero-wave {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 70px;
+}
+
+@media (min-width: 640px) {
+  .page-hero-wave {
+    height: 90px;
+  }
+}
+
+.wave-1 {
+  fill: rgba(255, 255, 255, 0.08);
+}
+
+.wave-2 {
+  fill: rgba(255, 255, 255, 0.2);
+}
+
+.wave-3 {
+  fill: white;
+}

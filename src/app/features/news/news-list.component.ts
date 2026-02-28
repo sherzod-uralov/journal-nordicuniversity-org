@@ -1,7 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { NewsStore } from '@store/news.store';
 import { NewsCardComponent } from '@shared/components/news-card/news-card.component';
-import { BreadcrumbComponent, BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
+import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
+import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { SeoService } from '@core/services/seo.service';
 import { Paginator } from 'primeng/paginator';
@@ -10,7 +11,7 @@ import { Skeleton } from 'primeng/skeleton';
 @Component({
   selector: 'app-news-list',
   standalone: true,
-  imports: [NewsCardComponent, BreadcrumbComponent, TranslatePipe, Paginator, Skeleton],
+  imports: [NewsCardComponent, PageHeaderComponent, TranslatePipe, Paginator, Skeleton],
   templateUrl: './news-list.component.html',
   styleUrl: './news-list.component.css',
 })

@@ -16,7 +16,7 @@ export class FooterComponent {
     { path: '/articles', label: 'nav.articles' },
     { path: '/volumes', label: 'nav.volumes' },
     { path: '/categories', label: 'nav.categories' },
-    { path: '/authors', label: 'nav.authors' },
+    { path: '/guidelines', label: 'nav.guidelines' },
     { path: '/news', label: 'nav.news' },
     { path: '/about', label: 'nav.about' },
   ];

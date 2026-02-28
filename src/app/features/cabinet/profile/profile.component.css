@@ -6,7 +6,7 @@
   width: 4rem;
   height: 4rem;
   border-radius: 1rem;
-  background: linear-gradient(135deg, var(--color-dusk, #415a77), var(--color-prussian, #1b263b));
+  background: linear-gradient(135deg, var(--color-dusk, #1e5799), var(--color-prussian, #1b3352));
   color: #fff;
   display: flex;
   align-items: center;

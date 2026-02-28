@@ -36,6 +36,17 @@ export class HomeComponent implements OnInit {
 
   readonly sliderArticles = computed(() => this.articleStore.latestArticles().slice(0, 3));
 
+  readonly featuredMain = computed(() => this.articleStore.featuredArticles()[0] ?? null);
+
+  readonly featuredSidebar = computed(() => {
+    const featured = this.articleStore.featuredArticles().slice(1);
+    if (featured.length >= 3) return featured.slice(0, 3);
+    const home = this.articleStore.homeArticles().filter(
+      a => a.id !== this.featuredMain()?.id && !featured.some(f => f.id === a.id)
+    );
+    return [...featured, ...home].slice(0, 3);
+  });
+
   constructor() {
     afterNextRender(() => {
       const interval = setInterval(() => {

@@ -9,7 +9,8 @@ import { SubCategory } from '@core/models/category.model';
 import { ArticleFilterBody } from '@core/models/article.model';
 import { ArticleCardComponent } from '@shared/components/article-card/article-card.component';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
-import { BreadcrumbComponent, BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
+import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
+import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { ScrollAnimateDirective } from '@shared/directives/scroll-animate.directive';
 import { SeoService } from '@core/services/seo.service';
@@ -17,7 +18,7 @@ import { Paginator } from 'primeng/paginator';
 import { Skeleton } from 'primeng/skeleton';
 import { Checkbox } from 'primeng/checkbox';
 import { RadioButton } from 'primeng/radiobutton';
-import { ToggleSwitch } from 'primeng/toggleswitch';
+import { ToggleSwitchComponent } from '@shared/components/toggle-switch/toggle-switch.component';
 import { DatePicker } from 'primeng/datepicker';
 
 @Component({
@@ -25,10 +26,10 @@ import { DatePicker } from 'primeng/datepicker';
   standalone: true,
   imports: [
     DatePipe, FormsModule, ArticleCardComponent,
-    EmptyStateComponent, BreadcrumbComponent,
+    EmptyStateComponent, PageHeaderComponent,
     TranslatePipe, ScrollAnimateDirective,
     Paginator, Skeleton, Checkbox, RadioButton,
-    ToggleSwitch, DatePicker,
+    ToggleSwitchComponent, DatePicker,
   ],
   templateUrl: './article-list.component.html',
   styleUrl: './article-list.component.css',

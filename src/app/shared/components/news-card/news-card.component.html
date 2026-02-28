@@ -1,5 +1,5 @@
 <a
-  [routerLink]="['/news', slug]"
+  [routerLink]="['/news', news().slug]"
   class="block bg-white rounded-xl border border-alabaster/60 overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-dusk/5 hover:-translate-y-0.5 group"
 >
   <!-- Image -->
@@ -7,7 +7,7 @@
     <div class="aspect-[16/9] overflow-hidden bg-alabaster">
       <img
         [src]="news().source!.file_path | fileUrl"
-        [alt]="news() | localize:'news_title'"
+        [alt]="news().title"
         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
       />
     </div>
@@ -16,20 +16,20 @@
   <div class="p-5">
     <!-- Date & Hashtags -->
     <div class="flex items-center gap-2 mb-2">
-      <span class="text-xs text-lavender">{{ news().createdAt | dateLocale }}</span>
-      @if (news().news_hashtags) {
-        <span class="text-xs text-dusk">#{{ news().news_hashtags }}</span>
+      <span class="text-xs text-lavender">{{ news().time | dateLocale }}</span>
+      @if (news().hashtags) {
+        <span class="text-xs text-dusk">#{{ news().hashtags }}</span>
       }
     </div>
 
     <!-- Title -->
     <h3 class="font-heading font-bold text-ink text-lg leading-snug mb-2 group-hover:text-dusk transition-colors">
-      {{ news() | localize:'news_title' | truncate:100 }}
+      {{ news().title | truncate:100 }}
     </h3>
 
     <!-- Description -->
     <p class="text-sm text-dusk leading-relaxed mb-3">
-      {{ news() | localize:'news_description' | truncate:120 }}
+      {{ news().description | truncate:120 }}
     </p>
 
     <!-- Read More -->

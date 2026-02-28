@@ -6,7 +6,8 @@ import { Article } from '@core/models/article.model';
 import { ArticleCardComponent } from '@shared/components/article-card/article-card.component';
 import { Skeleton } from 'primeng/skeleton';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
-import { BreadcrumbComponent, BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
+import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
+import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
 import { FileUrlPipe } from '@shared/pipes/file-url.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { SafeHtmlPipe } from '@shared/pipes/safe-html.pipe';
@@ -20,7 +21,7 @@ import { environment } from '@env';
   standalone: true,
   imports: [
     RouterLink, ArticleCardComponent, Skeleton,
-    EmptyStateComponent, BreadcrumbComponent, FileUrlPipe,
+    EmptyStateComponent, PageHeaderComponent, FileUrlPipe,
     TranslatePipe, SafeHtmlPipe, DateLocalePipe, ScrollAnimateDirective,
   ],
   templateUrl: './volume-detail.component.html',

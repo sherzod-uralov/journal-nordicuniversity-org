@@ -13,7 +13,7 @@
 }
 
 .tag-container--focused {
-  border-color: #415a77;
+  border-color: #1e5799;
   box-shadow: 0 0 0 3px rgba(65, 90, 119, 0.1);
 }
 
@@ -32,7 +32,7 @@
   border-radius: 0.375rem;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: #1b263b;
+  color: #1b3352;
   line-height: 1.4;
   animation: tag-appear 0.15s ease;
 }
@@ -52,14 +52,14 @@
   border: none;
   background: transparent;
   cursor: pointer;
-  color: #778da9;
+  color: #7793b3;
   transition: color 0.15s, background 0.15s;
   padding: 0;
 }
 
 .tag-remove:hover {
   background: #d5dde6;
-  color: #0d1b2a;
+  color: #0f1c2e;
 }
 
 .tag-text-input {
@@ -69,12 +69,12 @@
   outline: none;
   background: transparent;
   font-size: 0.875rem;
-  color: #0d1b2a;
+  color: #0f1c2e;
   padding: 0.25rem 0;
 }
 
 .tag-text-input::placeholder {
-  color: #778da9;
+  color: #7793b3;
 }
 
 .tag-text-input:disabled {

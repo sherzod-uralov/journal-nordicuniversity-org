@@ -2,11 +2,33 @@
   display: block;
 }
 
-:host ::ng-deep .breadcrumb-light a,
-:host ::ng-deep .breadcrumb-light span {
-  color: rgba(255, 255, 255, 0.6);
+.vol-cover {
+  width: 12rem;
+  flex-shrink: 0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-:host ::ng-deep .breadcrumb-light a:hover {
-  color: rgba(255, 255, 255, 0.9);
+@media (min-width: 768px) {
+  .vol-cover {
+    width: 14rem;
+  }
+}
+
+.vol-cover-img {
+  width: 100%;
+  display: block;
+}
+
+.vol-cover-fallback {
+  aspect-ratio: 3 / 4;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--color-prussian), var(--color-dusk));
 }

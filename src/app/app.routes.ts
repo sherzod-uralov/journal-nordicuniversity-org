@@ -32,10 +32,6 @@ export const routes: Routes = [
     loadComponent: () => import('@features/categories/category-detail.component').then(m => m.CategoryDetailComponent),
   },
   {
-    path: 'authors',
-    loadComponent: () => import('@features/authors/author-list.component').then(m => m.AuthorListComponent),
-  },
-  {
     path: 'authors/:id',
     loadComponent: () => import('@features/authors/author-detail.component').then(m => m.AuthorDetailComponent),
   },
@@ -46,6 +42,10 @@ export const routes: Routes = [
   {
     path: 'news/:slug',
     loadComponent: () => import('@features/news/news-detail.component').then(m => m.NewsDetailComponent),
+  },
+  {
+    path: 'guidelines',
+    loadComponent: () => import('@features/guidelines/guidelines.component').then(m => m.GuidelinesComponent),
   },
   {
     path: 'about',

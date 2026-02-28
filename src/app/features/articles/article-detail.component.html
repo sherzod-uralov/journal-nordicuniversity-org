@@ -1,19 +1,17 @@
 @if (articleStore.loading()) {
-  <!-- Skeleton Loading -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <p-skeleton width="12rem" height="1rem" />
-    <div class="mt-8 space-y-4">
-      <p-skeleton width="6rem" height="1rem" />
-      <p-skeleton width="100%" height="1.75rem" />
-      <p-skeleton width="75%" height="1.75rem" />
+  <app-page-header [breadcrumbs]="breadcrumbs()" title="..." />
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="space-y-4">
+      <p-skeleton width="60%" height="1.5rem" />
+      <p-skeleton width="40%" height="1rem" />
       <div class="flex gap-3 mt-6">
-        <p-skeleton shape="circle" size="3rem" />
+        <p-skeleton shape="circle" size="2.75rem" />
         <div class="space-y-2">
           <p-skeleton width="10rem" height="1rem" />
-          <p-skeleton width="6rem" height="1rem" />
+          <p-skeleton width="6rem" height="0.75rem" />
         </div>
       </div>
-      <div class="h-px bg-alabaster my-6"></div>
+      <div class="h-px bg-alabaster my-8"></div>
       <p-skeleton width="100%" height="1rem" />
       <p-skeleton width="100%" height="1rem" />
       <p-skeleton width="83%" height="1rem" />
@@ -22,169 +20,105 @@
     </div>
   </div>
 } @else if (article(); as a) {
-  <!-- Hero Header -->
-  <div class="bg-gradient-to-br from-ink via-prussian to-dusk">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
-      <app-breadcrumb [items]="breadcrumbs()" class="breadcrumb-light" />
-
-      <div class="mt-8" appScrollAnimate="fade-up">
-        <!-- Category & Volume badges -->
-        <div class="flex flex-wrap items-center gap-2 mb-5">
-          @if (a.category?.name) {
-            <a [routerLink]="['/categories', a.categoryId]" class="inline-flex items-center px-3 py-1 rounded-full bg-white/15 text-white/90 text-xs font-medium backdrop-blur-sm hover:bg-white/25 transition-colors">
-              {{ a.category!.name }}
-            </a>
-          }
-          @if (a.SubCategory?.name) {
-            <span class="inline-flex items-center px-3 py-1 rounded-full bg-white/10 text-white/70 text-xs font-medium">
-              {{ a.SubCategory!.name }}
-            </span>
-          }
-          @if (a.volume?.title) {
-            <a [routerLink]="['/volumes', a.volume_id]" class="inline-flex items-center px-3 py-1 rounded-full bg-white/10 text-white/70 text-xs font-medium hover:bg-white/20 transition-colors">
-              <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-              {{ a.volume!.title }}
-            </a>
+  <app-page-header [breadcrumbs]="breadcrumbs()" [title]="a.title">
+    <!-- Hero metadata -->
+    <div class="hero-meta">
+      <!-- Author -->
+      <a [routerLink]="['/authors', a.author_id]" class="hero-author">
+        <app-avatar [name]="a.author?.full_name ?? ''" size="md" />
+        <div>
+          <span class="hero-author-name">{{ a.author?.full_name }}</span>
+          @if (a.author?.science_degree) {
+            <span class="hero-author-degree">{{ a.author!.science_degree }}</span>
           }
         </div>
+      </a>
 
-        <!-- Title -->
-        <h1 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-6">
-          {{ a.title }}
-        </h1>
-
-        <!-- Author row -->
-        <div class="flex flex-wrap items-center gap-4 mb-6">
-          <a [routerLink]="['/authors', a.author_id]" class="flex items-center gap-3 group">
-            <app-avatar [name]="a.author?.full_name ?? ''" size="md" />
-            <div>
-              <span class="text-sm font-semibold text-white group-hover:text-alabaster transition-colors">
-                {{ a.author?.full_name }}
-              </span>
-              @if (a.author?.science_degree) {
-                <div class="text-xs text-white/60">{{ a.author!.science_degree }}</div>
-              }
-            </div>
+      <!-- Meta chips -->
+      <div class="hero-chips">
+        @if (a.category?.name) {
+          <a [routerLink]="['/categories', a.categoryId]" class="hero-chip hero-chip--category">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+            {{ a.category!.name }}
           </a>
-
-          @if (a.coAuthors?.length) {
-            <div class="hidden sm:block w-px h-8 bg-white/20"></div>
-            <div class="flex flex-wrap items-center gap-1.5">
-              <span class="text-xs text-white/50 mr-1">{{ 'article.coauthors' | translate }}:</span>
-              @for (co of a.coAuthors; track co.id; let last = $last) {
-                <a [routerLink]="['/authors', co.id]" class="text-xs text-white/70 hover:text-white transition-colors">
-                  {{ co.full_name }}{{ !last ? ',' : '' }}
-                </a>
-              }
-            </div>
-          }
-        </div>
-
-        <!-- Meta stats row -->
-        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/60">
-          @if (a.publish_date) {
-            <span class="flex items-center gap-1.5">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-              {{ a.publish_date | dateLocale:'long' }}
-            </span>
-          }
-          <span class="flex items-center gap-1.5">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-            {{ a.viewsCount }} {{ 'article.views' | translate }}
+        }
+        @if (a.publish_date) {
+          <span class="hero-chip">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            {{ a.publish_date | dateLocale:'long' }}
           </span>
-          @if (a.first_page_in_volume && a.last_page_in_volume) {
-            <span class="flex items-center gap-1.5">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-              {{ 'article.pages' | translate }}: {{ a.first_page_in_volume }}-{{ a.last_page_in_volume }}
-            </span>
-          }
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Action bar (floating below hero) -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-10 mb-10" appScrollAnimate="fade-up">
-    <div class="bg-white rounded-2xl shadow-lg border border-alabaster/60 px-6 py-4 flex flex-wrap items-center gap-3">
-      <!-- DOI -->
-      @if (a.doi) {
-        <div class="flex items-center gap-2 mr-auto">
-          <span class="font-mono text-[10px] font-bold uppercase tracking-wider bg-ink text-white px-2 py-0.5 rounded">DOI</span>
-          <a href="https://doi.org/{{ a.doi }}" target="_blank" rel="noopener" class="font-mono text-xs text-dusk hover:text-ink transition-colors underline decoration-dusk/30 hover:decoration-ink">
-            {{ a.doi }}
+        }
+        <span class="hero-chip">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          {{ a.viewsCount }}
+        </span>
+        @if (a.volume?.title) {
+          <a [routerLink]="['/volumes', a.volume_id]" class="hero-chip">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            {{ a.volume!.title }}
           </a>
-        </div>
-      } @else {
-        <div class="mr-auto"></div>
-      }
-
-      <!-- Download PDF -->
-      @if (a.file?.file_path) {
-        <button (click)="downloadPdf()" class="inline-flex items-center gap-2 px-4 py-2 bg-ink text-white rounded-xl text-sm font-medium hover:bg-prussian transition-colors">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          {{ 'article.download' | translate }}
-        </button>
-      }
-
-      <!-- Cite -->
-      <div class="relative">
-        <button (click)="toggleCiteModal()" class="inline-flex items-center gap-2 px-4 py-2 border border-alabaster rounded-xl text-sm font-medium text-ink hover:bg-alabaster/40 transition-colors">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
-          {{ 'article.cite' | translate }}
-        </button>
-
-        <!-- Cite dropdown -->
-        @if (showCiteModal()) {
-          <div class="absolute right-0 top-full mt-2 w-96 max-w-[90vw] bg-white rounded-xl shadow-xl border border-alabaster/60 p-4 z-50">
-            <div class="flex items-center justify-between mb-3">
-              <h4 class="text-sm font-semibold text-ink">{{ 'article.cite' | translate }}</h4>
-              <button (click)="toggleCiteModal()" class="text-lavender hover:text-ink transition-colors">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-              </button>
-            </div>
-            <div class="bg-alabaster/30 rounded-lg p-3 text-xs text-dusk leading-relaxed font-mono mb-3 max-h-32 overflow-y-auto">
-              {{ citationText() }}
-            </div>
-            <button (click)="copyCitation()" class="w-full inline-flex items-center justify-center gap-2 px-3 py-2 bg-ink text-white rounded-lg text-xs font-medium hover:bg-prussian transition-colors">
-              @if (copiedCitation()) {
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                Copied!
-              } @else {
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
-                Copy Citation
-              }
-            </button>
-          </div>
+        }
+        @if (a.first_page_in_volume && a.last_page_in_volume) {
+          <span class="hero-chip">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            pp. {{ a.first_page_in_volume }}–{{ a.last_page_in_volume }}
+          </span>
         }
       </div>
 
+      <!-- DOI -->
+      @if (a.doi) {
+        <div class="hero-doi">
+          <span class="hero-doi-label">DOI</span>
+          <a href="https://doi.org/{{ a.doi }}" target="_blank" rel="noopener" class="hero-doi-link">
+            {{ a.doi }}
+          </a>
+        </div>
+      }
+    </div>
+  </app-page-header>
+
+  <!-- Toolbar -->
+  <div class="toolbar-strip no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-end gap-2">
+      <!-- Reading mode toggle -->
+      <button (click)="readingMode.set(!readingMode())" class="toolbar-btn" [class.toolbar-btn--active]="readingMode()">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      </button>
+
+      <!-- Download -->
+      @if (a.file?.file_path) {
+        <button (click)="downloadPdf()" class="toolbar-btn-primary">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <span class="hidden sm:inline">{{ 'article.download' | translate }}</span>
+        </button>
+      }
+
       <!-- Share -->
       <div class="relative">
-        <button (click)="toggleShareMenu()" class="inline-flex items-center gap-2 px-4 py-2 border border-alabaster rounded-xl text-sm font-medium text-ink hover:bg-alabaster/40 transition-colors">
+        <button (click)="toggleShareMenu()" class="toolbar-btn">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
-          {{ 'article.share' | translate }}
         </button>
 
         @if (copiedLink()) {
           <span class="absolute -top-8 right-0 text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-1 rounded-lg whitespace-nowrap">Link copied!</span>
         }
 
-        <!-- Share dropdown -->
         @if (showShareMenu()) {
-          <div class="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-xl border border-alabaster/60 py-2 z-50">
-            <button (click)="copyLink()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-ink hover:bg-alabaster/30 transition-colors">
+          <div class="share-dropdown">
+            <button (click)="copyLink()" class="share-item">
               <svg class="w-4 h-4 text-lavender" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
               Copy Link
             </button>
-            <button (click)="shareToTelegram()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-ink hover:bg-alabaster/30 transition-colors">
+            <button (click)="shareToTelegram()" class="share-item">
               <svg class="w-4 h-4 text-[#2AABEE]" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
               Telegram
             </button>
-            <button (click)="shareToTwitter()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-ink hover:bg-alabaster/30 transition-colors">
+            <button (click)="shareToTwitter()" class="share-item">
               <svg class="w-4 h-4 text-ink" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
               X (Twitter)
             </button>
-            <button (click)="shareToFacebook()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-ink hover:bg-alabaster/30 transition-colors">
+            <button (click)="shareToFacebook()" class="share-item">
               <svg class="w-4 h-4 text-[#1877F2]" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
               Facebook
             </button>
@@ -195,31 +129,65 @@
   </div>
 
   <!-- Content Area -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-    <div class="flex flex-col lg:flex-row gap-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
+    <div class="content-layout" [class.reading-mode]="readingMode()">
 
-      <!-- Main Content -->
-      <div class="flex-1 min-w-0">
+      <!-- Main Column -->
+      <article class="content-main">
+
+        <!-- Author Bar -->
+        <div class="author-bar no-print" appScrollAnimate="fade-up">
+          <a [routerLink]="['/authors', a.author_id]" class="flex items-center gap-3 group">
+            <app-avatar [name]="a.author?.full_name ?? ''" size="md" />
+            <div>
+              <span class="text-sm font-semibold text-ink group-hover:text-dusk transition-colors">
+                {{ a.author?.full_name }}
+              </span>
+              @if (a.author?.science_degree) {
+                <div class="text-xs text-lavender">{{ a.author!.science_degree }}</div>
+              }
+            </div>
+          </a>
+
+          @if (a.coAuthors?.length) {
+            <div class="hidden sm:block w-px h-8 bg-alabaster"></div>
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="text-xs text-lavender mr-1">{{ 'article.coauthors' | translate }}:</span>
+              @for (co of a.coAuthors; track co.id; let last = $last) {
+                <a [routerLink]="['/authors', co.id]" class="text-xs text-dusk hover:text-ink transition-colors">
+                  {{ co.full_name }}{{ !last ? ',' : '' }}
+                </a>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Article Source File -->
+        @if (pdfUrl()) {
+          <section class="content-section no-print" appScrollAnimate="fade-up">
+            <app-collapsible [title]="('article.source_file' | translate)" [open]="true">
+              <ng-template #icon>
+                <svg class="w-5 h-5 text-dusk" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              </ng-template>
+              <app-pdf-viewer [src]="pdfUrl()" />
+            </app-collapsible>
+          </section>
+        }
+
         <!-- Abstract -->
         @if (a.abstract) {
-          <section class="mb-10" appScrollAnimate="fade-up">
-            <h2 class="flex items-center gap-2 font-heading text-xl font-bold text-ink mb-4">
-              <span class="w-1 h-6 bg-dusk rounded-full"></span>
-              {{ 'article.abstract' | translate }}
-            </h2>
-            <div class="bg-alabaster/20 border-l-4 border-dusk/30 rounded-r-xl p-5">
-              <p class="text-dusk leading-relaxed text-[15px]">{{ a.abstract }}</p>
+          <section class="content-section no-print" appScrollAnimate="fade-up">
+            <h2 class="section-title">{{ 'article.abstract' | translate }}</h2>
+            <div class="abstract-block">
+              <p class="text-dusk leading-relaxed">{{ a.abstract }}</p>
             </div>
           </section>
         }
 
         <!-- Keywords -->
         @if (keywords().length) {
-          <section class="mb-10" appScrollAnimate="fade-up">
-            <h2 class="flex items-center gap-2 font-heading text-xl font-bold text-ink mb-4">
-              <span class="w-1 h-6 bg-dusk rounded-full"></span>
-              {{ 'article.keywords' | translate }}
-            </h2>
+          <section class="content-section no-print" appScrollAnimate="fade-up">
+            <h2 class="section-title">{{ 'article.keywords' | translate }}</h2>
             <div class="flex flex-wrap gap-2">
               @for (kw of keywords(); track kw) {
                 <app-tag [label]="kw" />
@@ -228,110 +196,204 @@
           </section>
         }
 
-        <!-- Description / Body -->
+        <!-- Body -->
         @if (a.description) {
-          <section class="mb-10" appScrollAnimate="fade-up">
+          <section class="content-section no-print" appScrollAnimate="fade-up">
             <div class="article-content" [innerHTML]="a.description | safeHtml"></div>
           </section>
         }
 
         <!-- References -->
         @if (a.references) {
-          <section class="mb-10" appScrollAnimate="fade-up">
-            <h2 class="flex items-center gap-2 font-heading text-xl font-bold text-ink mb-4">
-              <span class="w-1 h-6 bg-dusk rounded-full"></span>
-              {{ 'article.references' | translate }}
-            </h2>
-            <div class="bg-alabaster/20 rounded-xl p-5">
-              <div class="text-sm text-dusk leading-relaxed whitespace-pre-line references-list">{{ a.references }}</div>
+          <section class="content-section no-print" appScrollAnimate="fade-up">
+            <h2 class="section-title">{{ 'article.references' | translate }}</h2>
+            <div class="references-block">
+              <div class="text-sm text-dusk leading-relaxed whitespace-pre-line">{{ a.references }}</div>
             </div>
           </section>
         }
-      </div>
 
-      <!-- Sidebar -->
-      <aside class="lg:w-80 shrink-0">
-        <div class="sticky top-4 space-y-6">
-
-          <!-- Article Info Card -->
-          <div class="bg-white border border-alabaster rounded-2xl overflow-hidden shadow-sm" appScrollAnimate="fade-up">
-            <!-- Image -->
-            @if (a.image?.file_path) {
-              <div class="aspect-[16/10] overflow-hidden">
-                <img [src]="a.image!.file_path | fileUrl" [alt]="a.title" class="w-full h-full object-cover" />
+        <!-- Citation -->
+        <section class="content-section no-print" appScrollAnimate="fade-up">
+          <h2 class="section-title">{{ 'article.citation' | translate }}</h2>
+          <div class="citation-block">
+            <div class="citation-header">
+              <label class="text-xs font-semibold text-lavender uppercase tracking-wider">{{ 'article.citation.style' | translate }}</label>
+              <!-- Custom citation style select -->
+              <div class="cite-select" (appClickOutside)="closeStyleDropdown()">
+                <button type="button" class="cite-select-trigger" (click)="toggleStyleDropdown()">
+                  <span>{{ selectedStyleLabel() }}</span>
+                  <svg class="cite-select-chevron" [class.cite-select-chevron--open]="styleDropdownOpen()" width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+                  </svg>
+                </button>
+                @if (styleDropdownOpen()) {
+                  <div class="cite-select-dropdown">
+                    @for (style of citationStyles; track style.value) {
+                      <button
+                        type="button"
+                        class="cite-select-item"
+                        [class.cite-select-item--active]="style.value === selectedCitationStyle()"
+                        (click)="onCitationStyleChange(style.value)"
+                      >
+                        {{ style.label }}
+                      </button>
+                    }
+                  </div>
+                }
               </div>
-            }
-
-            <div class="p-5 space-y-4">
-              <h3 class="text-sm font-semibold text-ink uppercase tracking-wider">{{ 'article.volume' | translate }}</h3>
-
-              <!-- Info rows -->
-              <div class="space-y-3">
-                @if (a.publish_date) {
-                  <div class="flex items-start gap-3">
-                    <svg class="w-4 h-4 text-lavender mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    <div>
-                      <div class="text-xs text-lavender">{{ 'article.published' | translate }}</div>
-                      <div class="text-sm text-ink font-medium">{{ a.publish_date | dateLocale:'long' }}</div>
-                    </div>
-                  </div>
+            </div>
+            <div class="citation-text">{{ citationText() }}</div>
+            <div class="citation-actions">
+              <button (click)="copyCitation()" class="citation-btn citation-btn--primary">
+                @if (copiedCitation()) {
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  {{ 'article.citation.copied' | translate }}
+                } @else {
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                  {{ 'article.citation.copy' | translate }}
                 }
-
-                @if (a.category?.name) {
-                  <div class="flex items-start gap-3">
-                    <svg class="w-4 h-4 text-lavender mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-                    <div>
-                      <div class="text-xs text-lavender">{{ 'article.category' | translate }}</div>
-                      <a [routerLink]="['/categories', a.categoryId]" class="text-sm text-dusk font-medium hover:text-ink transition-colors">{{ a.category!.name }}</a>
-                    </div>
-                  </div>
-                }
-
-                @if (a.volume?.title) {
-                  <div class="flex items-start gap-3">
-                    <svg class="w-4 h-4 text-lavender mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                    <div>
-                      <div class="text-xs text-lavender">{{ 'article.volume' | translate }}</div>
-                      <a [routerLink]="['/volumes', a.volume_id]" class="text-sm text-dusk font-medium hover:text-ink transition-colors">{{ a.volume!.title }}</a>
-                    </div>
-                  </div>
-                }
-
-                @if (a.first_page_in_volume && a.last_page_in_volume) {
-                  <div class="flex items-start gap-3">
-                    <svg class="w-4 h-4 text-lavender mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    <div>
-                      <div class="text-xs text-lavender">{{ 'article.pages' | translate }}</div>
-                      <div class="text-sm text-ink font-medium">{{ a.first_page_in_volume }} – {{ a.last_page_in_volume }}</div>
-                    </div>
-                  </div>
-                }
-
-                <div class="flex items-start gap-3">
-                  <svg class="w-4 h-4 text-lavender mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                  <div>
-                    <div class="text-xs text-lavender">{{ 'article.views' | translate }}</div>
-                    <div class="text-sm text-ink font-medium">{{ a.viewsCount }}</div>
-                  </div>
-                </div>
-
-                @if (a.doi) {
-                  <div class="flex items-start gap-3">
-                    <svg class="w-4 h-4 text-lavender mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                    <div class="min-w-0">
-                      <div class="text-xs text-lavender">{{ 'article.doi' | translate }}</div>
-                      <a href="https://doi.org/{{ a.doi }}" target="_blank" rel="noopener" class="text-sm text-dusk font-mono hover:text-ink transition-colors break-all">{{ a.doi }}</a>
-                    </div>
+              </button>
+              <!-- Custom export select -->
+              <div class="cite-select cite-select--export" (appClickOutside)="closeExportDropdown()">
+                <button type="button" class="citation-btn" (click)="toggleExportDropdown()">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                  {{ 'article.citation.export' | translate }}
+                  <svg class="cite-select-chevron" [class.cite-select-chevron--open]="exportDropdownOpen()" width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+                  </svg>
+                </button>
+                @if (exportDropdownOpen()) {
+                  <div class="cite-select-dropdown cite-select-dropdown--right">
+                    @for (fmt of exportFormats; track fmt.value) {
+                      <button
+                        type="button"
+                        class="cite-select-item"
+                        (click)="exportCitation(fmt.value)"
+                      >
+                        <span>{{ fmt.label }}</span>
+                        <span class="cite-select-ext">{{ fmt.ext }}</span>
+                      </button>
+                    }
                   </div>
                 }
               </div>
             </div>
           </div>
+        </section>
+
+        <!-- License -->
+        <section class="content-section no-print" appScrollAnimate="fade-up">
+          <h2 class="section-title">{{ 'article.license' | translate }}</h2>
+          <div class="license-block">
+            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener" class="license-badge">
+              <svg class="w-20 h-7" viewBox="0 0 120 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="120" height="42" rx="4" fill="#EF9421"/>
+                <text x="8" y="16" font-size="9" font-weight="700" fill="white" font-family="Arial, sans-serif">CREATIVE</text>
+                <text x="8" y="28" font-size="9" font-weight="700" fill="white" font-family="Arial, sans-serif">COMMONS</text>
+                <circle cx="85" cy="21" r="12" fill="white"/>
+                <text x="79" y="26" font-size="13" font-weight="700" fill="#EF9421" font-family="Arial, sans-serif">CC</text>
+                <circle cx="108" cy="21" r="9" fill="white"/>
+                <text x="101" y="25" font-size="10" font-weight="700" fill="#EF9421" font-family="Arial, sans-serif">BY</text>
+              </svg>
+            </a>
+            <div class="license-content">
+              <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener" class="text-sm font-semibold text-dusk hover:text-ink transition-colors">
+                Creative Commons Attribution 4.0 International (CC BY 4.0)
+              </a>
+              <p class="text-sm text-lavender leading-relaxed mt-1">{{ 'article.license.text' | translate }}</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Certificates -->
+        @if (a.certificates?.length) {
+          @for (cert of a.certificates; track cert.id) {
+            <section class="content-section no-print" appScrollAnimate="fade-up">
+              <app-collapsible [title]="('article.certificate.for' | translate) + ' ' + (cert.author?.full_name ?? '')">
+                <ng-template #icon>
+                  <svg class="w-5 h-5 text-dusk" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                </ng-template>
+                <app-pdf-viewer [src]="cert.certificate_link" />
+              </app-collapsible>
+            </section>
+          }
+        }
+      </article>
+
+      <!-- Sidebar -->
+      <aside class="content-sidebar no-print">
+        <div class="sticky top-24 space-y-5">
+
+          <!-- Article Info -->
+          <div class="sidebar-card" appScrollAnimate="fade-up">
+            @if (a.image?.file_path) {
+              <div class="sidebar-card-img">
+                <img [src]="a.image!.file_path | fileUrl" [alt]="a.title" class="w-full h-full object-cover" />
+              </div>
+            }
+            <div class="p-5 space-y-3.5">
+              <div class="info-row">
+                <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <div>
+                  <div class="info-label">{{ 'article.published' | translate }}</div>
+                  <div class="info-value">{{ a.publish_date | dateLocale:'long' }}</div>
+                </div>
+              </div>
+
+              @if (a.category?.name) {
+                <div class="info-row">
+                  <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                  <div>
+                    <div class="info-label">{{ 'article.category' | translate }}</div>
+                    <a [routerLink]="['/categories', a.categoryId]" class="info-value text-dusk hover:text-ink transition-colors">{{ a.category!.name }}</a>
+                  </div>
+                </div>
+              }
+
+              @if (a.volume?.title) {
+                <div class="info-row">
+                  <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                  <div>
+                    <div class="info-label">{{ 'article.volume' | translate }}</div>
+                    <a [routerLink]="['/volumes', a.volume_id]" class="info-value text-dusk hover:text-ink transition-colors">{{ a.volume!.title }}</a>
+                  </div>
+                </div>
+              }
+
+              @if (a.first_page_in_volume && a.last_page_in_volume) {
+                <div class="info-row">
+                  <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                  <div>
+                    <div class="info-label">{{ 'article.pages' | translate }}</div>
+                    <div class="info-value">{{ a.first_page_in_volume }} – {{ a.last_page_in_volume }}</div>
+                  </div>
+                </div>
+              }
+
+              <div class="info-row">
+                <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                <div>
+                  <div class="info-label">{{ 'article.views' | translate }}</div>
+                  <div class="info-value">{{ a.viewsCount }}</div>
+                </div>
+              </div>
+
+              @if (a.doi) {
+                <div class="info-row">
+                  <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                  <div class="min-w-0">
+                    <div class="info-label">{{ 'article.doi' | translate }}</div>
+                    <a href="https://doi.org/{{ a.doi }}" target="_blank" rel="noopener" class="info-value text-dusk font-mono text-xs hover:text-ink transition-colors break-all">{{ a.doi }}</a>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
 
           <!-- Author Card -->
-          <div class="bg-white border border-alabaster rounded-2xl p-5 shadow-sm" appScrollAnimate="fade-up">
-            <h3 class="text-sm font-semibold text-ink uppercase tracking-wider mb-4">{{ 'article.author' | translate }}</h3>
-
+          <div class="sidebar-card p-5" appScrollAnimate="fade-up">
+            <h3 class="text-xs font-semibold text-lavender uppercase tracking-wider mb-4">{{ 'article.author' | translate }}</h3>
             <a [routerLink]="['/authors', a.author_id]" class="flex items-center gap-3 group mb-3">
               <app-avatar [name]="a.author?.full_name ?? ''" size="lg" />
               <div>
@@ -343,21 +405,19 @@
             </a>
 
             @if (a.author?.job) {
-              <div class="text-xs text-dusk mb-1">
+              <p class="text-xs text-dusk mt-2">
                 <span class="text-lavender">{{ 'author.workplace' | translate }}:</span> {{ a.author!.job }}
-              </div>
+              </p>
             }
-
             @if (a.author?.OrcID) {
-              <div class="text-xs text-dusk">
+              <p class="text-xs text-dusk mt-1">
                 <span class="text-lavender">ORCID:</span>
-                <a href="https://orcid.org/{{ a.author!.OrcID }}" target="_blank" rel="noopener" class="text-dusk hover:text-ink transition-colors ml-1">{{ a.author!.OrcID }}</a>
-              </div>
+                <a href="https://orcid.org/{{ a.author!.OrcID }}" target="_blank" rel="noopener" class="hover:text-ink transition-colors ml-1 font-mono">{{ a.author!.OrcID }}</a>
+              </p>
             }
 
-            <!-- Co-authors -->
             @if (a.coAuthors?.length) {
-              <div class="mt-4 pt-4 border-t border-alabaster">
+              <div class="mt-4 pt-4 border-t border-alabaster/60">
                 <h4 class="text-xs font-semibold text-lavender uppercase tracking-wider mb-3">{{ 'article.coauthors' | translate }}</h4>
                 <div class="space-y-2.5">
                   @for (co of a.coAuthors; track co.id) {
@@ -378,7 +438,7 @@
 
           <!-- Download Card -->
           @if (a.file?.file_path) {
-            <div class="bg-gradient-to-br from-ink to-prussian rounded-2xl p-5 text-white shadow-sm" appScrollAnimate="fade-up">
+            <div class="download-card" appScrollAnimate="fade-up">
               <div class="flex items-center gap-3 mb-3">
                 <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
                   <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -393,10 +453,8 @@
               </button>
             </div>
           }
-
         </div>
       </aside>
-
     </div>
   </div>
 }

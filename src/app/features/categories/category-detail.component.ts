@@ -1,20 +1,20 @@
-import { Component, inject, OnInit, OnDestroy, input, signal } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, input, signal, computed } from '@angular/core';
 import { CategoryStore } from '@store/category.store';
 import { ArticleApiService } from '@services/api/article-api.service';
 import { Article } from '@core/models/article.model';
-import { PaginatedResponse } from '@core/models/api-response.model';
 import { ArticleCardComponent } from '@shared/components/article-card/article-card.component';
-import { BreadcrumbComponent, BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
+import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
+import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
+import { ScrollAnimateDirective } from '@shared/directives/scroll-animate.directive';
 import { SeoService } from '@core/services/seo.service';
-import { Paginator } from 'primeng/paginator';
 import { Skeleton } from 'primeng/skeleton';
-import { Tag } from 'primeng/tag';
 
 @Component({
   selector: 'app-category-detail',
   standalone: true,
-  imports: [ArticleCardComponent, BreadcrumbComponent, TranslatePipe, Paginator, Skeleton, Tag],
+  imports: [ArticleCardComponent, PageHeaderComponent, EmptyStateComponent, TranslatePipe, ScrollAnimateDirective, Skeleton],
   templateUrl: './category-detail.component.html',
   styleUrl: './category-detail.component.css',
 })
@@ -23,43 +23,37 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
   readonly categoryStore = inject(CategoryStore);
   private readonly articleApi = inject(ArticleApiService);
   private readonly seo = inject(SeoService);
+
   readonly articles = signal<Article[]>([]);
-  readonly totalPages = signal(0);
-  readonly totalRecords = signal(0);
-  readonly currentPage = signal(1);
   readonly articlesLoading = signal(false);
+
+  readonly breadcrumbs = computed<BreadcrumbItem[]>(() => [
+    { label: 'Home', translateKey: 'nav.home', route: '/' },
+    { label: 'Categories', translateKey: 'nav.categories', route: '/categories' },
+    { label: this.categoryStore.selectedCategory()?.name || '...' },
+  ]);
+
+  readonly categoryName = computed(() => this.categoryStore.selectedCategory()?.name || '');
 
   ngOnInit(): void {
     const numId = Number(this.id());
     this.categoryStore.loadById(numId);
-    this.loadArticles(1);
+    this.loadArticles(numId);
   }
 
-  ngOnDestroy(): void { this.categoryStore.clearSelected(); }
-
-  get breadcrumbs(): BreadcrumbItem[] {
-    return [{ label: 'Home', translateKey: 'nav.home', route: '/' }, { label: 'Categories', translateKey: 'nav.categories', route: '/categories' }, { label: this.categoryStore.selectedCategory()?.name || '...' }];
+  ngOnDestroy(): void {
+    this.categoryStore.clearSelected();
   }
 
-  get first(): number {
-    return (this.currentPage() - 1) * 12;
-  }
-
-  loadArticles(page: number): void {
+  private loadArticles(categoryId: number): void {
     this.articlesLoading.set(true);
-    this.articleApi.getByCategory(Number(this.id()), { page, limit: 12 }).subscribe({
-      next: (res: PaginatedResponse<Article>) => {
-        this.articles.set(res.data);
-        this.totalPages.set(res.totalPages);
-        this.totalRecords.set(res.totalPages * 12);
-        this.currentPage.set(res.currentPage);
+    this.articleApi.getByCategory(categoryId).subscribe({
+      next: (articles) => {
+        this.articles.set(articles);
         this.articlesLoading.set(false);
+        this.seo.update({ title: this.categoryName() || 'Category' });
       },
       error: () => this.articlesLoading.set(false),
     });
-  }
-
-  onPageChange(event: { page?: number }): void {
-    this.loadArticles((event.page ?? 0) + 1);
   }
 }

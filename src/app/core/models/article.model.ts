@@ -41,6 +41,7 @@ export interface Article {
   last_page_in_volume: number | null;
   isPaid: boolean;
   coAuthors?: AuthorShort[];
+  certificates?: ArticleCertificate[];
   transaction?: {
     transactions_link: {
       click_link: string;
@@ -48,6 +49,17 @@ export interface Article {
     };
     amount: number;
   };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ArticleCertificate {
+  id: string;
+  certificate_link: string;
+  folder_name: string;
+  author_id: string;
+  article_id: string;
+  author?: AuthorShort;
   createdAt: string;
   updatedAt: string;
 }

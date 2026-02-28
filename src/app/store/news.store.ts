@@ -4,11 +4,12 @@ import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap } from 'rxjs';
 import { tapResponse } from '@ngrx/operators';
 import { NewsApiService } from '@services/api/news-api.service';
-import { News } from '@core/models/news.model';
+import { NewsItem } from '@core/models/news.model';
 
 interface NewsState {
-  newsList: News[];
-  selectedNews: News | null;
+  newsList: NewsItem[];
+  selectedNews: NewsItem | null;
+  totalCount: number;
   totalPages: number;
   currentPage: number;
   loading: boolean;
@@ -18,6 +19,7 @@ interface NewsState {
 const initialState: NewsState = {
   newsList: [],
   selectedNews: null,
+  totalCount: 0,
   totalPages: 0,
   currentPage: 1,
   loading: false,
@@ -32,10 +34,11 @@ export const NewsStore = signalStore(
       pipe(
         tap(() => patchState(store, { loading: true })),
         switchMap((params) =>
-          newsApi.getAll(params).pipe(
+          newsApi.getList(params).pipe(
             tapResponse({
               next: (res) => patchState(store, {
                 newsList: res.data,
+                totalCount: res.TotalCount,
                 totalPages: res.totalPages,
                 currentPage: res.currentPage,
                 loading: false,

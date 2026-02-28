@@ -1,18 +1,127 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <app-breadcrumb [items]="breadcrumbs" />
-  <h1 class="font-heading text-3xl sm:text-4xl font-bold text-ink mt-6 mb-8">{{ 'volumes.title' | translate }}</h1>
+<app-page-header [breadcrumbs]="breadcrumbs" [titleKey]="'volumes.title'" />
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 lg:pb-16">
 
   @if (volumeStore.loading()) {
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-      @for (i of [1,2,3,4,5,6,7,8,9,10]; track i) {
-        <p-skeleton height="200px" borderRadius="12px" />
+    <!-- Featured skeleton -->
+    <div class="featured-skeleton">
+      <p-skeleton width="100%" height="100%" borderRadius="12px" styleClass="!h-full" />
+      <div class="flex-1 space-y-4">
+        <p-skeleton width="5rem" height="0.75rem" />
+        <p-skeleton width="70%" height="2rem" />
+        <p-skeleton width="100%" height="1rem" />
+        <p-skeleton width="80%" height="1rem" />
+        <p-skeleton width="8rem" height="2.5rem" borderRadius="8px" />
+      </div>
+    </div>
+    <!-- Archive skeleton -->
+    <div class="mt-12 space-y-0">
+      @for (i of [1,2,3,4]; track i) {
+        <div class="archive-skeleton">
+          <p-skeleton width="4rem" height="5rem" borderRadius="6px" />
+          <div class="flex-1 space-y-2">
+            <p-skeleton width="50%" height="1.25rem" />
+            <p-skeleton width="30%" height="0.75rem" />
+          </div>
+        </div>
       }
     </div>
   } @else {
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-      @for (volume of volumeStore.volumes(); track volume.id) {
-        <app-volume-card [volume]="volume" />
-      }
-    </div>
+
+    <!-- ══ Featured Latest Volume ══ -->
+    @if (latestVolume(); as vol) {
+      <a [routerLink]="['/volumes', vol.id]"
+         class="featured group"
+         appScrollAnimate="fade-up">
+
+        <!-- Cover -->
+        <div class="featured-cover">
+          @if (vol.image?.file_path) {
+            <img [src]="vol.image!.file_path | fileUrl" [alt]="vol.title" />
+          } @else {
+            <div class="featured-fallback">
+              <svg class="w-12 h-12 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+              </svg>
+              <span class="font-heading font-bold text-xl text-white mt-2">{{ vol.title }}</span>
+            </div>
+          }
+          <div class="featured-badge">{{ 'volumes.latest' | translate }}</div>
+        </div>
+
+        <!-- Info -->
+        <div class="featured-info">
+          <div class="featured-meta">
+            @if (vol.articleCount) {
+              <span>{{ vol.articleCount }} {{ 'volumes.articles_count' | translate }}</span>
+            }
+            @if (vol.createdAt) {
+              <span>{{ vol.createdAt | date:'MMMM yyyy' }}</span>
+            }
+          </div>
+
+          <h2 class="featured-title font-heading">{{ vol.title }}</h2>
+
+          @if (vol.description) {
+            <p class="featured-desc">{{ vol.description }}</p>
+          }
+
+          <div class="featured-cta">
+            <span>{{ 'volumes.read_volume' | translate }}</span>
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+          </div>
+        </div>
+      </a>
+    }
+
+    <!-- ══ Archive ══ -->
+    @if (archiveVolumes().length > 0) {
+      <div class="archive-section" appScrollAnimate="fade-up">
+        <h3 class="archive-heading font-heading">{{ 'volumes.archive' | translate }}</h3>
+
+        <div class="archive-list">
+          @for (vol of archiveVolumes(); track vol.id; let last = $last) {
+            <a [routerLink]="['/volumes', vol.id]"
+               class="archive-row group">
+
+              <!-- Cover thumbnail -->
+              <div class="archive-cover">
+                @if (vol.image?.file_path) {
+                  <img [src]="vol.image!.file_path | fileUrl" [alt]="vol.title" />
+                } @else {
+                  <div class="archive-cover-fallback">
+                    <span class="font-heading text-xs font-bold text-white">{{ vol.title }}</span>
+                  </div>
+                }
+              </div>
+
+              <!-- Info -->
+              <div class="archive-info">
+                <h4 class="archive-title font-heading group-hover:text-dusk transition-colors">{{ vol.title }}</h4>
+                <div class="archive-meta">
+                  @if (vol.articleCount) {
+                    <span>{{ vol.articleCount }} {{ 'volumes.articles_count' | translate }}</span>
+                  }
+                  @if (vol.createdAt) {
+                    <span>{{ vol.createdAt | date:'MMM yyyy' }}</span>
+                  }
+                </div>
+              </div>
+
+              <!-- Arrow -->
+              <svg class="archive-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"/>
+              </svg>
+            </a>
+
+            @if (!last) {
+              <div class="archive-divider"></div>
+            }
+          }
+        </div>
+      </div>
+    }
   }
-</div>
+</section>

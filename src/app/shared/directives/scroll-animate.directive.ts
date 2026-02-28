@@ -24,7 +24,7 @@ export class ScrollAnimateDirective implements OnInit, OnDestroy {
       ([entry]) => {
         if (entry.isIntersecting) {
           el.style.opacity = '1';
-          el.style.transform = 'translate(0, 0)';
+          el.style.transform = 'none';
           this.observer?.unobserve(el);
         }
       },

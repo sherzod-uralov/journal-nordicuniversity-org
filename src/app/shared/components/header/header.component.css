@@ -11,23 +11,30 @@
 /* ── Backdrop ── */
 
 .header-backdrop {
-  background: #0d1b2a;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: #1b3352;
+  border: 1px solid transparent;
+  border-bottom-color: rgba(255, 255, 255, 0.08);
   border-radius: 0;
-  margin: 0;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  box-shadow: none;
   transition:
-    background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    margin 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    max-width 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    margin 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    padding 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    border-radius 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    backdrop-filter 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .header--scrolled .header-backdrop {
   max-width: 80rem;
   margin: 0.5rem auto;
   padding: 0.125rem 0.5rem;
-  background: rgba(13, 27, 42, 0.92);
+  background: rgba(27, 51, 82, 0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -46,7 +53,7 @@
   padding: 0 1.5rem;
   max-width: 80rem;
   margin: 0 auto;
-  transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: height 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .header--scrolled .header-inner {
@@ -64,7 +71,7 @@
 .logo-img {
   height: 1.75rem;
   width: auto;
-  transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: height 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .header--scrolled .logo-img {
@@ -130,7 +137,7 @@
   align-items: center;
   padding: 0.3125rem 0.875rem;
   background: white;
-  color: #0d1b2a;
+  color: #0f1c2e;
   font-size: 0.8125rem;
   font-weight: 600;
   border-radius: 0.375rem;
@@ -138,7 +145,7 @@
 }
 
 .login-btn:hover {
-  background: #e0e1dd;
+  background: #edf1f6;
 }
 
 /* ── Hamburger ── */
@@ -158,13 +165,13 @@
 /* ── Mobile Menu ── */
 
 .mobile-menu {
-  background: #0d1b2a;
+  background: #1b3352;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   animation: menu-enter 0.2s ease-out;
 }
 
 .header--scrolled .mobile-menu {
-  background: rgba(13, 27, 42, 0.97);
+  background: rgba(27, 51, 82, 0.97);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   margin: 0.375rem 1rem 0;
@@ -209,7 +216,7 @@
 
 .header-spacer {
   height: 3.75rem;
-  transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: height 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .header-spacer--scrolled {

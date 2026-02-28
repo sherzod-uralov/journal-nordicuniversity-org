@@ -23,3 +23,24 @@ export interface News {
   createdAt: string;
   updatedAt: string;
 }
+
+/** Localized news item returned by POST /news/list */
+export interface NewsItem {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  body: string;
+  hashtags: string;
+  time: string;
+  source?: FileUpload;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface NewsListResponse {
+  data: NewsItem[];
+  TotalCount: number;
+  currentPage: number;
+  totalPages: number;
+}

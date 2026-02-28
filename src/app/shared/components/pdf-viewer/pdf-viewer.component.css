@@ -1,0 +1,57 @@
+:host {
+  display: block;
+}
+
+.pdf-embed-wrapper {
+  border-radius: 0.625rem;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #525659;
+}
+
+.pdf-object {
+  width: 100%;
+  height: 85vh;
+  min-height: 500px;
+  display: block;
+}
+
+.pdf-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 3rem 1rem;
+  background: rgba(0, 0, 0, 0.015);
+}
+
+.pdf-fallback-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--color-ink);
+  color: white;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.pdf-fallback-link:hover {
+  background: var(--color-prussian);
+}
+
+.pdf-ssr-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 3rem 1rem;
+  background: rgba(0, 0, 0, 0.015);
+  border-radius: 0.625rem;
+  border: 1px dashed var(--color-alabaster);
+}

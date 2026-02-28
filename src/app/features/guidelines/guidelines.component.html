@@ -1,0 +1,57 @@
+<app-page-header [breadcrumbs]="breadcrumbs" [titleKey]="'guidelines.title'" />
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
+
+  <!-- Two-column layout: info left, image right -->
+  <div class="guidelines-layout" appScrollAnimate="fade-up">
+
+    <!-- Left: Content -->
+    <div class="guidelines-content">
+      <h2 class="content-heading font-heading">{{ 'guidelines.subtitle' | translate }}</h2>
+      <p class="content-description">{{ 'guidelines.description' | translate }}</p>
+
+      <!-- Requirements list -->
+      <ol class="requirements-list">
+        @for (section of sections; track section.number) {
+          <li class="requirement-item">
+            <span class="requirement-number">{{ section.number }}</span>
+            <div class="requirement-body">
+              <h3 class="requirement-title font-heading">{{ section.titleKey | translate }}</h3>
+              <ul class="requirement-details">
+                @for (item of section.items; track item) {
+                  <li class="requirement-detail">{{ item | translate }}</li>
+                }
+              </ul>
+            </div>
+          </li>
+        }
+      </ol>
+    </div>
+
+    <!-- Right: Image + Download -->
+    <div class="guidelines-image-block">
+      <div class="image-wrapper">
+        <img src="images/emirate.jpg" alt="IMRAD" class="imrad-img" />
+      </div>
+      <a href="images/emirate.jpg" download="IMRAD-requirements.jpg" class="download-btn">
+        <svg class="download-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+        </svg>
+        {{ 'guidelines.download_image' | translate }}
+      </a>
+    </div>
+  </div>
+
+  <!-- IMRAD Note -->
+  <div class="imrad-note" appScrollAnimate="fade-up">
+    <div class="imrad-note-icon">
+      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <div>
+      <h4 class="imrad-note-title font-heading">{{ 'guidelines.imrad_note.title' | translate }}</h4>
+      <p class="imrad-note-text">{{ 'guidelines.imrad_note.text' | translate }}</p>
+    </div>
+  </div>
+</div>

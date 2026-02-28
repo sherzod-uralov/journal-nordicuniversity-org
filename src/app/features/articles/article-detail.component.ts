@@ -3,25 +3,38 @@ import { RouterLink } from '@angular/router';
 import { ArticleStore } from '@store/article.store';
 import { SeoService } from '@core/services/seo.service';
 import { TagComponent } from '@shared/components/tag/tag.component';
-import { BreadcrumbComponent, BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
+import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
+import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
 import { Skeleton } from 'primeng/skeleton';
+import { CollapsibleComponent } from '@shared/components/collapsible/collapsible.component';
 import { AvatarComponent } from '@shared/components/avatar/avatar.component';
 import { DateLocalePipe } from '@shared/pipes/date-locale.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { SafeHtmlPipe } from '@shared/pipes/safe-html.pipe';
 import { FileUrlPipe } from '@shared/pipes/file-url.pipe';
 import { ScrollAnimateDirective } from '@shared/directives/scroll-animate.directive';
+import { ClickOutsideDirective } from '@shared/directives/click-outside.directive';
+import { PdfViewerComponent } from '@shared/components/pdf-viewer/pdf-viewer.component';
 import { environment } from '@env';
 import { Article } from '@core/models/article.model';
+import {
+  CitationData, CitationStyle, CITATION_STYLES,
+  ExportFormat, EXPORT_FORMATS,
+  formatCitation, exportBibTeX, exportRIS, exportCSLJSON, exportEndNoteXML,
+  exportPlainText, exportCSV, exportMODSXML, exportRefer, exportMARCXML, exportJATSXML,
+  downloadFile,
+} from '@core/utils/citation.util';
 
 @Component({
   selector: 'app-article-detail',
   standalone: true,
   imports: [
     RouterLink, TagComponent,
-    BreadcrumbComponent, Skeleton,
+    PageHeaderComponent, Skeleton,
+    CollapsibleComponent,
     AvatarComponent, DateLocalePipe, TranslatePipe,
     SafeHtmlPipe, FileUrlPipe, ScrollAnimateDirective,
+    ClickOutsideDirective, PdfViewerComponent,
   ],
   templateUrl: './article-detail.component.html',
   styleUrl: './article-detail.component.css',
@@ -32,10 +45,21 @@ export class ArticleDetailComponent implements OnInit, OnDestroy {
   private readonly seo = inject(SeoService);
   readonly apiUrl = environment.apiUrl;
 
-  readonly showCiteModal = signal(false);
-  readonly copiedCitation = signal(false);
   readonly showShareMenu = signal(false);
   readonly copiedLink = signal(false);
+  readonly readingMode = signal(false);
+  readonly copiedCitation = signal(false);
+
+  readonly selectedCitationStyle = signal<CitationStyle>('APA');
+  readonly citationStyles = CITATION_STYLES;
+  readonly exportFormats = EXPORT_FORMATS;
+
+  readonly styleDropdownOpen = signal(false);
+  readonly exportDropdownOpen = signal(false);
+
+  readonly selectedStyleLabel = computed(() =>
+    this.citationStyles.find(s => s.value === this.selectedCitationStyle())?.label ?? 'APA'
+  );
 
   readonly article = computed(() => this.articleStore.selectedArticle());
 
@@ -61,16 +85,39 @@ export class ArticleDetailComponent implements OnInit, OnDestroy {
     return kw.split(',').map(k => k.trim()).filter(Boolean);
   });
 
-  readonly citationText = computed(() => {
+  readonly pdfUrl = computed(() => {
     const a = this.article();
-    if (!a) return '';
-    const authors = a.author?.full_name ?? '';
-    const year = a.publish_date ? new Date(a.publish_date).getFullYear() : '';
-    const vol = a.volume?.title ?? '';
-    const pages = a.first_page_in_volume && a.last_page_in_volume
-      ? `, pp. ${a.first_page_in_volume}-${a.last_page_in_volume}` : '';
-    const doi = a.doi ? `. https://doi.org/${a.doi}` : '';
-    return `${authors} (${year}). ${a.title}. Nordic University Scientific Journal, ${vol}${pages}${doi}`;
+    if (!a?.file?.file_path) return '';
+    const base = this.apiUrl.replace(/\/+$/, '');
+    const path = a.file.file_path.replace(/^\/+/, '');
+    return `${base}/${path}`;
+  });
+
+  readonly citationData = computed<CitationData | null>(() => {
+    const a = this.article();
+    if (!a) return null;
+    const authors: string[] = [];
+    if (a.author?.full_name) authors.push(a.author.full_name);
+    if (a.coAuthors?.length) {
+      for (const co of a.coAuthors) authors.push(co.full_name);
+    }
+    return {
+      authors,
+      title: a.title,
+      journalTitle: 'Nordic University Scientific Journal',
+      volume: a.volume?.title ?? undefined,
+      firstPage: a.first_page_in_volume,
+      lastPage: a.last_page_in_volume,
+      doi: a.doi,
+      publishDate: a.publish_date,
+      url: typeof window !== 'undefined' ? window.location.href : undefined,
+    };
+  });
+
+  readonly citationText = computed(() => {
+    const data = this.citationData();
+    if (!data) return '';
+    return formatCitation(data, this.selectedCitationStyle());
   });
 
   readonly articleUrl = computed(() => {
@@ -88,12 +135,31 @@ export class ArticleDetailComponent implements OnInit, OnDestroy {
   }
 
   downloadPdf(): void {
-    const a = this.article();
-    if (a?.file?.file_path) {
-      const base = this.apiUrl.replace(/\/+$/, '');
-      const path = a.file.file_path.replace(/^\/+/, '');
-      window.open(`${base}/${path}`, '_blank');
-    }
+    const url = this.pdfUrl();
+    if (url) window.open(url, '_blank');
+  }
+
+  onCitationStyleChange(style: CitationStyle): void {
+    this.selectedCitationStyle.set(style);
+    this.styleDropdownOpen.set(false);
+  }
+
+  toggleStyleDropdown(): void {
+    this.styleDropdownOpen.update(v => !v);
+    this.exportDropdownOpen.set(false);
+  }
+
+  closeStyleDropdown(): void {
+    this.styleDropdownOpen.set(false);
+  }
+
+  toggleExportDropdown(): void {
+    this.exportDropdownOpen.update(v => !v);
+    this.styleDropdownOpen.set(false);
+  }
+
+  closeExportDropdown(): void {
+    this.exportDropdownOpen.set(false);
   }
 
   copyCitation(): void {
@@ -103,8 +169,44 @@ export class ArticleDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  toggleCiteModal(): void {
-    this.showCiteModal.update(v => !v);
+  exportCitation(format: ExportFormat): void {
+    const data = this.citationData();
+    if (!data) return;
+    const slug = this.article()?.slug ?? 'article';
+    this.exportDropdownOpen.set(false);
+
+    switch (format) {
+      case 'bibtex':
+        downloadFile(exportBibTeX(data), `${slug}.bib`, 'application/x-bibtex');
+        break;
+      case 'ris':
+        downloadFile(exportRIS(data), `${slug}.ris`, 'application/x-research-info-systems');
+        break;
+      case 'csl-json':
+        downloadFile(exportCSLJSON(data), `${slug}.json`, 'application/json');
+        break;
+      case 'endnote-xml':
+        downloadFile(exportEndNoteXML(data), `${slug}.xml`, 'application/xml');
+        break;
+      case 'plain-text':
+        downloadFile(exportPlainText(data), `${slug}.txt`, 'text/plain');
+        break;
+      case 'csv':
+        downloadFile(exportCSV(data), `${slug}.csv`, 'text/csv');
+        break;
+      case 'mods-xml':
+        downloadFile(exportMODSXML(data), `${slug}-mods.xml`, 'application/xml');
+        break;
+      case 'refer':
+        downloadFile(exportRefer(data), `${slug}.refer`, 'text/plain');
+        break;
+      case 'marc-xml':
+        downloadFile(exportMARCXML(data), `${slug}-marc.xml`, 'application/xml');
+        break;
+      case 'jats-xml':
+        downloadFile(exportJATSXML(data), `${slug}-jats.xml`, 'application/xml');
+        break;
+    }
   }
 
   toggleShareMenu(): void {

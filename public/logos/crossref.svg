@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 60" fill="none">
+  <circle cx="22" cy="30" r="18" fill="#FF6C3E"/>
+  <path d="M16 24c3-2.5 7-2.5 10 0s3 7.5 0 10-7 2.5-10 0" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M22 22v16M16 30h12" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <text x="48" y="36" font-family="Arial, sans-serif" font-weight="bold" font-size="22" fill="#1F2937">Crossref</text>
+</svg>

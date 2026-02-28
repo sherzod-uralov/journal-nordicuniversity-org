@@ -4,12 +4,11 @@ import { Article } from '@core/models/article.model';
 import { FileUrlPipe } from '@shared/pipes/file-url.pipe';
 import { TruncatePipe } from '@shared/pipes/truncate.pipe';
 import { DateLocalePipe } from '@shared/pipes/date-locale.pipe';
-import { Tag } from 'primeng/tag';
 
 @Component({
   selector: 'app-article-card',
   standalone: true,
-  imports: [RouterLink, FileUrlPipe, TruncatePipe, DateLocalePipe, Tag],
+  imports: [RouterLink, FileUrlPipe, TruncatePipe, DateLocalePipe],
   templateUrl: './article-card.component.html',
   styleUrl: './article-card.component.css',
 })

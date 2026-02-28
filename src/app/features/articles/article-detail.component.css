@@ -2,21 +2,539 @@
   display: block;
 }
 
-/* Light breadcrumb on dark hero */
-:host ::ng-deep .breadcrumb-light a,
-:host ::ng-deep .breadcrumb-light span {
+/* ── Hero Metadata ── */
+.hero-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.875rem;
+  margin-top: 1.25rem;
+}
+
+.hero-author {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.hero-author:hover {
+  opacity: 0.85;
+}
+
+/* Avatar contrast on dark hero */
+:host ::ng-deep .hero-author .rounded-full {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: var(--color-ink) !important;
+}
+
+.hero-author-name {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: white;
+  line-height: 1.3;
+}
+
+.hero-author-degree {
+  display: block;
+  font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.6);
+  line-height: 1.3;
 }
 
-:host ::ng-deep .breadcrumb-light a:hover {
-  color: rgba(255, 255, 255, 0.9);
+.hero-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
-/* Article content typography */
+.hero-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-decoration: none;
+  backdrop-filter: blur(4px);
+  transition: background 0.15s;
+}
+
+.hero-chip:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.hero-chip--category {
+  background: rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+  color: white;
+}
+
+.hero-chip--category:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.hero-doi {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hero-doi-label {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.125rem 0.4rem;
+  border-radius: 0.25rem;
+}
+
+.hero-doi-link {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.hero-doi-link:hover {
+  color: white;
+}
+
+/* ── Toolbar Strip ── */
+.toolbar-strip {
+  background: white;
+  border-bottom: 1px solid var(--color-alabaster);
+  padding: 0.625rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.4rem 0.625rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-alabaster);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-dusk);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.toolbar-btn:hover {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: var(--color-lavender);
+}
+
+.toolbar-btn--active {
+  background: var(--color-ink);
+  color: white;
+  border-color: var(--color-ink);
+}
+
+.toolbar-btn--active:hover {
+  background: var(--color-prussian);
+  border-color: var(--color-prussian);
+}
+
+.toolbar-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--color-ink);
+  color: white;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.toolbar-btn-primary:hover {
+  background: var(--color-prussian);
+}
+
+/* ── Dropdowns ── */
+.share-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 0.5rem;
+  width: 13rem;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--color-alabaster);
+  padding: 0.375rem 0;
+  z-index: 50;
+}
+
+.share-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  color: var(--color-ink);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.share-item:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+/* ── Content Layout ── */
+.content-layout {
+  display: flex;
+  gap: 2.5rem;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.content-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.content-sidebar {
+  width: 19rem;
+  flex-shrink: 0;
+}
+
+/* Reading Mode */
+.reading-mode .content-main {
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+.reading-mode .content-sidebar {
+  display: none;
+}
+
+/* ── Author Bar ── */
+.author-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
+  border-bottom: 1px solid var(--color-alabaster);
+}
+
+/* ── Content Sections ── */
+.content-section {
+  margin-bottom: 2.25rem;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin-bottom: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-title::before {
+  content: '';
+  width: 3px;
+  height: 1.125rem;
+  background: var(--color-dusk);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.abstract-block {
+  background: rgba(0, 0, 0, 0.015);
+  border-left: 3px solid var(--color-dusk);
+  border-radius: 0 0.625rem 0.625rem 0;
+  padding: 1.25rem;
+}
+
+.references-block {
+  background: rgba(0, 0, 0, 0.015);
+  border-radius: 0.625rem;
+  padding: 1.25rem;
+}
+
+/* ── Citation Block ── */
+.citation-block {
+  background: rgba(0, 0, 0, 0.015);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-alabaster);
+  overflow: visible;
+  position: relative;
+  z-index: 10;
+}
+
+.citation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 30;
+}
+
+.citation-text {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: var(--color-dusk);
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--color-alabaster);
+  word-break: break-word;
+}
+
+.citation-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 20;
+}
+
+.citation-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-alabaster);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-dusk);
+  background: white;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.citation-btn:hover {
+  border-color: var(--color-lavender);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.citation-btn--primary {
+  background: var(--color-ink);
+  color: white;
+  border-color: var(--color-ink);
+}
+
+.citation-btn--primary:hover {
+  background: var(--color-prussian);
+  border-color: var(--color-prussian);
+}
+
+/* ── Custom Citation Selects ── */
+.cite-select {
+  position: relative;
+}
+
+.cite-select-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--color-alabaster);
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  min-width: 10rem;
+  text-align: left;
+}
+
+.cite-select-trigger:hover {
+  border-color: var(--color-lavender);
+}
+
+.cite-select-trigger:focus {
+  border-color: var(--color-dusk);
+  box-shadow: 0 0 0 3px rgba(65, 90, 119, 0.08);
+  outline: none;
+}
+
+.cite-select-chevron {
+  margin-left: auto;
+  color: var(--color-lavender);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.cite-select-chevron--open {
+  transform: rotate(180deg);
+}
+
+.cite-select-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 100;
+  min-width: 100%;
+  width: max-content;
+  max-height: 280px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid var(--color-alabaster);
+  border-radius: 0.625rem;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18);
+  padding: 0.25rem 0;
+}
+
+.cite-select-dropdown--right {
+  left: auto;
+  right: 0;
+}
+
+.cite-select-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.5rem 0.875rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.8125rem;
+  color: var(--color-ink);
+  transition: background 0.1s;
+  white-space: nowrap;
+}
+
+.cite-select-item:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.cite-select-item--active {
+  background: rgba(65, 90, 119, 0.08);
+  font-weight: 600;
+  color: var(--color-dusk);
+}
+
+.cite-select-ext {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.6875rem;
+  color: var(--color-lavender);
+  background: rgba(0, 0, 0, 0.04);
+  padding: 0.1rem 0.375rem;
+  border-radius: 0.25rem;
+}
+
+.cite-select--export {
+  margin-left: auto;
+}
+
+/* ── License Block ── */
+.license-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: rgba(0, 0, 0, 0.015);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-alabaster);
+}
+
+.license-badge {
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+
+.license-badge:hover {
+  opacity: 0.8;
+}
+
+.license-content {
+  min-width: 0;
+}
+
+/* ── Sidebar Cards ── */
+.sidebar-card {
+  background: white;
+  border: 1px solid var(--color-alabaster);
+  border-radius: 0.875rem;
+  overflow: hidden;
+}
+
+.sidebar-card-img {
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+}
+
+.info-icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--color-lavender);
+  margin-top: 0.125rem;
+  flex-shrink: 0;
+}
+
+.info-label {
+  font-size: 0.6875rem;
+  color: var(--color-lavender);
+  line-height: 1;
+  margin-bottom: 0.125rem;
+}
+
+.info-value {
+  font-size: 0.8125rem;
+  color: var(--color-ink);
+  font-weight: 500;
+}
+
+.download-card {
+  background: linear-gradient(135deg, var(--color-ink), var(--color-prussian));
+  border-radius: 0.875rem;
+  padding: 1.25rem;
+  color: white;
+}
+
+/* ── Article Content Typography ── */
 .article-content {
   font-size: 1rem;
   line-height: 1.8;
-  color: #415a77;
+  color: var(--color-dusk);
 }
 
 .article-content h1,
@@ -25,7 +543,7 @@
 .article-content h4,
 .article-content h5,
 .article-content h6 {
-  color: #0d1b2a;
+  color: var(--color-ink);
   font-weight: 700;
   margin-top: 2em;
   margin-bottom: 0.75em;
@@ -35,7 +553,7 @@
 .article-content h2 {
   font-size: 1.5rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e0e1dd;
+  border-bottom: 2px solid var(--color-alabaster);
 }
 
 .article-content h3 {
@@ -51,14 +569,14 @@
 }
 
 .article-content a {
-  color: #415a77;
+  color: var(--color-dusk);
   text-decoration: underline;
   text-underline-offset: 2px;
   transition: color 0.15s;
 }
 
 .article-content a:hover {
-  color: #0d1b2a;
+  color: var(--color-ink);
 }
 
 .article-content ul,
@@ -80,12 +598,12 @@
 }
 
 .article-content blockquote {
-  border-left: 4px solid #778da9;
+  border-left: 4px solid var(--color-lavender);
   padding: 0.75rem 1.25rem;
   margin: 1.5em 0;
-  background: rgba(224, 225, 221, 0.2);
+  background: rgba(0, 0, 0, 0.02);
   border-radius: 0 0.75rem 0.75rem 0;
-  color: #415a77;
+  color: var(--color-dusk);
   font-style: italic;
 }
 
@@ -98,19 +616,19 @@
 
 .article-content th,
 .article-content td {
-  border: 1px solid #e0e1dd;
+  border: 1px solid var(--color-alabaster);
   padding: 0.625rem 0.875rem;
   text-align: left;
 }
 
 .article-content th {
-  background: #f8f8f7;
+  background: var(--color-alabaster);
   font-weight: 600;
-  color: #0d1b2a;
+  color: var(--color-ink);
 }
 
 .article-content tr:hover td {
-  background: rgba(224, 225, 221, 0.15);
+  background: rgba(0, 0, 0, 0.015);
 }
 
 .article-content img {
@@ -121,8 +639,8 @@
 }
 
 .article-content pre {
-  background: #1b263b;
-  color: #e0e1dd;
+  background: var(--color-prussian);
+  color: var(--color-alabaster);
   padding: 1.25rem;
   border-radius: 0.75rem;
   overflow-x: auto;
@@ -134,7 +652,7 @@
 .article-content code {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: 0.875em;
-  background: rgba(224, 225, 221, 0.4);
+  background: rgba(0, 0, 0, 0.04);
   padding: 0.15em 0.4em;
   border-radius: 0.25rem;
 }
@@ -151,7 +669,7 @@
 .article-content figcaption {
   text-align: center;
   font-size: 0.875rem;
-  color: #778da9;
+  color: var(--color-lavender);
   margin-top: 0.5rem;
 }
 
@@ -163,7 +681,42 @@
   font-size: 0.75em;
 }
 
-/* References list styling */
-.references-list {
-  counter-reset: ref-counter;
+/* ── Responsive ── */
+@media (max-width: 1023px) {
+  .content-layout {
+    flex-direction: column;
+  }
+
+  .content-sidebar {
+    width: 100%;
+  }
+
+  .license-block {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .citation-export-group {
+    margin-left: 0;
+  }
+}
+
+/* ── Print Styles ── */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  :host {
+    background: white;
+  }
+
+  .content-layout {
+    display: block;
+  }
+
+  .content-sidebar {
+    display: none;
+  }
 }
