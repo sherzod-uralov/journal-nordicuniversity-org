@@ -10,7 +10,7 @@ import { registerSitemap } from './server/sitemap';
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
 
-const PORT = process.env['PORT'] || 4200;
+const PORT = process.env['PORT'] || 3772;
 const SITE_URL = process.env['SITE_URL']
   || (process.env['NODE_ENV'] === 'production'
     ? 'https://journal.nordicuniversity.org'
