@@ -1,4 +1,4 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, input, output, signal , ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
   imports: [FormsModule],
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchBarComponent {
   readonly placeholder = input('Search...');

@@ -37,7 +37,7 @@
           <div class="director-featured" appScrollAnimate="fade-up">
             <div class="director-featured-img">
               @if (lead.image?.file_path) {
-                <img [src]="lead.image!.file_path | fileUrl" [alt]="lead.full_name" />
+                <app-image [src]="lead.image!.file_path" [alt]="lead.full_name" [priority]="true" />
               } @else {
                 <app-avatar [name]="lead.full_name" size="lg" />
               }
@@ -57,7 +57,7 @@
               <div class="director-card" appScrollAnimate="fade-up">
                 <div class="director-card-img">
                   @if (dir.image?.file_path) {
-                    <img [src]="dir.image!.file_path | fileUrl" [alt]="dir.full_name" />
+                    <app-image [src]="dir.image!.file_path" [alt]="dir.full_name" />
                   } @else {
                     <app-avatar [name]="dir.full_name" size="lg" />
                   }
@@ -110,7 +110,7 @@
           @for (member of data.members; track member.id) {
             <div class="member-card" appScrollAnimate="fade-up">
               <div class="member-flag">
-                <svg class="member-flag-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="member-flag-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.75 21h16.5M4 3h16M5.625 3v18M18.375 3v18M7.5 6.75h9M7.5 9.75h9M7.5 12.75h6"/>
                 </svg>
               </div>

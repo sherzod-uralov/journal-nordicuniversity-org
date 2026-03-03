@@ -6,6 +6,7 @@
   [attr.maxlength]="maxlength()"
   [autocomplete]="autocomplete()"
   [disabled]="isDisabled()"
+  [attr.aria-describedby]="fieldId() ? fieldId() + '-error' : null"
   (input)="onInput($event)"
   (blur)="onBlur()"
   class="input-base"

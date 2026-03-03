@@ -29,7 +29,11 @@
     </div>
     @if (authorStore.totalPages() > 1) {
       <div class="mt-8">
-        <p-paginator [first]="first" [rows]="20" [totalRecords]="authorStore.totalPages() * 20" (onPageChange)="onPageChange($event)" />
+        <app-pagination
+          [currentPage]="authorStore.currentPage()"
+          [totalPages]="authorStore.totalPages()"
+          (pageChange)="onPageChange($event)"
+        />
       </div>
     }
   }

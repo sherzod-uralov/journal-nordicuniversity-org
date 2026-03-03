@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, input, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, input, signal, computed , ChangeDetectionStrategy } from '@angular/core';
 import { CategoryStore } from '@store/category.store';
 import { ArticleApiService } from '@services/api/article-api.service';
 import { Article } from '@core/models/article.model';
@@ -17,6 +17,7 @@ import { Skeleton } from 'primeng/skeleton';
   imports: [ArticleCardComponent, PageHeaderComponent, EmptyStateComponent, TranslatePipe, ScrollAnimateDirective, Skeleton],
   templateUrl: './category-detail.component.html',
   styleUrl: './category-detail.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoryDetailComponent implements OnInit, OnDestroy {
   readonly id = input.required<string>();

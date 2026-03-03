@@ -1,7 +1,8 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter, withComponentInputBinding, withViewTransitions, withInMemoryScrolling } from '@angular/router';
+import { ApplicationConfig } from '@angular/core';
+import { provideRouter, withComponentInputBinding, withInMemoryScrolling, withPreloading, PreloadAllModules } from '@angular/router';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
-import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideClientHydration, withEventReplay, withIncrementalHydration, withHttpTransferCacheOptions } from '@angular/platform-browser';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
@@ -12,18 +13,24 @@ import { JournalPreset } from '@core/theme/journal-preset';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideBrowserGlobalErrorListeners(),
     provideRouter(
       routes,
       withComponentInputBinding(),
-      withViewTransitions(),
       withInMemoryScrolling({ scrollPositionRestoration: 'top' }),
+      withPreloading(PreloadAllModules),
     ),
     provideHttpClient(
       withFetch(),
       withInterceptors([authInterceptor, errorInterceptor]),
     ),
-    provideAnimations(),
+    provideClientHydration(
+      withEventReplay(),
+      withIncrementalHydration(),
+      withHttpTransferCacheOptions({
+        includePostRequests: true,
+      }),
+    ),
+    provideAnimationsAsync(),
     providePrimeNG({
       theme: {
         preset: JournalPreset,

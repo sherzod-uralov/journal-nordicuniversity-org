@@ -1,0 +1,222 @@
+@if (searchStore.isOverlayOpen()) {
+  <div
+    class="search-backdrop fixed inset-0 z-50 bg-ink/50 backdrop-blur-sm"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Search"
+    (click)="onBackdropClick($event)"
+    (keydown)="onKeydown($event)"
+  >
+    <!-- Panel -->
+    <div class="search-panel max-w-2xl mx-auto mt-[10vh] sm:mt-[15vh] mx-4 sm:mx-auto rounded-xl bg-white shadow-2xl border border-alabaster overflow-hidden">
+
+      <!-- Search Input -->
+      <div class="flex items-center gap-3 px-4 py-3 border-b border-alabaster/70">
+        <svg class="w-5 h-5 text-lavender shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input
+          #searchInput
+          type="text"
+          [value]="searchStore.query()"
+          (input)="onInputChange($event)"
+          (keydown)="onKeydown($event)"
+          [placeholder]="'search.placeholder' | translate"
+          class="flex-1 text-base text-ink placeholder-lavender/60 outline-none bg-transparent"
+          autocomplete="off"
+          spellcheck="false"
+          aria-label="Search articles, news, authors"
+        />
+        @if (searchStore.suggestionsLoading()) {
+          <div class="w-5 h-5 border-2 border-dusk/30 border-t-dusk rounded-full animate-spin shrink-0"></div>
+        }
+        <kbd class="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-alabaster text-lavender text-[10px] font-mono rounded border border-alabaster">
+          ESC
+        </kbd>
+      </div>
+
+      <!-- Results area -->
+      <div class="max-h-[60vh] overflow-y-auto overscroll-contain" aria-live="polite">
+
+        <!-- When query is empty: show history + trending -->
+        @if (!searchStore.query().trim()) {
+
+          <!-- Recent Searches -->
+          @if (searchStore.searchHistory().length > 0) {
+            <div class="px-4 pt-3 pb-1">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] text-lavender uppercase tracking-wider font-semibold">{{ 'search.recent' | translate }}</span>
+                <button (click)="clearHistory()" class="text-[11px] text-dusk hover:text-ink transition-colors font-medium" type="button" aria-label="Clear search history">
+                  {{ 'search.clear_history' | translate }}
+                </button>
+              </div>
+              @for (item of searchStore.searchHistory(); track item.query; let i = $index) {
+                <button
+                  class="search-item group"
+                  [class.search-item--active]="searchStore.activeSuggestionIndex() === i"
+                  (click)="selectHistoryItem(item.query)"
+                  type="button"
+                >
+                  <svg class="w-4 h-4 text-lavender/70 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <span class="flex-1 text-sm text-ink truncate text-left">{{ item.query }}</span>
+                  <button
+                    (click)="removeHistoryItem($event, item.query)"
+                    class="opacity-0 group-hover:opacity-100 p-0.5 text-lavender hover:text-ink transition-all"
+                    type="button"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
+                </button>
+              }
+            </div>
+          }
+
+          <!-- Trending -->
+          @if (searchStore.trendingSearches().length > 0) {
+            <div class="px-4 pt-3 pb-2">
+              <span class="text-[11px] text-lavender uppercase tracking-wider font-semibold block mb-2">{{ 'search.trending' | translate }}</span>
+              @for (item of searchStore.trendingSearches(); track item.id; let i = $index) {
+                <button
+                  class="search-item"
+                  [class.search-item--active]="searchStore.activeSuggestionIndex() === searchStore.searchHistory().length + i"
+                  (click)="selectSuggestion(item)"
+                  type="button"
+                >
+                  <svg class="w-4 h-4 text-lavender/70 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/>
+                  </svg>
+                  <div class="flex-1 min-w-0 text-left">
+                    <span class="text-sm text-ink truncate block">{{ item.label }}</span>
+                    @if (item.subtitle) {
+                      <span class="text-xs text-lavender truncate block">{{ item.subtitle }}</span>
+                    }
+                  </div>
+                </button>
+              }
+            </div>
+          }
+
+          <!-- Empty state when no history and no trending -->
+          @if (searchStore.searchHistory().length === 0 && searchStore.trendingSearches().length === 0) {
+            <div class="px-4 py-8 text-center">
+              <svg class="w-10 h-10 text-alabaster mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+              <p class="text-sm text-lavender">{{ 'search.start_typing' | translate }}</p>
+            </div>
+          }
+
+        } @else {
+
+          <!-- Suggestions -->
+          @if (searchStore.suggestions().length > 0) {
+            <!-- Group: Articles -->
+            @if (getArticleSuggestions().length > 0) {
+              <div class="px-4 pt-3 pb-1">
+                <span class="text-[11px] text-lavender uppercase tracking-wider font-semibold block mb-2">{{ 'search.articles' | translate }}</span>
+                @for (item of getArticleSuggestions(); track item.id; let i = $index) {
+                  <button
+                    class="search-item"
+                    [class.search-item--active]="searchStore.activeSuggestionIndex() === getGlobalIndex('article', i)"
+                    (click)="selectSuggestion(item)"
+                    type="button"
+                  >
+                    <svg class="w-4 h-4 text-lavender/70 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                    </svg>
+                    <div class="flex-1 min-w-0 text-left">
+                      <span class="text-sm text-ink truncate block" [innerHTML]="item.label | highlight:searchStore.query()"></span>
+                      @if (item.subtitle) {
+                        <span class="text-xs text-lavender truncate block">{{ item.subtitle }}</span>
+                      }
+                    </div>
+                  </button>
+                }
+              </div>
+            }
+
+            <!-- Group: Categories -->
+            @if (getCategorySuggestions().length > 0) {
+              <div class="px-4 pt-3 pb-1">
+                <span class="text-[11px] text-lavender uppercase tracking-wider font-semibold block mb-2">{{ 'search.categories' | translate }}</span>
+                @for (item of getCategorySuggestions(); track item.id; let i = $index) {
+                  <button
+                    class="search-item"
+                    [class.search-item--active]="searchStore.activeSuggestionIndex() === getGlobalIndex('category', i)"
+                    (click)="selectSuggestion(item)"
+                    type="button"
+                  >
+                    <svg class="w-4 h-4 text-lavender/70 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/>
+                    </svg>
+                    <span class="text-sm text-ink truncate flex-1 text-left" [innerHTML]="item.label | highlight:searchStore.query()"></span>
+                  </button>
+                }
+              </div>
+            }
+
+            <!-- Group: History matches -->
+            @if (getHistorySuggestions().length > 0) {
+              <div class="px-4 pt-3 pb-1">
+                <span class="text-[11px] text-lavender uppercase tracking-wider font-semibold block mb-2">{{ 'search.recent' | translate }}</span>
+                @for (item of getHistorySuggestions(); track item.id; let i = $index) {
+                  <button
+                    class="search-item"
+                    [class.search-item--active]="searchStore.activeSuggestionIndex() === getGlobalIndex('history', i)"
+                    (click)="selectSuggestion(item)"
+                    type="button"
+                  >
+                    <svg class="w-4 h-4 text-lavender/70 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="text-sm text-ink truncate flex-1 text-left" [innerHTML]="item.label | highlight:searchStore.query()"></span>
+                  </button>
+                }
+              </div>
+            }
+          } @else if (!searchStore.suggestionsLoading()) {
+            <!-- No results -->
+            <div class="px-4 py-8 text-center">
+              <p class="text-sm text-lavender">{{ 'search.no_results' | translate }}</p>
+              <p class="text-xs text-lavender/60 mt-1">{{ 'search.try_different' | translate }}</p>
+            </div>
+          }
+
+        }
+      </div>
+
+      <!-- Footer -->
+      <div class="flex items-center justify-between px-4 py-2.5 border-t border-alabaster/70 bg-alabaster/20">
+        <div class="hidden sm:flex items-center gap-3 text-[11px] text-lavender">
+          <span class="inline-flex items-center gap-1">
+            <kbd class="px-1 py-0.5 bg-alabaster text-lavender text-[10px] font-mono rounded border border-alabaster">↑↓</kbd>
+            {{ 'search.navigate' | translate }}
+          </span>
+          <span class="inline-flex items-center gap-1">
+            <kbd class="px-1 py-0.5 bg-alabaster text-lavender text-[10px] font-mono rounded border border-alabaster">↵</kbd>
+            {{ 'search.select' | translate }}
+          </span>
+          <span class="inline-flex items-center gap-1">
+            <kbd class="px-1 py-0.5 bg-alabaster text-lavender text-[10px] font-mono rounded border border-alabaster">esc</kbd>
+            {{ 'search.close' | translate }}
+          </span>
+        </div>
+        @if (searchStore.query().trim()) {
+          <button
+            (click)="searchStore.executeSearch(searchStore.query())"
+            class="text-xs text-dusk hover:text-ink font-medium transition-colors"
+            type="button"
+          >
+            {{ 'search.search_all' | translate }} "{{ searchStore.query() }}"
+          </button>
+        }
+      </div>
+
+    </div>
+  </div>
+}

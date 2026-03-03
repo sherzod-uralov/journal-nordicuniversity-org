@@ -1,4 +1,4 @@
-import { Component, forwardRef, input, signal, contentChild, TemplateRef } from '@angular/core';
+import { Component, forwardRef, input, signal, contentChild, TemplateRef , ChangeDetectionStrategy } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/forms';
 import { NgTemplateOutlet } from '@angular/common';
 import { ClickOutsideDirective } from '@shared/directives/click-outside.directive';
@@ -9,6 +9,7 @@ import { ClickOutsideDirective } from '@shared/directives/click-outside.directiv
   imports: [FormsModule, NgTemplateOutlet, ClickOutsideDirective],
   templateUrl: './select-input.component.html',
   styleUrl: './select-input.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

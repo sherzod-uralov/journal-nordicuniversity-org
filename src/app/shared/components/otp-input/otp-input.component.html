@@ -1,10 +1,11 @@
-<div class="otp-container" (paste)="onPaste($event)">
+<div class="otp-container" role="group" aria-label="OTP code" (paste)="onPaste($event)">
   @for (digit of digits(); track $index) {
     <input
       #otpBox
       type="text"
       inputmode="numeric"
       maxlength="1"
+      [attr.aria-label]="'Digit ' + ($index + 1)"
       [value]="digit"
       [disabled]="isDisabled()"
       (input)="onInput($event, $index)"

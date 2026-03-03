@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, input, signal } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, input, signal , ChangeDetectionStrategy } from '@angular/core';
 import { AuthorStore } from '@store/author.store';
 import { ArticleApiService } from '@services/api/article-api.service';
 import { Article } from '@core/models/article.model';
@@ -15,6 +15,7 @@ import { SeoService } from '@core/services/seo.service';
   imports: [ArticleCardComponent, Skeleton, BreadcrumbComponent, AvatarComponent, TranslatePipe],
   templateUrl: './author-detail.component.html',
   styleUrl: './author-detail.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthorDetailComponent implements OnInit, OnDestroy {
   readonly id = input.required<string>();

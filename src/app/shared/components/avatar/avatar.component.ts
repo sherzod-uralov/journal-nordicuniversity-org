@@ -1,12 +1,13 @@
-import { Component, input, computed } from '@angular/core';
-import { FileUrlPipe } from '@shared/pipes/file-url.pipe';
+import { Component, input, computed , ChangeDetectionStrategy } from '@angular/core';
+import { ImageComponent } from '@shared/components/image/image.component';
 
 @Component({
   selector: 'app-avatar',
   standalone: true,
-  imports: [FileUrlPipe],
+  imports: [ImageComponent],
   templateUrl: './avatar.component.html',
   styleUrl: './avatar.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AvatarComponent {
   readonly src = input<string | null>(null);

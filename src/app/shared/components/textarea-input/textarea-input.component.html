@@ -5,6 +5,7 @@
   [rows]="rows()"
   [attr.maxlength]="maxlength()"
   [disabled]="isDisabled()"
+  [attr.aria-describedby]="fieldId() ? fieldId() + '-error' : null"
   (input)="onInput($event)"
   (blur)="onBlur()"
   class="input-base"

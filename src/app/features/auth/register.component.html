@@ -9,7 +9,7 @@
     </div>
 
     <!-- Step Indicator -->
-    <div class="flex items-center justify-center gap-3 mb-8">
+    <div class="flex items-center justify-center gap-3 mb-8" role="progressbar" [attr.aria-valuenow]="step()" aria-valuemin="1" aria-valuemax="3">
       @for (s of [1, 2, 3]; track s) {
         <div class="flex items-center gap-3">
           <div
@@ -43,7 +43,7 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-ink mb-2">{{ 'auth.register.phone' | translate }} <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium text-ink mb-2">{{ 'auth.register.phone' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
             <app-phone-input [(ngModel)]="phone" name="phone" />
           </div>
 
@@ -119,33 +119,33 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.name' | translate }} <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.name' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
             <app-text-input [(ngModel)]="full_name" name="name" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.password' | translate }} <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.password' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
             <app-password-input [(ngModel)]="password" name="password" />
           </div>
 
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.degree' | translate }} <span class="text-red-500">*</span></label>
+              <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.degree' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
               <app-text-input [(ngModel)]="science_degree" name="degree" />
             </div>
             <div>
-              <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.job' | translate }} <span class="text-red-500">*</span></label>
+              <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.job' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
               <app-text-input [(ngModel)]="job" name="job" />
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.position' | translate }} <span class="text-red-500">*</span></label>
+              <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.position' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
               <app-text-input [(ngModel)]="place_position" name="position" />
             </div>
             <div>
-              <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.birthday' | translate }} <span class="text-red-500">*</span></label>
+              <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.birthday' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
               <app-date-input [(ngModel)]="birthdayDate" name="birthday" [maxDate]="maxDate" />
             </div>
           </div>

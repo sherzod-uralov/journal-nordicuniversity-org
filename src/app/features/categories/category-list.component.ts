@@ -1,10 +1,10 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit , ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CategoryStore } from '@store/category.store';
 import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
 import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
-import { FileUrlPipe } from '@shared/pipes/file-url.pipe';
+import { ImageComponent } from '@shared/components/image/image.component';
 import { ScrollAnimateDirective } from '@shared/directives/scroll-animate.directive';
 import { SeoService } from '@core/services/seo.service';
 import { Skeleton } from 'primeng/skeleton';
@@ -12,9 +12,10 @@ import { Skeleton } from 'primeng/skeleton';
 @Component({
   selector: 'app-category-list',
   standalone: true,
-  imports: [RouterLink, PageHeaderComponent, TranslatePipe, FileUrlPipe, ScrollAnimateDirective, Skeleton],
+  imports: [RouterLink, PageHeaderComponent, TranslatePipe, ImageComponent, ScrollAnimateDirective, Skeleton],
   templateUrl: './category-list.component.html',
   styleUrl: './category-list.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoryListComponent implements OnInit {
   readonly categoryStore = inject(CategoryStore);

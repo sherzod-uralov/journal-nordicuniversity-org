@@ -9,7 +9,7 @@
       <a routerLink="/" class="logo-link" (click)="closeMobileMenu()">
         <img
           src="/logo.svg"
-          alt="Nordic University Journal"
+          alt="International Nordic University Scientific Journal"
           class="logo-img brightness-0 invert"
         />
       </a>
@@ -28,13 +28,23 @@
         }
       </nav>
 
-      <!-- Right: Lang + Auth + Hamburger -->
+      <!-- Right: Search + Lang + Bookmarks + Auth + Hamburger -->
       <div class="actions-right">
+        <app-search-trigger class="hidden lg:block" />
         <app-language-switcher />
+
+        <a routerLink="/bookmarks" class="bookmark-btn hidden sm:flex" aria-label="Bookmarks">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z"/>
+          </svg>
+          @if (bookmarkStore.count() > 0) {
+            <span class="bookmark-badge">{{ bookmarkStore.count() }}</span>
+          }
+        </a>
 
         @if (authService.isAuthenticated()) {
           <a routerLink="/cabinet" class="auth-btn hidden sm:inline-flex">
-            <svg class="w-3.5 h-3.5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <svg class="w-3.5 h-3.5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
             </svg>
             {{ 'nav.cabinet' | translate }}
@@ -50,13 +60,15 @@
           (click)="toggleMobileMenu()"
           class="hamburger lg:hidden"
           aria-label="Toggle menu"
+          [attr.aria-expanded]="mobileMenuOpen()"
+          aria-controls="mobile-menu"
         >
           @if (mobileMenuOpen()) {
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
             </svg>
           } @else {
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5"/>
             </svg>
           }
@@ -68,7 +80,7 @@
 
   <!-- Mobile Menu -->
   @if (mobileMenuOpen()) {
-    <div class="mobile-menu lg:hidden">
+    <div id="mobile-menu" class="mobile-menu lg:hidden" role="navigation" aria-label="Mobile navigation">
       <nav class="mobile-nav">
         @for (link of navLinks; track link.path) {
           <a
@@ -82,6 +94,17 @@
           </a>
         }
         <div class="mobile-divider"></div>
+        <a routerLink="/bookmarks" (click)="closeMobileMenu()" class="mobile-link mobile-link--bookmark">
+          <svg class="w-4 h-4 inline-block mr-2 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z"/>
+          </svg>
+          {{ 'bookmarks.title' | translate }}
+          @if (bookmarkStore.count() > 0) {
+            <span class="ml-1.5 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-[11px] font-semibold rounded-full bg-white/15 text-white">
+              {{ bookmarkStore.count() }}
+            </span>
+          }
+        </a>
         @if (authService.isAuthenticated()) {
           <a routerLink="/cabinet" (click)="closeMobileMenu()" class="mobile-link">
             {{ 'nav.cabinet' | translate }}

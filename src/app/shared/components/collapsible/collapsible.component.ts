@@ -1,4 +1,4 @@
-import { Component, input, signal, contentChild, TemplateRef, OnInit } from '@angular/core';
+import { Component, input, signal, contentChild, TemplateRef, OnInit , ChangeDetectionStrategy } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 
 @Component({
@@ -7,6 +7,7 @@ import { NgTemplateOutlet } from '@angular/common';
   imports: [NgTemplateOutlet],
   templateUrl: './collapsible.component.html',
   styleUrl: './collapsible.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CollapsibleComponent implements OnInit {
   readonly title = input.required<string>();

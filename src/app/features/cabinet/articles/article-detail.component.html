@@ -63,9 +63,9 @@
           }
 
           <!-- Status stepper -->
-          <div class="stepper">
+          <div class="stepper" role="list">
             @for (step of steps; track step.key; let i = $index; let last = $last) {
-              <div class="step" [class]="'step--' + getStepState(i)">
+              <div class="step" role="listitem" [class]="'step--' + getStepState(i)">
                 <div class="step-icon">
                   @if (getStepState(i) === 'completed') {
                     <i class="pi pi-check text-xs"></i>
@@ -135,12 +135,12 @@
               <p class="text-2xl font-heading font-bold text-purple-900 mb-3">{{ a.transaction.amount | number }} UZS</p>
               <div class="flex flex-wrap gap-3">
                 <button (click)="payWithClick()"
-                  class="inline-flex items-center justify-center px-5 py-2.5 bg-white rounded-lg border border-purple-200 hover:border-[#0065FF] hover:shadow-md transition-all cursor-pointer">
-                  <img src="/logos/click.svg" alt="Click" class="h-7">
+                  class="inline-flex items-center justify-center px-5 py-2.5 bg-white rounded-lg border border-purple-200 hover:border-[#0065FF] hover:shadow-md transition-all cursor-pointer" aria-label="Pay with Click">
+                  <img src="/logos/click.svg" alt="Click" class="h-7" loading="lazy">
                 </button>
                 <button (click)="payWithPayme()"
-                  class="inline-flex items-center justify-center px-5 py-2.5 bg-white rounded-lg border border-purple-200 hover:border-[#33cccc] hover:shadow-md transition-all cursor-pointer">
-                  <img src="/logos/payme.svg" alt="Payme" class="h-7">
+                  class="inline-flex items-center justify-center px-5 py-2.5 bg-white rounded-lg border border-purple-200 hover:border-[#33cccc] hover:shadow-md transition-all cursor-pointer" aria-label="Pay with Payme">
+                  <img src="/logos/payme.svg" alt="Payme" class="h-7" loading="lazy">
                 </button>
               </div>
             </div>
@@ -397,7 +397,7 @@
           <h3 class="section-title mb-3">{{ 'cabinet.articles.download' | translate }}</h3>
           <div class="space-y-2">
             @if (a.file?.file_path) {
-              <a [href]="getFileUrl(a.file!.file_path)" target="_blank" rel="noopener" class="file-row">
+              <a [href]="getFileUrl(a.file!.file_path)" target="_blank" rel="noopener noreferrer" class="file-row" aria-label="Download article file">
                 <div class="file-icon file-icon--pdf">
                   <i class="pi pi-file-pdf text-sm"></i>
                 </div>
@@ -409,7 +409,7 @@
               </a>
             }
             @if (a.plagiarist_file?.file_path) {
-              <a [href]="getFileUrl(a.plagiarist_file!.file_path)" target="_blank" rel="noopener" class="file-row">
+              <a [href]="getFileUrl(a.plagiarist_file!.file_path)" target="_blank" rel="noopener noreferrer" class="file-row" aria-label="Download plagiarism report">
                 <div class="file-icon file-icon--report">
                   <i class="pi pi-shield text-sm"></i>
                 </div>
@@ -421,7 +421,7 @@
               </a>
             }
             @if (a.review_file?.file_path) {
-              <a [href]="getFileUrl(a.review_file!.file_path)" target="_blank" rel="noopener" class="file-row">
+              <a [href]="getFileUrl(a.review_file!.file_path)" target="_blank" rel="noopener noreferrer" class="file-row" aria-label="Download review report">
                 <div class="file-icon file-icon--report">
                   <i class="pi pi-file-edit text-sm"></i>
                 </div>

@@ -1,4 +1,4 @@
-import { Component, input, computed } from '@angular/core';
+import { Component, input, computed , ChangeDetectionStrategy } from '@angular/core';
 import { ArticleStatus } from '@core/models/article.model';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 
@@ -8,6 +8,7 @@ import { TranslatePipe } from '@shared/pipes/translate.pipe';
   imports: [TranslatePipe],
   templateUrl: './article-status-badge.component.html',
   styleUrl: './article-status-badge.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ArticleStatusBadgeComponent {
   readonly status = input.required<ArticleStatus>();

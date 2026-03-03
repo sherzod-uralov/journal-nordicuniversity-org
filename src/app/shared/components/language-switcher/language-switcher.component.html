@@ -1,7 +1,8 @@
-<div class="flex items-center gap-0.5 bg-white/8 rounded-md py-[0.2rem] px-0.5">
+<div class="flex items-center gap-0.5 bg-white/8 rounded-md py-[0.2rem] px-0.5" role="group" aria-label="Language">
   @for (lang of languages; track lang.code) {
     <button
       (click)="setLang(lang.code)"
+      [attr.aria-pressed]="languageService.lang() === lang.code"
       [class]="'px-2.5 py-1 text-[11px] font-medium rounded transition-all duration-150 ' +
         (languageService.lang() === lang.code
           ? 'bg-white/15 text-white'

@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, signal, computed, inject, PLATFORM_ID, afterNextRender } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 
@@ -10,27 +10,32 @@ export class LanguageService {
   private readonly http = inject(HttpClient);
   private readonly isBrowser = isPlatformBrowser(this.platformId);
 
-  private readonly currentLang = signal<Language>(this.loadLanguage());
+  private readonly currentLang = signal<Language>('en');
   private readonly translations = signal<Record<string, string>>({});
 
   readonly language = this.currentLang.asReadonly();
   readonly lang = computed(() => this.currentLang());
 
   constructor() {
-    this.loadTranslations(this.currentLang());
-  }
+    this.loadTranslations('en');
 
-  private loadLanguage(): Language {
-    if (this.isBrowser) {
-      return (localStorage.getItem('lang') as Language) || 'en';
-    }
-    return 'en';
+    afterNextRender(() => {
+      const stored = (localStorage.getItem('lang') as Language) || 'en';
+      if (stored !== 'en') {
+        this.currentLang.set(stored);
+        document.documentElement.lang = stored;
+        this.loadTranslations(stored);
+      } else {
+        document.documentElement.lang = 'en';
+      }
+    });
   }
 
   setLanguage(lang: Language): void {
     this.currentLang.set(lang);
     if (this.isBrowser) {
       localStorage.setItem('lang', lang);
+      document.documentElement.lang = lang;
     }
     this.loadTranslations(lang);
   }

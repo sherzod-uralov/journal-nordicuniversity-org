@@ -1,6 +1,6 @@
 import {
   Component, forwardRef, signal, output, inject,
-  PLATFORM_ID, ElementRef, viewChildren, AfterViewInit,
+  PLATFORM_ID, ElementRef, viewChildren, AfterViewInit, ChangeDetectionStrategy,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -10,6 +10,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
   standalone: true,
   templateUrl: './otp-input.component.html',
   styleUrl: './otp-input.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

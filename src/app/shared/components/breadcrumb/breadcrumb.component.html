@@ -1,16 +1,16 @@
-<nav class="flex items-center gap-2 text-sm text-lavender" aria-label="Breadcrumb">
+<nav class="flex items-center gap-1.5 text-sm text-lavender min-w-0" aria-label="Breadcrumb">
   @for (item of items(); track item.label; let last = $last) {
     @if (item.route && !last) {
-      <a [routerLink]="item.route" class="hover:text-dusk transition-colors">
+      <a [routerLink]="item.route" class="shrink-0 whitespace-nowrap hover:text-dusk transition-colors">
         {{ item.translateKey ? (item.translateKey | translate) : item.label }}
       </a>
     } @else {
-      <span [class]="last ? 'text-ink font-medium' : ''">
+      <span class="min-w-0 truncate" [class]="last ? 'text-ink font-medium' : ''" [attr.aria-current]="last ? 'page' : null">
         {{ item.translateKey ? (item.translateKey | translate) : item.label }}
       </span>
     }
     @if (!last) {
-      <svg class="w-4 h-4 text-lavender/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg class="w-3.5 h-3.5 shrink-0 text-lavender/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
       </svg>
     }

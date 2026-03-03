@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '@env';
 import { Article, ArticleFilterBody, MultiArticlesResponse } from '@core/models/article.model';
 import { PaginatedResponse, MultiSearchResponse } from '@core/models/api-response.model';
@@ -59,5 +59,26 @@ export class ArticleApiService {
 
   update(id: string, data: FormData): Observable<Article> {
     return this.http.put<Article>(`${this.baseUrl}/author/${id}`, data);
+  }
+
+  searchSuggestions(query: string, limit = 5): Observable<Article[]> {
+    const body: ArticleFilterBody = {
+      mainFilter: { title: query },
+      sort: { createdAt: 'DESC' },
+    };
+    const params = new HttpParams().set('page', 1).set('limit', limit);
+    return this.http.post<MultiSearchResponse<Article>>(`${this.baseUrl}/multi-search`, body, { params }).pipe(
+      map(res => res.data)
+    );
+  }
+
+  getTopArticles(limit = 5): Observable<Article[]> {
+    const body: ArticleFilterBody = {
+      sort: { viewsCount: 'DESC', createdAt: 'DESC' },
+    };
+    const params = new HttpParams().set('page', 1).set('limit', limit);
+    return this.http.post<MultiSearchResponse<Article>>(`${this.baseUrl}/multi-search`, body, { params }).pipe(
+      map(res => res.data)
+    );
   }
 }

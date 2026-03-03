@@ -16,7 +16,9 @@
       <span class="text-sm text-lavender">{{ news.time | dateLocale:'long' }}</span>
 
       @if (news.source?.file_path) {
-        <img [src]="news.source!.file_path | fileUrl" [alt]="news.title" class="w-full rounded-xl mt-6 mb-8 shadow-sm" />
+        <div class="mt-6 mb-8">
+          <app-image [src]="news.source!.file_path" [alt]="news.title" [priority]="true" rounded="0.75rem" />
+        </div>
       }
 
       <div class="prose prose-slate max-w-none text-dusk leading-relaxed" [innerHTML]="news.body | safeHtml"></div>

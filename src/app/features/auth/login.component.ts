@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject , ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthStore } from '@store/auth.store';
@@ -16,6 +16,7 @@ import { Button } from 'primeng/button';
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
   readonly authStore = inject(AuthStore);
@@ -24,8 +25,10 @@ export class LoginComponent {
   password = '';
 
   onSubmit(): void {
-    if (this.phone && this.password) {
-      this.authStore.login({ phone_number: this.phone, password: this.password });
+    const phone = this.phone.trim();
+    const pass = this.password;
+    if (phone.length >= 9 && phone.length <= 15 && /^\+?\d+$/.test(phone) && pass.length >= 6) {
+      this.authStore.login({ phone_number: phone, password: pass });
     }
   }
 }

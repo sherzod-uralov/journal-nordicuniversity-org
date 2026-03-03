@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component , ChangeDetectionStrategy } from '@angular/core';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 
 @Component({
@@ -7,5 +7,6 @@ import { TranslatePipe } from '@shared/pipes/translate.pipe';
   imports: [TranslatePipe],
   templateUrl: './edit-article.component.html',
   styleUrl: './edit-article.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditArticleComponent {}

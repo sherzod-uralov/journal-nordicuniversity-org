@@ -31,10 +31,10 @@
     <!-- Right: Image + Download -->
     <div class="guidelines-image-block">
       <div class="image-wrapper">
-        <img src="images/emirate.jpg" alt="IMRAD" class="imrad-img" />
+        <img src="images/emirate.jpg" alt="IMRAD" class="imrad-img" loading="lazy" />
       </div>
-      <a href="images/emirate.jpg" download="IMRAD-requirements.jpg" class="download-btn">
-        <svg class="download-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <a href="images/emirate.jpg" download="IMRAD-requirements.jpg" class="download-btn" aria-label="Download IMRAD image">
+        <svg class="download-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
         </svg>
         {{ 'guidelines.download_image' | translate }}
@@ -45,7 +45,7 @@
   <!-- IMRAD Note -->
   <div class="imrad-note" appScrollAnimate="fade-up">
     <div class="imrad-note-icon">
-      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
       </svg>
     </div>

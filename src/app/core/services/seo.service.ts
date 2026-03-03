@@ -37,9 +37,9 @@ export class SeoService {
   private readonly title = inject(Title);
   private readonly doc = inject(DOCUMENT);
 
-  private readonly defaultTitle = 'Nordic University Scientific Journal';
-  private readonly journalTitle = 'Nordic University Scientific Journal';
-  private readonly publisher = 'Nordic University';
+  private readonly defaultTitle = 'International Nordic University Scientific Journal';
+  private readonly journalTitle = 'International Nordic University Scientific Journal';
+  private readonly publisher = 'International Nordic University';
   private readonly siteUrl = 'https://journal.nordicun.uz';
 
   private addedMetaTags: string[] = [];
@@ -96,7 +96,7 @@ export class SeoService {
     // --- Google Scholar / Highwire Press tags ---
     this.setMeta('citation_title', data.title);
     this.setMeta('citation_journal_title', data.journalTitle);
-    this.setMeta('citation_journal_abbrev', 'Nord. Univ. Sci. J.');
+    this.setMeta('citation_journal_abbrev', 'Int. Nord. Univ. Sci. J.');
     this.setMeta('citation_publisher', data.publisher || this.publisher);
 
     if (data.language) {

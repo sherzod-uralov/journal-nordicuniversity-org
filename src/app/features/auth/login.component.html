@@ -13,7 +13,7 @@
     <!-- Card -->
     <div class="bg-white rounded-2xl shadow-xl shadow-ink/5 border border-alabaster/40 p-8">
       @if (authStore.error()) {
-        <div class="mb-5 flex items-center gap-3 p-3.5 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm">
+        <div class="mb-5 flex items-center gap-3 p-3.5 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm" role="alert" aria-live="assertive">
           <i class="pi pi-exclamation-circle text-lg"></i>
           <span>{{ authStore.error() }}</span>
         </div>
@@ -22,13 +22,13 @@
       <form (ngSubmit)="onSubmit()" class="space-y-6">
         <!-- Phone -->
         <div>
-          <label class="block text-sm font-medium text-ink mb-2">{{ 'auth.login.phone' | translate }} <span class="text-red-500">*</span></label>
+          <label class="block text-sm font-medium text-ink mb-2">{{ 'auth.login.phone' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
           <app-phone-input [(ngModel)]="phone" name="phone" />
         </div>
 
         <!-- Password -->
         <div>
-          <label class="block text-sm font-medium text-ink mb-2">{{ 'auth.login.password' | translate }} <span class="text-red-500">*</span></label>
+          <label class="block text-sm font-medium text-ink mb-2">{{ 'auth.login.password' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
           <app-password-input [(ngModel)]="password" name="password" />
         </div>
 

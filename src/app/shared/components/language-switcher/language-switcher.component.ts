@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject , ChangeDetectionStrategy } from '@angular/core';
 import { LanguageService, Language } from '@core/services/language.service';
 
 @Component({
@@ -6,6 +6,7 @@ import { LanguageService, Language } from '@core/services/language.service';
   standalone: true,
   templateUrl: './language-switcher.component.html',
   styleUrl: './language-switcher.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LanguageSwitcherComponent {
   readonly languageService = inject(LanguageService);

@@ -1,20 +1,24 @@
-import { Component, DestroyRef, inject, signal, afterNextRender } from '@angular/core';
+import { Component, DestroyRef, inject, signal, afterNextRender , ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { LanguageSwitcherComponent } from '../language-switcher/language-switcher.component';
+import { SearchTriggerComponent } from '../search-trigger/search-trigger.component';
 import { AuthService } from '@core/services/auth.service';
 import { AuthStore } from '@store/auth.store';
+import { BookmarkStore } from '@store/bookmark.store';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, TranslatePipe, LanguageSwitcherComponent],
+  imports: [RouterLink, RouterLinkActive, TranslatePipe, LanguageSwitcherComponent, SearchTriggerComponent],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent {
   readonly authService = inject(AuthService);
   readonly authStore = inject(AuthStore);
+  readonly bookmarkStore = inject(BookmarkStore);
   readonly mobileMenuOpen = signal(false);
   readonly scrolled = signal(false);
 
@@ -32,6 +36,7 @@ export class HeaderComponent {
 
   constructor() {
     afterNextRender(() => {
+      this.bookmarkStore.load();
       const onScroll = () => this.scrolled.set(window.scrollY > 50);
       window.addEventListener('scroll', onScroll, { passive: true });
       onScroll();

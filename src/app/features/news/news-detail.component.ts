@@ -1,9 +1,9 @@
-import { Component, inject, OnInit, OnDestroy, input, computed } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, input, computed , ChangeDetectionStrategy } from '@angular/core';
 import { NewsStore } from '@store/news.store';
 import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
 import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
 import { Skeleton } from 'primeng/skeleton';
-import { FileUrlPipe } from '@shared/pipes/file-url.pipe';
+import { ImageComponent } from '@shared/components/image/image.component';
 import { DateLocalePipe } from '@shared/pipes/date-locale.pipe';
 import { SafeHtmlPipe } from '@shared/pipes/safe-html.pipe';
 import { SeoService } from '@core/services/seo.service';
@@ -11,9 +11,10 @@ import { SeoService } from '@core/services/seo.service';
 @Component({
   selector: 'app-news-detail',
   standalone: true,
-  imports: [PageHeaderComponent, Skeleton, FileUrlPipe, DateLocalePipe, SafeHtmlPipe],
+  imports: [PageHeaderComponent, Skeleton, ImageComponent, DateLocalePipe, SafeHtmlPipe],
   templateUrl: './news-detail.component.html',
   styleUrl: './news-detail.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewsDetailComponent implements OnInit, OnDestroy {
   readonly slug = input.required<string>();

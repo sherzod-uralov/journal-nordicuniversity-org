@@ -1,7 +1,7 @@
 @if (src()) {
-  <img [src]="src()! | fileUrl" [alt]="name()" [class]="sizeClasses() + ' rounded-full object-cover'" />
+  <app-image [src]="src()!" [alt]="name()" [class]="sizeClasses()" rounded="9999px" ratio="1/1" />
 } @else {
-  <div [class]="sizeClasses() + ' rounded-full bg-dusk/10 flex items-center justify-center text-dusk font-semibold'">
+  <div role="img" [attr.aria-label]="name()" [class]="sizeClasses() + ' rounded-full bg-dusk/10 flex items-center justify-center text-dusk font-semibold'">
     {{ initials() }}
   </div>
 }

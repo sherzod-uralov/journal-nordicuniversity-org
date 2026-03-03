@@ -1,4 +1,4 @@
-import { Component, forwardRef, signal, PLATFORM_ID, inject } from '@angular/core';
+import { Component, forwardRef, signal, PLATFORM_ID, inject , ChangeDetectionStrategy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/forms';
 import { ClickOutsideDirective } from '@shared/directives/click-outside.directive';
@@ -10,6 +10,7 @@ import { ALL_COUNTRIES, DEFAULT_COUNTRY, CountryCode } from '@shared/data/countr
   imports: [FormsModule, ClickOutsideDirective],
   templateUrl: './phone-input.component.html',
   styleUrl: './phone-input.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

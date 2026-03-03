@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, computed } from '@angular/core';
+import { Component, inject, OnInit, computed , ChangeDetectionStrategy } from '@angular/core';
 import { AuthStore } from '@store/auth.store';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { DateLocalePipe } from '@shared/pipes/date-locale.pipe';
@@ -9,6 +9,7 @@ import { DateLocalePipe } from '@shared/pipes/date-locale.pipe';
   imports: [TranslatePipe, DateLocalePipe],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileComponent implements OnInit {
   readonly authStore = inject(AuthStore);

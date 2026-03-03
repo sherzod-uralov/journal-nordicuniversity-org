@@ -1,10 +1,10 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit , ChangeDetectionStrategy } from '@angular/core';
 import { AboutStore } from '@store/about.store';
 import { AvatarComponent } from '@shared/components/avatar/avatar.component';
 import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
 import { CollapsibleComponent } from '@shared/components/collapsible/collapsible.component';
 import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
-import { FileUrlPipe } from '@shared/pipes/file-url.pipe';
+import { ImageComponent } from '@shared/components/image/image.component';
 import { SafeHtmlPipe } from '@shared/pipes/safe-html.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { SeoService } from '@core/services/seo.service';
@@ -18,7 +18,7 @@ import { Skeleton } from 'primeng/skeleton';
     AvatarComponent,
     PageHeaderComponent,
     CollapsibleComponent,
-    FileUrlPipe,
+    ImageComponent,
     SafeHtmlPipe,
     TranslatePipe,
     ScrollAnimateDirective,
@@ -26,6 +26,7 @@ import { Skeleton } from 'primeng/skeleton';
   ],
   templateUrl: './about.component.html',
   styleUrl: './about.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AboutComponent implements OnInit {
   readonly aboutStore = inject(AboutStore);

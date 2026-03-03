@@ -1,12 +1,14 @@
 <div class="tag-container"
+     role="group"
+     aria-label="Tags"
      [class.tag-container--focused]="focused()"
      [class.tag-container--disabled]="isDisabled()">
   @for (tag of tags(); track $index; let i = $index) {
     <span class="tag-pill">
       <span class="tag-text">{{ tag }}</span>
       @if (!isDisabled()) {
-        <button type="button" class="tag-remove" (click)="removeTag(i)">
-          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <button type="button" class="tag-remove" [attr.aria-label]="'Remove tag: ' + tag" (click)="removeTag(i)">
+          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
@@ -16,6 +18,7 @@
   <input
     [id]="fieldId()"
     type="text"
+    aria-label="Add tag"
     [placeholder]="tags().length === 0 ? placeholder() : ''"
     [value]="inputValue()"
     (input)="onInput($event)"

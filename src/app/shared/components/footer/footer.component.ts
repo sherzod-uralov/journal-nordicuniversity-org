@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component , ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 
@@ -8,6 +8,7 @@ import { TranslatePipe } from '@shared/pipes/translate.pipe';
   imports: [RouterLink, TranslatePipe],
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FooterComponent {
   readonly currentYear = new Date().getFullYear();

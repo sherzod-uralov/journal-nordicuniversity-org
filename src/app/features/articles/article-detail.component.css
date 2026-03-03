@@ -115,9 +115,6 @@
   background: white;
   border-bottom: 1px solid var(--color-alabaster);
   padding: 0.625rem 0;
-  position: sticky;
-  top: 0;
-  z-index: 30;
 }
 
 .toolbar-btn {
@@ -681,6 +678,95 @@
   font-size: 0.75em;
 }
 
+/* ── DOI Copy Button ── */
+.doi-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.25rem;
+  border: none;
+  background: transparent;
+  color: var(--color-lavender);
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.doi-copy-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--color-dusk);
+}
+
+/* ── Related Articles ── */
+.related-section {
+  margin-top: 3rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--color-alabaster);
+}
+
+.related-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.related-header .section-title {
+  margin-bottom: 0;
+}
+
+.slider-nav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.slider-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 1px solid var(--color-alabaster);
+  background: white;
+  color: var(--color-dusk);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.slider-nav-btn:hover {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: white;
+}
+
+.related-slider {
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 0.5rem;
+}
+
+.related-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.related-slide {
+  flex: 0 0 17rem;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 640px) {
+  .related-slide {
+    flex: 0 0 19rem;
+  }
+}
+
 /* ── Responsive ── */
 @media (max-width: 1023px) {
   .content-layout {
@@ -718,5 +804,28 @@
 
   .content-sidebar {
     display: none;
+  }
+
+  .content-main {
+    max-width: 100%;
+  }
+
+  .content-section {
+    break-inside: avoid;
+  }
+
+  .article-content {
+    font-size: 11pt;
+    line-height: 1.6;
+    color: black;
+  }
+
+  .section-title {
+    color: black;
+  }
+
+  .abstract-block,
+  .references-block {
+    border-color: #ccc;
   }
 }

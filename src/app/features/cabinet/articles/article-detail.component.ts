@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed, input } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, input , ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ArticleApiService } from '@services/api/article-api.service';
 import { FileApiService } from '@services/api/file-api.service';
@@ -20,6 +20,7 @@ interface StatusStep {
   imports: [RouterLink, ArticleStatusBadgeComponent, TranslatePipe, DateLocalePipe, DecimalPipe],
   templateUrl: './article-detail.component.html',
   styleUrl: './article-detail.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ArticleDetailComponent implements OnInit {
   readonly id = input.required<string>();
@@ -75,11 +76,11 @@ export class ArticleDetailComponent implements OnInit {
 
   payWithClick(): void {
     const link = this.article()?.transaction?.transactions_link?.click_link;
-    if (link) window.open(link, '_blank');
+    if (link) window.open(link, '_blank', 'noopener,noreferrer');
   }
 
   payWithPayme(): void {
     const link = this.article()?.transaction?.transactions_link?.payme_link;
-    if (link) window.open(link, '_blank');
+    if (link) window.open(link, '_blank', 'noopener,noreferrer');
   }
 }

@@ -14,7 +14,11 @@
     </div>
     @if (newsStore.totalPages() > 1) {
       <div class="mt-8">
-        <p-paginator [first]="first" [rows]="12" [totalRecords]="newsStore.totalCount()" (onPageChange)="onPageChange($event)" />
+        <app-pagination
+          [currentPage]="newsStore.currentPage()"
+          [totalPages]="newsStore.totalPages()"
+          (pageChange)="onPageChange($event)"
+        />
       </div>
     }
   }

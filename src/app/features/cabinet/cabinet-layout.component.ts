@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject , ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthStore } from '@store/auth.store';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
@@ -9,6 +9,7 @@ import { TranslatePipe } from '@shared/pipes/translate.pipe';
   imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe],
   templateUrl: './cabinet-layout.component.html',
   styleUrl: './cabinet-layout.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CabinetLayoutComponent {
   readonly authStore = inject(AuthStore);

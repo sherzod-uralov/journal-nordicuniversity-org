@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, signal, computed, afterNextRender, DestroyRef } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, afterNextRender, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { ArticleStore } from '@store/article.store';
 import { VolumeStore } from '@store/volume.store';
@@ -24,6 +25,7 @@ import { ScrollAnimateDirective } from '@shared/directives/scroll-animate.direct
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit {
   readonly articleStore = inject(ArticleStore);
@@ -35,6 +37,8 @@ export class HomeComponent implements OnInit {
   readonly currentSlide = signal(0);
 
   readonly sliderArticles = computed(() => this.articleStore.latestArticles().slice(0, 3));
+
+  readonly displayVolumes = computed(() => this.volumeStore.volumes().slice(0, 5));
 
   readonly featuredMain = computed(() => this.articleStore.featuredArticles()[0] ?? null);
 
@@ -62,9 +66,11 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.articleStore.loadMulti();
     this.volumeStore.loadVolumes();
-    this.statsApi.getStatistics().subscribe({
-      next: (res) => this.stats.set(res.data),
-    });
+    this.statsApi.getStatistics()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => this.stats.set(res.data),
+      });
   }
 
   getCardPos(index: number): number {

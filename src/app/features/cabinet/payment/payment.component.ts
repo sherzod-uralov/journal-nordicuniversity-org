@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, input, signal } from '@angular/core';
+import { Component, inject, OnInit, input, signal , ChangeDetectionStrategy } from '@angular/core';
 import { BillingApiService } from '@services/api/billing-api.service';
 import { Transaction } from '@core/models/transaction.model';
 import { DecimalPipe } from '@angular/common';
@@ -10,6 +10,7 @@ import { TranslatePipe } from '@shared/pipes/translate.pipe';
   imports: [TranslatePipe, DecimalPipe],
   templateUrl: './payment.component.html',
   styleUrl: './payment.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentComponent implements OnInit {
   readonly articleId = input.required<string>();
@@ -27,11 +28,11 @@ export class PaymentComponent implements OnInit {
 
   payWithClick(): void {
     const link = this.transaction()?.transactions_link?.click_link;
-    if (link) window.open(link, '_blank');
+    if (link) window.open(link, '_blank', 'noopener,noreferrer');
   }
 
   payWithPayme(): void {
     const link = this.transaction()?.transactions_link?.payme_link;
-    if (link) window.open(link, '_blank');
+    if (link) window.open(link, '_blank', 'noopener,noreferrer');
   }
 }

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject , ChangeDetectionStrategy } from '@angular/core';
 import { Location } from '@angular/common';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 
@@ -8,6 +8,7 @@ import { TranslatePipe } from '@shared/pipes/translate.pipe';
   imports: [TranslatePipe],
   templateUrl: './back-button.component.html',
   styleUrl: './back-button.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BackButtonComponent {
   private readonly location = inject(Location);

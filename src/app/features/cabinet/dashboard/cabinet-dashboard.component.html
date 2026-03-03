@@ -28,7 +28,7 @@
       </a>
     </div>
     <div class="space-y-3">
-      @for (article of cabinetStore.myArticles().slice(0, 5); track article.id) {
+      @for (article of recentArticles(); track article.id) {
         <div class="flex items-center gap-4 px-5 py-4 bg-white rounded-xl border border-alabaster/60 hover:shadow-sm transition-shadow">
           <!-- Left: article info -->
           <div class="flex-1 min-w-0">

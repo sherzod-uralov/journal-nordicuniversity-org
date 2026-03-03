@@ -1,4 +1,4 @@
-import { Component, forwardRef, input, signal, output } from '@angular/core';
+import { Component, forwardRef, input, signal, output , ChangeDetectionStrategy } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
@@ -6,6 +6,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
   standalone: true,
   templateUrl: './file-input.component.html',
   styleUrl: './file-input.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

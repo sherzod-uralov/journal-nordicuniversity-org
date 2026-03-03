@@ -1,14 +1,16 @@
 <a
   [routerLink]="['/news', news().slug]"
+  [attr.aria-label]="news().title"
   class="block bg-white rounded-xl border border-alabaster/60 overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-dusk/5 hover:-translate-y-0.5 group"
 >
   <!-- Image -->
   @if (news().source?.file_path) {
-    <div class="aspect-[16/9] overflow-hidden bg-alabaster">
-      <img
-        [src]="news().source!.file_path | fileUrl"
+    <div class="overflow-hidden">
+      <app-image
+        [src]="news().source!.file_path"
         [alt]="news().title"
-        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        ratio="16/9"
+        class="block transition-transform duration-500 group-hover:scale-105"
       />
     </div>
   }
@@ -35,7 +37,7 @@
     <!-- Read More -->
     <span class="inline-flex items-center gap-1 text-sm font-medium text-dusk group-hover:text-ink transition-colors">
       {{ 'news.read_more' | translate }}
-      <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
       </svg>
     </span>

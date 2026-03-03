@@ -4,14 +4,8 @@
     <div class="py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
       <!-- Brand -->
       <div>
-        <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
-            <span class="text-white font-heading font-bold text-base">NU</span>
-          </div>
-          <div>
-            <div class="font-heading font-bold text-white text-lg">Nordic University</div>
-            <div class="text-xs text-lavender">Scientific Journal</div>
-          </div>
+        <div class="mb-4">
+          <img src="logo.svg" alt="International Nordic University Scientific Journal" class="h-14 brightness-0 invert" />
         </div>
         <p class="text-sm text-lavender/80 leading-relaxed max-w-xs">
           Advancing knowledge through peer-reviewed research and academic excellence.
@@ -40,14 +34,14 @@
         <h3 class="font-semibold text-white text-sm uppercase tracking-wider mb-4">{{ 'footer.contact' | translate }}</h3>
         <ul class="space-y-2.5 text-sm text-lavender/80">
           <li class="flex items-start gap-2">
-            <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
             {{ 'footer.address' | translate }}
           </li>
           <li class="flex items-start gap-2">
-            <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
             </svg>
             journal@nordicun.uz
@@ -59,7 +53,15 @@
     <!-- Bottom Bar -->
     <div class="py-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-lavender/60">
       <span>&copy; {{ currentYear }} {{ 'footer.copyright' | translate }}. {{ 'footer.rights' | translate }}.</span>
-      <span>Nordic University, Tashkent</span>
+      <div class="flex items-center gap-3">
+        <a href="/sitemap.xml" class="hover:text-white transition-colors flex items-center gap-1" aria-label="Sitemap">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503-8.457a4.49 4.49 0 00-3.003-1.168 4.49 4.49 0 00-3.003 1.168M3.75 12h.008v.008H3.75V12zm16.5 0h.008v.008h-.008V12zm-8.25-6h.008v.008H12V6z"/>
+          </svg>
+          Sitemap
+        </a>
+        <span>International Nordic University, Tashkent</span>
+      </div>
     </div>
   </div>
 </footer>

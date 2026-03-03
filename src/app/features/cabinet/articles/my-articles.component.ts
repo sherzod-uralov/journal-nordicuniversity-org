@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, effect } from '@angular/core';
+import { Component, inject, OnInit, effect , ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CabinetStore } from '@store/cabinet.store';
 import { AuthStore } from '@store/auth.store';
@@ -13,6 +13,7 @@ import { DateLocalePipe } from '@shared/pipes/date-locale.pipe';
   imports: [RouterLink, ArticleStatusBadgeComponent, EmptyStateComponent, TranslatePipe, DateLocalePipe],
   templateUrl: './my-articles.component.html',
   styleUrl: './my-articles.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MyArticlesComponent implements OnInit {
   readonly cabinetStore = inject(CabinetStore);

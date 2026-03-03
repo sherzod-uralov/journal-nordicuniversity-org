@@ -1,6 +1,7 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { ArticleStore } from '@store/article.store';
 import { CategoryStore } from '@store/category.store';
 import { VolumeStore } from '@store/volume.store';
@@ -14,12 +15,11 @@ import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.compone
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { ScrollAnimateDirective } from '@shared/directives/scroll-animate.directive';
 import { SeoService } from '@core/services/seo.service';
-import { Paginator } from 'primeng/paginator';
+import { SearchService } from '@core/services/search.service';
 import { Skeleton } from 'primeng/skeleton';
-import { Checkbox } from 'primeng/checkbox';
-import { RadioButton } from 'primeng/radiobutton';
+import { PaginationComponent } from '@shared/components/pagination/pagination.component';
 import { ToggleSwitchComponent } from '@shared/components/toggle-switch/toggle-switch.component';
-import { DatePicker } from 'primeng/datepicker';
+import { DatepickerComponent } from '@shared/components/datepicker/datepicker.component';
 
 @Component({
   selector: 'app-article-list',
@@ -28,11 +28,12 @@ import { DatePicker } from 'primeng/datepicker';
     DatePipe, FormsModule, ArticleCardComponent,
     EmptyStateComponent, PageHeaderComponent,
     TranslatePipe, ScrollAnimateDirective,
-    Paginator, Skeleton, Checkbox, RadioButton,
-    ToggleSwitchComponent, DatePicker,
+    Skeleton, PaginationComponent,
+    ToggleSwitchComponent, DatepickerComponent,
   ],
   templateUrl: './article-list.component.html',
   styleUrl: './article-list.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ArticleListComponent implements OnInit {
   readonly articleStore = inject(ArticleStore);
@@ -40,6 +41,8 @@ export class ArticleListComponent implements OnInit {
   readonly volumeStore = inject(VolumeStore);
   private readonly subcategoryApi = inject(SubcategoryApiService);
   private readonly seo = inject(SeoService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly searchService = inject(SearchService);
 
   // Filter signals
   readonly searchQuery = signal('');
@@ -76,7 +79,7 @@ export class ArticleListComponent implements OnInit {
 
   readonly filteredSubCategories = computed(() => {
     const cats = this.selectedCategories();
-    const subs = this.subcategories();
+    const subs = this.subcategories().filter(s => s.name);
     if (cats.length === 0) return subs;
     return subs.filter(s => cats.includes(s.categoryId));
   });
@@ -92,11 +95,15 @@ export class ArticleListComponent implements OnInit {
     return count;
   });
 
-  // Paginator helper
-  readonly first = computed(() => (this.articleStore.currentPage() - 1) * 12);
 
   ngOnInit(): void {
     this.seo.update({ title: 'Articles', description: 'Browse peer-reviewed scientific articles' });
+
+    const q = this.route.snapshot.queryParamMap.get('q');
+    if (q) {
+      this.searchQuery.set(q);
+    }
+
     this.doSearch(1);
     this.categoryStore.loadCategories();
     this.volumeStore.loadVolumes();
@@ -167,8 +174,8 @@ export class ArticleListComponent implements OnInit {
     this.doSearch(1);
   }
 
-  onPageChange(event: { first?: number; rows?: number; page?: number }): void {
-    this.doSearch((event.page ?? 0) + 1);
+  onPageChange(page: number): void {
+    this.doSearch(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -235,6 +242,10 @@ export class ArticleListComponent implements OnInit {
   }
 
   doSearch(page: number): void {
+    const query = this.searchQuery();
+    if (query.trim() && page === 1) {
+      this.searchService.addToHistory(query);
+    }
     this.articleStore.searchArticles({
       body: this.buildFilterBody(),
       page,

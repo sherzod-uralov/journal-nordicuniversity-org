@@ -1,4 +1,4 @@
-import { Component, forwardRef, input, signal, ElementRef, viewChild, AfterViewInit } from '@angular/core';
+import { Component, forwardRef, input, signal, ElementRef, viewChild, AfterViewInit , ChangeDetectionStrategy } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
@@ -6,6 +6,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
   standalone: true,
   templateUrl: './textarea-input.component.html',
   styleUrl: './textarea-input.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

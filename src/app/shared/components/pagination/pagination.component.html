@@ -1,0 +1,44 @@
+<nav class="pg" aria-label="Pagination">
+  <!-- Prev -->
+  <button
+    class="pg-arrow"
+    type="button"
+    [disabled]="!canPrev()"
+    (click)="prev()"
+    aria-label="Previous page"
+  >
+    <svg class="pg-arrow-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/>
+    </svg>
+  </button>
+
+  <!-- Pages -->
+  @for (page of pages(); track $index) {
+    @if (page === '...') {
+      <span class="pg-ellipsis" aria-hidden="true">&hellip;</span>
+    } @else {
+      <button
+        class="pg-page"
+        type="button"
+        [class.pg-page--active]="page === currentPage()"
+        [attr.aria-current]="page === currentPage() ? 'page' : null"
+        (click)="goTo(page)"
+      >
+        {{ page }}
+      </button>
+    }
+  }
+
+  <!-- Next -->
+  <button
+    class="pg-arrow"
+    type="button"
+    [disabled]="!canNext()"
+    (click)="next()"
+    aria-label="Next page"
+  >
+    <svg class="pg-arrow-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+    </svg>
+  </button>
+</nav>

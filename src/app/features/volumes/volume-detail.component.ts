@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, input, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, input, signal, computed , ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { VolumeStore } from '@store/volume.store';
 import { ArticleApiService } from '@services/api/article-api.service';
@@ -9,6 +9,7 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
 import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
 import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
 import { FileUrlPipe } from '@shared/pipes/file-url.pipe';
+import { ImageComponent } from '@shared/components/image/image.component';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { SafeHtmlPipe } from '@shared/pipes/safe-html.pipe';
 import { DateLocalePipe } from '@shared/pipes/date-locale.pipe';
@@ -21,11 +22,12 @@ import { environment } from '@env';
   standalone: true,
   imports: [
     RouterLink, ArticleCardComponent, Skeleton,
-    EmptyStateComponent, PageHeaderComponent, FileUrlPipe,
+    EmptyStateComponent, PageHeaderComponent, FileUrlPipe, ImageComponent,
     TranslatePipe, SafeHtmlPipe, DateLocalePipe, ScrollAnimateDirective,
   ],
   templateUrl: './volume-detail.component.html',
   styleUrl: './volume-detail.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VolumeDetailComponent implements OnInit, OnDestroy {
   readonly id = input.required<string>();
@@ -66,7 +68,7 @@ export class VolumeDetailComponent implements OnInit, OnDestroy {
     if (v?.source?.file_path) {
       const base = environment.apiUrl.replace(/\/+$/, '');
       const path = v.source.file_path.replace(/^\/+/, '');
-      window.open(`${base}/${path}`, '_blank');
+      window.open(`${base}/${path}`, '_blank', 'noopener,noreferrer');
     }
   }
 }

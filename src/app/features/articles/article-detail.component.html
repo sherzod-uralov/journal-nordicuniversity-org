@@ -38,13 +38,13 @@
       <div class="hero-chips">
         @if (a.category?.name) {
           <a [routerLink]="['/categories', a.categoryId]" class="hero-chip hero-chip--category">
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
             {{ a.category!.name }}
           </a>
         }
         @if (a.publish_date) {
           <span class="hero-chip">
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             {{ a.publish_date | dateLocale:'long' }}
           </span>
         }
@@ -54,13 +54,13 @@
         </span>
         @if (a.volume?.title) {
           <a [routerLink]="['/volumes', a.volume_id]" class="hero-chip">
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
             {{ a.volume!.title }}
           </a>
         }
         @if (a.first_page_in_volume && a.last_page_in_volume) {
           <span class="hero-chip">
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             pp. {{ a.first_page_in_volume }}–{{ a.last_page_in_volume }}
           </span>
         }
@@ -70,7 +70,7 @@
       @if (a.doi) {
         <div class="hero-doi">
           <span class="hero-doi-label">DOI</span>
-          <a href="https://doi.org/{{ a.doi }}" target="_blank" rel="noopener" class="hero-doi-link">
+          <a href="https://doi.org/{{ a.doi }}" target="_blank" rel="noopener noreferrer" class="hero-doi-link">
             {{ a.doi }}
           </a>
         </div>
@@ -82,8 +82,22 @@
   <div class="toolbar-strip no-print">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-end gap-2">
       <!-- Reading mode toggle -->
-      <button (click)="readingMode.set(!readingMode())" class="toolbar-btn" [class.toolbar-btn--active]="readingMode()">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      <button (click)="readingMode.set(!readingMode())" class="toolbar-btn" [class.toolbar-btn--active]="readingMode()" aria-label="Toggle reading mode" [attr.aria-pressed]="readingMode()">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      </button>
+
+      <!-- Bookmark -->
+      <button (click)="toggleBookmark()" class="toolbar-btn" [class.toolbar-btn--active]="bookmarkStore.isBookmarked(a.id)" [attr.aria-label]="bookmarkStore.isBookmarked(a.id) ? 'Remove bookmark' : 'Add bookmark'">
+        @if (bookmarkStore.isBookmarked(a.id)) {
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M6.32 2.577a49.255 49.255 0 0111.36 0c1.497.174 2.57 1.46 2.57 2.93V21.75a.75.75 0 01-1.085.67L12 18.089l-7.165 4.332A.75.75 0 013.75 21.75V5.507c0-1.47 1.073-2.756 2.57-2.93z" clip-rule="evenodd"/></svg>
+        } @else {
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z"/></svg>
+        }
+      </button>
+
+      <!-- Print -->
+      <button (click)="printArticle()" class="toolbar-btn" aria-label="Print article">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18.25 7.034v.001"/></svg>
       </button>
 
       <!-- Download -->
@@ -96,29 +110,29 @@
 
       <!-- Share -->
       <div class="relative">
-        <button (click)="toggleShareMenu()" class="toolbar-btn">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+        <button (click)="toggleShareMenu()" class="toolbar-btn" aria-label="Share" [attr.aria-expanded]="showShareMenu()">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
         </button>
 
         @if (copiedLink()) {
-          <span class="absolute -top-8 right-0 text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-1 rounded-lg whitespace-nowrap">Link copied!</span>
+          <span class="absolute -top-8 right-0 text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-1 rounded-lg whitespace-nowrap" aria-live="polite">Link copied!</span>
         }
 
         @if (showShareMenu()) {
-          <div class="share-dropdown">
-            <button (click)="copyLink()" class="share-item">
+          <div class="share-dropdown" role="menu">
+            <button (click)="copyLink()" class="share-item" role="menuitem">
               <svg class="w-4 h-4 text-lavender" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
               Copy Link
             </button>
-            <button (click)="shareToTelegram()" class="share-item">
+            <button (click)="shareToTelegram()" class="share-item" role="menuitem">
               <svg class="w-4 h-4 text-[#2AABEE]" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
               Telegram
             </button>
-            <button (click)="shareToTwitter()" class="share-item">
+            <button (click)="shareToTwitter()" class="share-item" role="menuitem">
               <svg class="w-4 h-4 text-ink" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
               X (Twitter)
             </button>
-            <button (click)="shareToFacebook()" class="share-item">
+            <button (click)="shareToFacebook()" class="share-item" role="menuitem">
               <svg class="w-4 h-4 text-[#1877F2]" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
               Facebook
             </button>
@@ -136,7 +150,7 @@
       <article class="content-main">
 
         <!-- Author Bar -->
-        <div class="author-bar no-print" appScrollAnimate="fade-up">
+        <div class="author-bar" appScrollAnimate="fade-up">
           <a [routerLink]="['/authors', a.author_id]" class="flex items-center gap-3 group">
             <app-avatar [name]="a.author?.full_name ?? ''" size="md" />
             <div>
@@ -164,19 +178,23 @@
 
         <!-- Article Source File -->
         @if (pdfUrl()) {
-          <section class="content-section no-print" appScrollAnimate="fade-up">
-            <app-collapsible [title]="('article.source_file' | translate)" [open]="true">
-              <ng-template #icon>
-                <svg class="w-5 h-5 text-dusk" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-              </ng-template>
-              <app-pdf-viewer [src]="pdfUrl()" />
-            </app-collapsible>
-          </section>
+          @defer (on viewport) {
+            <section class="content-section no-print" appScrollAnimate="fade-up">
+              <app-collapsible [title]="('article.source_file' | translate)" [open]="true">
+                <ng-template #icon>
+                  <svg class="w-5 h-5 text-dusk" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </ng-template>
+                <app-pdf-viewer [src]="pdfUrl()" />
+              </app-collapsible>
+            </section>
+          } @placeholder {
+            <div class="h-96 bg-alabaster/30 rounded-xl animate-pulse"></div>
+          }
         }
 
         <!-- Abstract -->
         @if (a.abstract) {
-          <section class="content-section no-print" appScrollAnimate="fade-up">
+          <section class="content-section" appScrollAnimate="fade-up">
             <h2 class="section-title">{{ 'article.abstract' | translate }}</h2>
             <div class="abstract-block">
               <p class="text-dusk leading-relaxed">{{ a.abstract }}</p>
@@ -186,7 +204,7 @@
 
         <!-- Keywords -->
         @if (keywords().length) {
-          <section class="content-section no-print" appScrollAnimate="fade-up">
+          <section class="content-section" appScrollAnimate="fade-up">
             <h2 class="section-title">{{ 'article.keywords' | translate }}</h2>
             <div class="flex flex-wrap gap-2">
               @for (kw of keywords(); track kw) {
@@ -198,14 +216,14 @@
 
         <!-- Body -->
         @if (a.description) {
-          <section class="content-section no-print" appScrollAnimate="fade-up">
+          <section class="content-section" appScrollAnimate="fade-up">
             <div class="article-content" [innerHTML]="a.description | safeHtml"></div>
           </section>
         }
 
         <!-- References -->
         @if (a.references) {
-          <section class="content-section no-print" appScrollAnimate="fade-up">
+          <section class="content-section" appScrollAnimate="fade-up">
             <h2 class="section-title">{{ 'article.references' | translate }}</h2>
             <div class="references-block">
               <div class="text-sm text-dusk leading-relaxed whitespace-pre-line">{{ a.references }}</div>
@@ -214,80 +232,84 @@
         }
 
         <!-- Citation -->
-        <section class="content-section no-print" appScrollAnimate="fade-up">
-          <h2 class="section-title">{{ 'article.citation' | translate }}</h2>
-          <div class="citation-block">
-            <div class="citation-header">
-              <label class="text-xs font-semibold text-lavender uppercase tracking-wider">{{ 'article.citation.style' | translate }}</label>
-              <!-- Custom citation style select -->
-              <div class="cite-select" (appClickOutside)="closeStyleDropdown()">
-                <button type="button" class="cite-select-trigger" (click)="toggleStyleDropdown()">
-                  <span>{{ selectedStyleLabel() }}</span>
-                  <svg class="cite-select-chevron" [class.cite-select-chevron--open]="styleDropdownOpen()" width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
-                  </svg>
+        @defer (on viewport) {
+          <section class="content-section no-print" appScrollAnimate="fade-up">
+            <h2 class="section-title">{{ 'article.citation' | translate }}</h2>
+            <div class="citation-block">
+              <div class="citation-header">
+                <label class="text-xs font-semibold text-lavender uppercase tracking-wider">{{ 'article.citation.style' | translate }}</label>
+                <!-- Custom citation style select -->
+                <div class="cite-select" (appClickOutside)="closeStyleDropdown()">
+                  <button type="button" class="cite-select-trigger" (click)="toggleStyleDropdown()">
+                    <span>{{ selectedStyleLabel() }}</span>
+                    <svg class="cite-select-chevron" [class.cite-select-chevron--open]="styleDropdownOpen()" width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+                    </svg>
+                  </button>
+                  @if (styleDropdownOpen()) {
+                    <div class="cite-select-dropdown">
+                      @for (style of citationStyles; track style.value) {
+                        <button
+                          type="button"
+                          class="cite-select-item"
+                          [class.cite-select-item--active]="style.value === selectedCitationStyle()"
+                          (click)="onCitationStyleChange(style.value)"
+                        >
+                          {{ style.label }}
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+              <div class="citation-text">{{ citationText() }}</div>
+              <div class="citation-actions">
+                <button (click)="copyCitation()" class="citation-btn citation-btn--primary">
+                  @if (copiedCitation()) {
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    {{ 'article.citation.copied' | translate }}
+                  } @else {
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                    {{ 'article.citation.copy' | translate }}
+                  }
                 </button>
-                @if (styleDropdownOpen()) {
-                  <div class="cite-select-dropdown">
-                    @for (style of citationStyles; track style.value) {
-                      <button
-                        type="button"
-                        class="cite-select-item"
-                        [class.cite-select-item--active]="style.value === selectedCitationStyle()"
-                        (click)="onCitationStyleChange(style.value)"
-                      >
-                        {{ style.label }}
-                      </button>
-                    }
-                  </div>
-                }
+                <!-- Custom export select -->
+                <div class="cite-select cite-select--export" (appClickOutside)="closeExportDropdown()">
+                  <button type="button" class="citation-btn" (click)="toggleExportDropdown()">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    {{ 'article.citation.export' | translate }}
+                    <svg class="cite-select-chevron" [class.cite-select-chevron--open]="exportDropdownOpen()" width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+                    </svg>
+                  </button>
+                  @if (exportDropdownOpen()) {
+                    <div class="cite-select-dropdown cite-select-dropdown--right">
+                      @for (fmt of exportFormats; track fmt.value) {
+                        <button
+                          type="button"
+                          class="cite-select-item"
+                          (click)="exportCitation(fmt.value)"
+                        >
+                          <span>{{ fmt.label }}</span>
+                          <span class="cite-select-ext">{{ fmt.ext }}</span>
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
               </div>
             </div>
-            <div class="citation-text">{{ citationText() }}</div>
-            <div class="citation-actions">
-              <button (click)="copyCitation()" class="citation-btn citation-btn--primary">
-                @if (copiedCitation()) {
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                  {{ 'article.citation.copied' | translate }}
-                } @else {
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
-                  {{ 'article.citation.copy' | translate }}
-                }
-              </button>
-              <!-- Custom export select -->
-              <div class="cite-select cite-select--export" (appClickOutside)="closeExportDropdown()">
-                <button type="button" class="citation-btn" (click)="toggleExportDropdown()">
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                  {{ 'article.citation.export' | translate }}
-                  <svg class="cite-select-chevron" [class.cite-select-chevron--open]="exportDropdownOpen()" width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
-                  </svg>
-                </button>
-                @if (exportDropdownOpen()) {
-                  <div class="cite-select-dropdown cite-select-dropdown--right">
-                    @for (fmt of exportFormats; track fmt.value) {
-                      <button
-                        type="button"
-                        class="cite-select-item"
-                        (click)="exportCitation(fmt.value)"
-                      >
-                        <span>{{ fmt.label }}</span>
-                        <span class="cite-select-ext">{{ fmt.ext }}</span>
-                      </button>
-                    }
-                  </div>
-                }
-              </div>
-            </div>
-          </div>
-        </section>
+          </section>
+        } @placeholder {
+          <div class="h-32"></div>
+        }
 
         <!-- License -->
-        <section class="content-section no-print" appScrollAnimate="fade-up">
+        <section class="content-section" appScrollAnimate="fade-up">
           <h2 class="section-title">{{ 'article.license' | translate }}</h2>
           <div class="license-block">
-            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener" class="license-badge">
-              <svg class="w-20 h-7" viewBox="0 0 120 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" class="license-badge">
+              <svg class="w-20 h-7" viewBox="0 0 120 42" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Creative Commons Attribution 4.0">
                 <rect width="120" height="42" rx="4" fill="#EF9421"/>
                 <text x="8" y="16" font-size="9" font-weight="700" fill="white" font-family="Arial, sans-serif">CREATIVE</text>
                 <text x="8" y="28" font-size="9" font-weight="700" fill="white" font-family="Arial, sans-serif">COMMONS</text>
@@ -298,7 +320,7 @@
               </svg>
             </a>
             <div class="license-content">
-              <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener" class="text-sm font-semibold text-dusk hover:text-ink transition-colors">
+              <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-dusk hover:text-ink transition-colors">
                 Creative Commons Attribution 4.0 International (CC BY 4.0)
               </a>
               <p class="text-sm text-lavender leading-relaxed mt-1">{{ 'article.license.text' | translate }}</p>
@@ -308,15 +330,19 @@
 
         <!-- Certificates -->
         @if (a.certificates?.length) {
-          @for (cert of a.certificates; track cert.id) {
-            <section class="content-section no-print" appScrollAnimate="fade-up">
-              <app-collapsible [title]="('article.certificate.for' | translate) + ' ' + (cert.author?.full_name ?? '')">
-                <ng-template #icon>
-                  <svg class="w-5 h-5 text-dusk" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
-                </ng-template>
-                <app-pdf-viewer [src]="cert.certificate_link" />
-              </app-collapsible>
-            </section>
+          @defer (on viewport) {
+            @for (cert of a.certificates; track cert.id) {
+              <section class="content-section no-print" appScrollAnimate="fade-up">
+                <app-collapsible [title]="('article.certificate.for' | translate) + ' ' + (cert.author?.full_name ?? '')">
+                  <ng-template #icon>
+                    <svg class="w-5 h-5 text-dusk" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                  </ng-template>
+                  <app-pdf-viewer [src]="cert.certificate_link" />
+                </app-collapsible>
+              </section>
+            }
+          } @placeholder {
+            <div class="h-24"></div>
           }
         }
       </article>
@@ -329,12 +355,12 @@
           <div class="sidebar-card" appScrollAnimate="fade-up">
             @if (a.image?.file_path) {
               <div class="sidebar-card-img">
-                <img [src]="a.image!.file_path | fileUrl" [alt]="a.title" class="w-full h-full object-cover" />
+                <app-image [src]="a.image!.file_path" [alt]="a.title" [priority]="true" />
               </div>
             }
             <div class="p-5 space-y-3.5">
               <div class="info-row">
-                <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 <div>
                   <div class="info-label">{{ 'article.published' | translate }}</div>
                   <div class="info-value">{{ a.publish_date | dateLocale:'long' }}</div>
@@ -343,7 +369,7 @@
 
               @if (a.category?.name) {
                 <div class="info-row">
-                  <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                  <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
                   <div>
                     <div class="info-label">{{ 'article.category' | translate }}</div>
                     <a [routerLink]="['/categories', a.categoryId]" class="info-value text-dusk hover:text-ink transition-colors">{{ a.category!.name }}</a>
@@ -353,7 +379,7 @@
 
               @if (a.volume?.title) {
                 <div class="info-row">
-                  <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                  <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                   <div>
                     <div class="info-label">{{ 'article.volume' | translate }}</div>
                     <a [routerLink]="['/volumes', a.volume_id]" class="info-value text-dusk hover:text-ink transition-colors">{{ a.volume!.title }}</a>
@@ -363,7 +389,7 @@
 
               @if (a.first_page_in_volume && a.last_page_in_volume) {
                 <div class="info-row">
-                  <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                  <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                   <div>
                     <div class="info-label">{{ 'article.pages' | translate }}</div>
                     <div class="info-value">{{ a.first_page_in_volume }} – {{ a.last_page_in_volume }}</div>
@@ -372,7 +398,7 @@
               }
 
               <div class="info-row">
-                <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                 <div>
                   <div class="info-label">{{ 'article.views' | translate }}</div>
                   <div class="info-value">{{ a.viewsCount }}</div>
@@ -381,10 +407,19 @@
 
               @if (a.doi) {
                 <div class="info-row">
-                  <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                  <div class="min-w-0">
+                  <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                  <div class="min-w-0 flex-1">
                     <div class="info-label">{{ 'article.doi' | translate }}</div>
-                    <a href="https://doi.org/{{ a.doi }}" target="_blank" rel="noopener" class="info-value text-dusk font-mono text-xs hover:text-ink transition-colors break-all">{{ a.doi }}</a>
+                    <div class="flex items-center gap-1.5">
+                      <a href="https://doi.org/{{ a.doi }}" target="_blank" rel="noopener noreferrer" class="info-value text-dusk font-mono text-xs hover:text-ink transition-colors break-all flex-1">{{ a.doi }}</a>
+                      <button (click)="copyDoi()" class="doi-copy-btn" [attr.aria-label]="'article.copy_doi' | translate">
+                        @if (copiedDoi()) {
+                          <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        } @else {
+                          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                        }
+                      </button>
+                    </div>
                   </div>
                 </div>
               }
@@ -412,7 +447,7 @@
             @if (a.author?.OrcID) {
               <p class="text-xs text-dusk mt-1">
                 <span class="text-lavender">ORCID:</span>
-                <a href="https://orcid.org/{{ a.author!.OrcID }}" target="_blank" rel="noopener" class="hover:text-ink transition-colors ml-1 font-mono">{{ a.author!.OrcID }}</a>
+                <a href="https://orcid.org/{{ a.author!.OrcID }}" target="_blank" rel="noopener noreferrer" class="hover:text-ink transition-colors ml-1 font-mono">{{ a.author!.OrcID }}</a>
               </p>
             }
 
@@ -456,5 +491,52 @@
         </div>
       </aside>
     </div>
+
+    <!-- Related Articles -->
+    @if (relatedArticles().length || relatedLoading()) {
+      @defer (on viewport) {
+        <section class="related-section no-print" appScrollAnimate="fade-up">
+          <div class="related-header">
+            <h2 class="section-title">{{ 'article.related' | translate }}</h2>
+            @if (relatedArticles().length > 2) {
+              <div class="slider-nav">
+                <button (click)="slidePrev()" class="slider-nav-btn" aria-label="Previous">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <button (click)="slideNext()" class="slider-nav-btn" aria-label="Next">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+            }
+          </div>
+          @if (relatedLoading()) {
+            <div class="related-slider" #relatedSlider>
+              @for (_ of [1,2,3,4]; track $index) {
+                <div class="related-slide">
+                  <div class="bg-white rounded-xl border border-alabaster/60 overflow-hidden h-full">
+                    <p-skeleton width="100%" height="10rem" />
+                    <div class="p-5 space-y-2">
+                      <p-skeleton width="40%" height="0.75rem" />
+                      <p-skeleton width="90%" height="1rem" />
+                      <p-skeleton width="70%" height="0.75rem" />
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="related-slider" #relatedSlider>
+              @for (rel of relatedArticles(); track rel.id) {
+                <div class="related-slide">
+                  <app-article-card [article]="rel" />
+                </div>
+              }
+            </div>
+          }
+        </section>
+      } @placeholder {
+        <div class="h-32"></div>
+      }
+    }
   </div>
 }

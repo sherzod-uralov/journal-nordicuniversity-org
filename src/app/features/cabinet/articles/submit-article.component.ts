@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed , ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ArticleApiService } from '@services/api/article-api.service';
@@ -31,6 +31,7 @@ import { TagInputComponent } from '@shared/components/tag-input/tag-input.compon
   ],
   templateUrl: './submit-article.component.html',
   styleUrl: './submit-article.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SubmitArticleComponent implements OnInit {
   private readonly articleApi = inject(ArticleApiService);
@@ -131,16 +132,16 @@ export class SubmitArticleComponent implements OnInit {
   validate(): boolean {
     const errs: Record<string, string> = {};
 
-    if (!this.title || this.title.trim().length < 3) {
+    if (!this.title || this.title.trim().length < 3 || this.title.trim().length > 500) {
       errs['title'] = 'cabinet.submit.error.title';
     }
-    if (!this.abstract || this.abstract.trim().length < 10) {
+    if (!this.abstract || this.abstract.trim().length < 10 || this.abstract.trim().length > 2000) {
       errs['abstract'] = 'cabinet.submit.error.abstract';
     }
-    if (!this.description || this.description.trim().length < 3) {
+    if (!this.description || this.description.trim().length < 3 || this.description.trim().length > 50000) {
       errs['description'] = 'cabinet.submit.error.description';
     }
-    if (this.keywords().length === 0) {
+    if (this.keywords().length === 0 || this.keywords().length > 20 || this.keywords().some(k => k.length > 100)) {
       errs['keywords'] = 'cabinet.submit.error.keywords';
     }
     if (!this.selectedCategory()) {

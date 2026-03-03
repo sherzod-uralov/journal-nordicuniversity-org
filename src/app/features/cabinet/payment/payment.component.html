@@ -29,13 +29,15 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 px-6 py-5 bg-[#fafaf8] border-t border-alabaster/40">
         <button
           (click)="payWithClick()"
-          class="flex items-center justify-center px-5 py-3 bg-white rounded-lg border border-alabaster hover:border-[#0065FF] hover:shadow-md transition-all cursor-pointer">
-          <img src="/logos/click.svg" alt="Click" class="h-8">
+          class="flex items-center justify-center px-5 py-3 bg-white rounded-lg border border-alabaster hover:border-[#0065FF] hover:shadow-md transition-all cursor-pointer"
+          aria-label="Pay with Click">
+          <img src="/logos/click.svg" alt="Click" class="h-8" loading="lazy">
         </button>
         <button
           (click)="payWithPayme()"
-          class="flex items-center justify-center px-5 py-3 bg-white rounded-lg border border-alabaster hover:border-[#33cccc] hover:shadow-md transition-all cursor-pointer">
-          <img src="/logos/payme.svg" alt="Payme" class="h-8">
+          class="flex items-center justify-center px-5 py-3 bg-white rounded-lg border border-alabaster hover:border-[#33cccc] hover:shadow-md transition-all cursor-pointer"
+          aria-label="Pay with Payme">
+          <img src="/logos/payme.svg" alt="Payme" class="h-8" loading="lazy">
         </button>
       </div>
     </div>

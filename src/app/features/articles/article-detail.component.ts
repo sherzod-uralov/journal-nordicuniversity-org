@@ -1,6 +1,9 @@
-import { Component, inject, OnInit, input, OnDestroy, signal, computed, effect } from '@angular/core';
+import { Component, inject, input, OnDestroy, signal, computed, effect, ChangeDetectionStrategy, PLATFORM_ID, viewChild, ElementRef } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ArticleStore } from '@store/article.store';
+import { BookmarkStore } from '@store/bookmark.store';
+import { ArticleApiService } from '@services/api/article-api.service';
 import { SeoService } from '@core/services/seo.service';
 import { TagComponent } from '@shared/components/tag/tag.component';
 import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
@@ -8,10 +11,12 @@ import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.compone
 import { Skeleton } from 'primeng/skeleton';
 import { CollapsibleComponent } from '@shared/components/collapsible/collapsible.component';
 import { AvatarComponent } from '@shared/components/avatar/avatar.component';
+import { ArticleCardComponent } from '@shared/components/article-card/article-card.component';
 import { DateLocalePipe } from '@shared/pipes/date-locale.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { SafeHtmlPipe } from '@shared/pipes/safe-html.pipe';
 import { FileUrlPipe } from '@shared/pipes/file-url.pipe';
+import { ImageComponent } from '@shared/components/image/image.component';
 import { ScrollAnimateDirective } from '@shared/directives/scroll-animate.directive';
 import { ClickOutsideDirective } from '@shared/directives/click-outside.directive';
 import { PdfViewerComponent } from '@shared/components/pdf-viewer/pdf-viewer.component';
@@ -32,23 +37,34 @@ import {
     RouterLink, TagComponent,
     PageHeaderComponent, Skeleton,
     CollapsibleComponent,
-    AvatarComponent, DateLocalePipe, TranslatePipe,
-    SafeHtmlPipe, FileUrlPipe, ScrollAnimateDirective,
-    ClickOutsideDirective, PdfViewerComponent,
+    AvatarComponent, ArticleCardComponent, DateLocalePipe, TranslatePipe,
+    SafeHtmlPipe, FileUrlPipe, ImageComponent,
+    ScrollAnimateDirective, ClickOutsideDirective, PdfViewerComponent,
   ],
   templateUrl: './article-detail.component.html',
   styleUrl: './article-detail.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ArticleDetailComponent implements OnInit, OnDestroy {
+export class ArticleDetailComponent implements OnDestroy {
   readonly slug = input.required<string>();
   readonly articleStore = inject(ArticleStore);
+  readonly bookmarkStore = inject(BookmarkStore);
+  private readonly articleApi = inject(ArticleApiService);
   private readonly seo = inject(SeoService);
+  private readonly platformId = inject(PLATFORM_ID);
   readonly apiUrl = environment.apiUrl;
 
   readonly showShareMenu = signal(false);
   readonly copiedLink = signal(false);
   readonly readingMode = signal(false);
   readonly copiedCitation = signal(false);
+
+  readonly copiedDoi = signal(false);
+  readonly relatedArticles = signal<Article[]>([]);
+  readonly relatedLoading = signal(false);
+  readonly sliderIndex = signal(0);
+
+  private readonly sliderRef = viewChild<ElementRef>('relatedSlider');
 
   readonly selectedCitationStyle = signal<CitationStyle>('APA');
   readonly citationStyles = CITATION_STYLES;
@@ -64,9 +80,22 @@ export class ArticleDetailComponent implements OnInit, OnDestroy {
   readonly article = computed(() => this.articleStore.selectedArticle());
 
   constructor() {
+    // Reload when slug changes (related article click)
+    effect(() => {
+      const slug = this.slug();
+      if (slug) {
+        this.articleStore.loadBySlug(slug);
+        this.relatedArticles.set([]);
+        this.sliderIndex.set(0);
+      }
+    });
+
     effect(() => {
       const a = this.article();
-      if (a) this.applyArticleSeo(a);
+      if (a) {
+        this.applyArticleSeo(a);
+        this.loadRelatedArticles(a);
+      }
     });
   }
 
@@ -104,7 +133,7 @@ export class ArticleDetailComponent implements OnInit, OnDestroy {
     return {
       authors,
       title: a.title,
-      journalTitle: 'Nordic University Scientific Journal',
+      journalTitle: 'International Nordic University Scientific Journal',
       volume: a.volume?.title ?? undefined,
       firstPage: a.first_page_in_volume,
       lastPage: a.last_page_in_volume,
@@ -125,10 +154,6 @@ export class ArticleDetailComponent implements OnInit, OnDestroy {
     return window.location.href;
   });
 
-  ngOnInit(): void {
-    this.articleStore.loadBySlug(this.slug());
-  }
-
   ngOnDestroy(): void {
     this.articleStore.clearSelected();
     this.seo.resetMeta();
@@ -136,7 +161,53 @@ export class ArticleDetailComponent implements OnInit, OnDestroy {
 
   downloadPdf(): void {
     const url = this.pdfUrl();
-    if (url) window.open(url, '_blank');
+    if (url) window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  toggleBookmark(): void {
+    const a = this.article();
+    if (a) this.bookmarkStore.toggle(a);
+  }
+
+  printArticle(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      window.print();
+    }
+  }
+
+  copyDoi(): void {
+    const doi = this.article()?.doi;
+    if (!doi) return;
+    navigator.clipboard.writeText(`https://doi.org/${doi}`).then(() => {
+      this.copiedDoi.set(true);
+      setTimeout(() => this.copiedDoi.set(false), 2000);
+    });
+  }
+
+  private loadRelatedArticles(a: Article): void {
+    if (!a.categoryId) return;
+    this.relatedLoading.set(true);
+    this.articleApi.getByCategory(a.categoryId).subscribe({
+      next: (articles) => {
+        this.relatedArticles.set(articles.filter(r => r.id !== a.id).slice(0, 8));
+        this.relatedLoading.set(false);
+      },
+      error: () => this.relatedLoading.set(false),
+    });
+  }
+
+  slideNext(): void {
+    const el = this.sliderRef()?.nativeElement;
+    if (!el) return;
+    const slideWidth = el.querySelector('.related-slide')?.offsetWidth ?? 300;
+    el.scrollBy({ left: slideWidth + 20, behavior: 'smooth' });
+  }
+
+  slidePrev(): void {
+    const el = this.sliderRef()?.nativeElement;
+    if (!el) return;
+    const slideWidth = el.querySelector('.related-slide')?.offsetWidth ?? 300;
+    el.scrollBy({ left: -(slideWidth + 20), behavior: 'smooth' });
   }
 
   onCitationStyleChange(style: CitationStyle): void {
@@ -224,18 +295,18 @@ export class ArticleDetailComponent implements OnInit, OnDestroy {
   shareToTelegram(): void {
     const url = encodeURIComponent(this.articleUrl());
     const text = encodeURIComponent(this.article()?.title ?? '');
-    window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
+    window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank', 'noopener,noreferrer');
   }
 
   shareToTwitter(): void {
     const url = encodeURIComponent(this.articleUrl());
     const text = encodeURIComponent(this.article()?.title ?? '');
-    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank', 'noopener,noreferrer');
   }
 
   shareToFacebook(): void {
     const url = encodeURIComponent(this.articleUrl());
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'noopener,noreferrer');
   }
 
   private applyArticleSeo(a: Article): void {
@@ -270,7 +341,7 @@ export class ArticleDetailComponent implements OnInit, OnDestroy {
       authors,
       doi: a.doi || undefined,
       publishDate: a.publish_date || undefined,
-      journalTitle: 'Nordic University Scientific Journal',
+      journalTitle: 'International Nordic University Scientific Journal',
       volume: a.volume?.title || undefined,
       firstPage: a.first_page_in_volume || undefined,
       lastPage: a.last_page_in_volume || undefined,
@@ -279,7 +350,7 @@ export class ArticleDetailComponent implements OnInit, OnDestroy {
       articleUrl,
       imageUrl,
       language: 'en',
-      publisher: 'Nordic University',
+      publisher: 'International Nordic University',
     });
   }
 }

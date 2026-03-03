@@ -52,6 +52,10 @@ export const routes: Routes = [
     loadComponent: () => import('@features/about/about.component').then(m => m.AboutComponent),
   },
   {
+    path: 'bookmarks',
+    loadComponent: () => import('@features/bookmarks/bookmarks.component').then(m => m.BookmarksComponent),
+  },
+  {
     path: 'auth',
     canActivate: [guestGuard],
     children: [

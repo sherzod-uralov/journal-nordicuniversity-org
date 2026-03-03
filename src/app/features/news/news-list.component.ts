@@ -1,19 +1,20 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit , ChangeDetectionStrategy } from '@angular/core';
 import { NewsStore } from '@store/news.store';
 import { NewsCardComponent } from '@shared/components/news-card/news-card.component';
 import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
 import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { SeoService } from '@core/services/seo.service';
-import { Paginator } from 'primeng/paginator';
 import { Skeleton } from 'primeng/skeleton';
+import { PaginationComponent } from '@shared/components/pagination/pagination.component';
 
 @Component({
   selector: 'app-news-list',
   standalone: true,
-  imports: [NewsCardComponent, PageHeaderComponent, TranslatePipe, Paginator, Skeleton],
+  imports: [NewsCardComponent, PageHeaderComponent, TranslatePipe, Skeleton, PaginationComponent],
   templateUrl: './news-list.component.html',
   styleUrl: './news-list.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewsListComponent implements OnInit {
   readonly newsStore = inject(NewsStore);
@@ -25,11 +26,8 @@ export class NewsListComponent implements OnInit {
     this.newsStore.loadNews({ page: 1, limit: 12 });
   }
 
-  get first(): number {
-    return (this.newsStore.currentPage() - 1) * 12;
-  }
-
-  onPageChange(event: { page?: number }): void {
-    this.newsStore.loadNews({ page: (event.page ?? 0) + 1, limit: 12 });
+  onPageChange(page: number): void {
+    this.newsStore.loadNews({ page, limit: 12 });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }

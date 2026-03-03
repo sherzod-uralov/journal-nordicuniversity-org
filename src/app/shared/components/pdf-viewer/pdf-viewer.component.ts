@@ -1,4 +1,4 @@
-import { Component, input, computed, PLATFORM_ID, inject } from '@angular/core';
+import { Component, input, computed, PLATFORM_ID, inject , ChangeDetectionStrategy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
@@ -9,6 +9,7 @@ import { TranslatePipe } from '@shared/pipes/translate.pipe';
   imports: [TranslatePipe],
   templateUrl: './pdf-viewer.component.html',
   styleUrl: './pdf-viewer.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PdfViewerComponent {
   readonly src = input.required<string>();

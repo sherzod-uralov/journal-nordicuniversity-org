@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit , ChangeDetectionStrategy } from '@angular/core';
 import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
 import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
@@ -11,6 +11,7 @@ import { SeoService } from '@core/services/seo.service';
   imports: [PageHeaderComponent, TranslatePipe, ScrollAnimateDirective],
   templateUrl: './guidelines.component.html',
   styleUrl: './guidelines.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GuidelinesComponent implements OnInit {
   private readonly seo = inject(SeoService);

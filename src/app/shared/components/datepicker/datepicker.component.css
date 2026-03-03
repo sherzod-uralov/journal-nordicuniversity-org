@@ -1,0 +1,234 @@
+:host {
+  display: block;
+}
+
+.dp-wrapper {
+  position: relative;
+}
+
+/* ── Input ── */
+.dp-input {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  width: 100%;
+  padding: 0.4375rem 0.625rem;
+  background: rgba(224, 225, 221, 0.15);
+  border: 1px solid var(--color-alabaster);
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+  outline: none;
+}
+
+.dp-input:hover:not(.dp-input--disabled) {
+  border-color: var(--color-lavender);
+  background: rgba(224, 225, 221, 0.25);
+}
+
+.dp-input:focus-visible {
+  border-color: var(--color-dusk);
+  box-shadow: 0 0 0 2px rgba(30, 87, 153, 0.1);
+}
+
+.dp-input--open {
+  border-color: var(--color-dusk);
+  box-shadow: 0 0 0 2px rgba(30, 87, 153, 0.08);
+  background: white;
+}
+
+.dp-input--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dp-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+  color: var(--color-lavender);
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+.dp-input--open .dp-icon,
+.dp-input:hover:not(.dp-input--disabled) .dp-icon {
+  color: var(--color-dusk);
+}
+
+.dp-value {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-ink);
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+.dp-placeholder {
+  color: var(--color-lavender);
+  font-family: var(--font-body);
+}
+
+.dp-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--color-lavender);
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: color 0.15s, background-color 0.15s;
+}
+
+.dp-clear:hover {
+  color: var(--color-ink);
+  background: rgba(224, 225, 221, 0.5);
+}
+
+/* ── Calendar Panel ── */
+.dp-panel {
+  position: fixed;
+  z-index: 9999;
+  background: white;
+  border: 1px solid var(--color-alabaster);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  box-shadow: 0 4px 16px rgba(13, 27, 42, 0.08);
+  animation: dp-enter 0.15s ease-out;
+}
+
+/* ── Header ── */
+.dp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.125rem 0.125rem 0.5rem;
+}
+
+.dp-month-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  user-select: none;
+}
+
+.dp-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--color-lavender);
+  border-radius: 0.25rem;
+  transition: color 0.15s, background-color 0.15s;
+}
+
+.dp-nav:hover {
+  color: var(--color-ink);
+  background: rgba(224, 225, 221, 0.4);
+}
+
+/* ── Weekday Headers ── */
+.dp-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 0.125rem;
+}
+
+.dp-weekdays span {
+  text-align: center;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: var(--color-lavender);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0;
+  user-select: none;
+}
+
+/* ── Day Grid ── */
+.dp-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+}
+
+.dp-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.12s, color 0.12s, box-shadow 0.12s;
+  user-select: none;
+}
+
+.dp-day:hover:not(:disabled):not(.dp-day--selected) {
+  background: rgba(224, 225, 221, 0.5);
+}
+
+.dp-day--other {
+  color: var(--color-lavender);
+  opacity: 0.35;
+}
+
+.dp-day--other:hover:not(:disabled):not(.dp-day--selected) {
+  opacity: 0.6;
+}
+
+.dp-day--today:not(.dp-day--selected) {
+  box-shadow: inset 0 0 0 1.5px var(--color-dusk);
+  color: var(--color-dusk);
+  font-weight: 600;
+}
+
+.dp-day--selected {
+  background: var(--color-dusk);
+  color: white;
+  font-weight: 600;
+}
+
+.dp-day--selected:hover {
+  background: var(--color-prussian);
+}
+
+.dp-day:disabled {
+  color: var(--color-lavender);
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+/* ── Today Button ── */
+.dp-today {
+  display: block;
+  width: 100%;
+  margin-top: 0.375rem;
+  padding: 0.3125rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--color-dusk);
+  text-align: center;
+  border-radius: 0.25rem;
+  transition: background-color 0.15s;
+}
+
+.dp-today:hover {
+  background: rgba(30, 87, 153, 0.06);
+}
+
+/* ── Animation ── */
+@keyframes dp-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

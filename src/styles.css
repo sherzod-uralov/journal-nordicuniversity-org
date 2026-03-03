@@ -19,8 +19,13 @@
 }
 
 /* Base styles */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 html {
-  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -80,10 +85,29 @@ code, pre, .font-mono {
   margin-top: 0.125rem;
 }
 
-/* Focus — disable browser outline on PrimeNG, theme handles it via tokens */
-[class*="p-"] :focus-visible,
-[class*="p-"]:focus-visible {
-  outline: none;
+/* Focus visibility */
+:focus-visible {
+  outline: 2px solid var(--color-lavender);
+  outline-offset: 2px;
+}
+
+/* Skip link */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 9999;
+  padding: 0.75rem 1.5rem;
+  background: var(--color-ink);
+  color: white;
+  font-weight: 600;
+  border-radius: 0 0 0.5rem 0.5rem;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 0;
 }
 
 /* Selection */
