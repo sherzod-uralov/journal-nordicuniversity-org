@@ -4,4 +4,4 @@ Allow: /
 Disallow: /cabinet/
 Disallow: /auth/
 
-Sitemap: https://journal.nordicun.uz/sitemap.xml
+Sitemap: https://journal.nordicuniversity.org/sitemap.xml

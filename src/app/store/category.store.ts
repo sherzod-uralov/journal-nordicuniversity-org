@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
+import { withTransferState } from '@core/utils/transfer-state.util';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap } from 'rxjs';
 import { tapResponse } from '@ngrx/operators';
@@ -26,7 +27,7 @@ export const CategoryStore = signalStore(
   withMethods((store, categoryApi = inject(CategoryApiService)) => ({
     loadCategories: rxMethod<void>(
       pipe(
-        tap(() => patchState(store, { loading: true })),
+        tap(() => { if (store.categories().length === 0) patchState(store, { loading: true }); }),
         switchMap(() =>
           categoryApi.getAll().pipe(
             tapResponse({
@@ -39,7 +40,7 @@ export const CategoryStore = signalStore(
     ),
     loadById: rxMethod<number>(
       pipe(
-        tap(() => patchState(store, { loading: true, selectedCategory: null })),
+        tap(() => { if (!store.selectedCategory()) patchState(store, { loading: true }); }),
         switchMap((id) =>
           categoryApi.getById(id).pipe(
             tapResponse({
@@ -54,4 +55,5 @@ export const CategoryStore = signalStore(
       patchState(store, { selectedCategory: null });
     },
   })),
+  withTransferState('category-store'),
 );

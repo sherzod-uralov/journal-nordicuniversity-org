@@ -147,7 +147,7 @@
 
 <!-- Featured: Newspaper Layout (1 big + 3 sidebar) -->
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
-  <div class="flex items-end justify-between mb-10" appScrollAnimate="fade-up">
+  <div class="flex items-end justify-between mb-10">
     <div>
       <span class="text-dusk text-xs font-medium tracking-[0.15em] uppercase">{{ 'home.section.featured_label' | translate }}</span>
       <h2 class="font-heading text-2xl sm:text-3xl font-bold text-ink mt-1">{{ 'home.featured' | translate }}</h2>
@@ -170,7 +170,7 @@
       </div>
     </div>
   } @else {
-    <div class="featured-layout" appScrollAnimate="fade-up">
+    <div class="featured-layout">
       <!-- Big featured card -->
       @if (featuredMain(); as mainArticle) {
         <div class="featured-main">
@@ -190,7 +190,7 @@
 <!-- Articles Grid -->
 <section class="bg-alabaster/30 border-y border-alabaster/60 py-16 lg:py-20">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-end justify-between mb-10" appScrollAnimate="fade-up">
+    <div class="flex items-end justify-between mb-10">
       <div>
         <span class="text-dusk text-xs font-medium tracking-[0.15em] uppercase">{{ 'home.section.articles_label' | translate }}</span>
         <h2 class="font-heading text-2xl sm:text-3xl font-bold text-ink mt-1">{{ 'home.articles' | translate }}</h2>
@@ -210,9 +210,7 @@
     } @else {
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         @for (article of articleStore.homeArticles(); track article.id) {
-          <div appScrollAnimate="fade-up">
-            <app-article-card [article]="article" />
-          </div>
+          <app-article-card [article]="article" />
         }
       </div>
     }
@@ -221,7 +219,7 @@
 
 <!-- Latest Articles (2 col compact) -->
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
-  <div class="flex items-end justify-between mb-10" appScrollAnimate="fade-up">
+  <div class="flex items-end justify-between mb-10">
     <div>
       <span class="text-dusk text-xs font-medium tracking-[0.15em] uppercase">{{ 'home.section.latest_label' | translate }}</span>
       <h2 class="font-heading text-2xl sm:text-3xl font-bold text-ink mt-1">{{ 'home.latest' | translate }}</h2>
@@ -241,9 +239,7 @@
   } @else {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       @for (article of articleStore.latestArticles(); track article.id) {
-        <div appScrollAnimate="fade-up">
           <app-article-card [article]="article" [compact]="true" />
-        </div>
       }
     </div>
   }
@@ -287,7 +283,7 @@
 <!-- Volumes -->
 <section class="py-16 lg:py-20">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-end justify-between mb-10" appScrollAnimate="fade-up">
+    <div class="flex items-end justify-between mb-10">
       <div>
         <span class="text-dusk text-xs font-medium tracking-[0.15em] uppercase">{{ 'home.section.volumes_label' | translate }}</span>
         <h2 class="font-heading text-2xl sm:text-3xl font-bold text-ink mt-1">{{ 'home.volumes' | translate }}</h2>
@@ -307,9 +303,7 @@
     } @else {
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         @for (volume of displayVolumes(); track volume.id) {
-          <div appScrollAnimate="fade-up">
             <app-volume-card [volume]="volume" />
-          </div>
         }
       </div>
     }
@@ -317,7 +311,7 @@
 </section>
 
 <!-- CTA -->
-<section class="relative bg-ink overflow-hidden" appScrollAnimate="fade-up">
+<section class="relative bg-ink overflow-hidden">
   <div class="absolute inset-0 hero-grid-pattern opacity-[0.03]"></div>
   <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-lavender/15 to-transparent"></div>
 

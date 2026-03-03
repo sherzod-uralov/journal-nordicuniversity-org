@@ -4,7 +4,7 @@
     [id]="fieldId()"
     class="select-trigger"
     [class.placeholder]="value() == null"
-    [disabled]="isDisabled()"
+    [disabled]="isDisabled() || disabled()"
     (click)="toggleDropdown()"
     [attr.aria-expanded]="dropdownOpen()"
     aria-haspopup="listbox"

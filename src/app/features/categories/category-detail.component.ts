@@ -43,7 +43,7 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.categoryStore.clearSelected();
+    this.seo.resetMeta();
   }
 
   private loadArticles(categoryId: number): void {
@@ -52,7 +52,11 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
       next: (articles) => {
         this.articles.set(articles);
         this.articlesLoading.set(false);
-        this.seo.update({ title: this.categoryName() || 'Category' });
+        const name = this.categoryName() || 'Category';
+        this.seo.update({
+          title: name,
+          description: `Browse articles in ${name} category`,
+        });
       },
       error: () => this.articlesLoading.set(false),
     });

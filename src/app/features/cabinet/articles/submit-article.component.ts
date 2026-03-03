@@ -45,7 +45,7 @@ export class SubmitArticleComponent implements OnInit {
   readonly categories = signal<Category[]>([]);
   readonly allSubcategories = signal<SubCategory[]>([]);
   readonly loading = signal(false);
-  readonly errors = signal<Record<string, string>>({});
+  readonly errors = signal<Record<string, string | undefined>>({});
 
   title = '';
   abstract = '';
@@ -65,16 +65,16 @@ export class SubmitArticleComponent implements OnInit {
   readonly filteredSubcategories = computed(() => {
     const catId = this.selectedCategory();
     if (!catId) return [];
-    return this.allSubcategories().filter(s => s.categoryId === catId);
+    return this.allSubcategories().filter(s => s.categoryId === catId && s.name);
   });
 
-  get categoryOptions() {
-    return this.categories().map(c => ({ value: c.id, label: c.name }));
-  }
+  readonly categoryOptions = computed(() =>
+    this.categories().filter(c => c.name).map(c => ({ value: c.id, label: c.name }))
+  );
 
-  get subcategoryOptions() {
-    return this.filteredSubcategories().map(s => ({ value: s.id, label: s.name }));
-  }
+  readonly subcategoryOptions = computed(() =>
+    this.filteredSubcategories().map(s => ({ value: s.id, label: s.name }))
+  );
 
   ngOnInit(): void {
     if (!this.authStore.profile()) {

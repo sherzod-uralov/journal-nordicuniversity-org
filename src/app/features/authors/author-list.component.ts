@@ -5,7 +5,7 @@ import { PageHeaderComponent } from '@shared/components/page-header/page-header.
 import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
 import { CardComponent } from '@shared/components/card/card.component';
 import { AvatarComponent } from '@shared/components/avatar/avatar.component';
-import { TranslatePipe } from '@shared/pipes/translate.pipe';
+
 import { SeoService } from '@core/services/seo.service';
 import { Skeleton } from 'primeng/skeleton';
 import { PaginationComponent } from '@shared/components/pagination/pagination.component';
@@ -13,7 +13,7 @@ import { PaginationComponent } from '@shared/components/pagination/pagination.co
 @Component({
   selector: 'app-author-list',
   standalone: true,
-  imports: [RouterLink, PageHeaderComponent, CardComponent, AvatarComponent, TranslatePipe, Skeleton, PaginationComponent],
+  imports: [RouterLink, PageHeaderComponent, CardComponent, AvatarComponent, Skeleton, PaginationComponent],
   templateUrl: './author-list.component.html',
   styleUrl: './author-list.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,7 +24,7 @@ export class AuthorListComponent implements OnInit {
   readonly breadcrumbs: BreadcrumbItem[] = [{ label: 'Home', translateKey: 'nav.home', route: '/' }, { label: 'Authors', translateKey: 'nav.authors' }];
 
   ngOnInit(): void {
-    this.seo.update({ title: 'Authors' });
+    this.seo.update({ title: 'Authors', description: 'Researchers and authors who have published in the journal' });
     this.authorStore.loadAuthors({ page: 1, limit: 20 });
   }
 

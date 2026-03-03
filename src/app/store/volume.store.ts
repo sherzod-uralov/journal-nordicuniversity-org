@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
+import { withTransferState } from '@core/utils/transfer-state.util';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap } from 'rxjs';
 import { tapResponse } from '@ngrx/operators';
@@ -26,7 +27,7 @@ export const VolumeStore = signalStore(
   withMethods((store, volumeApi = inject(VolumeApiService)) => ({
     loadVolumes: rxMethod<void>(
       pipe(
-        tap(() => patchState(store, { loading: true })),
+        tap(() => { if (store.volumes().length === 0) patchState(store, { loading: true }); }),
         switchMap(() =>
           volumeApi.getAll().pipe(
             tapResponse({
@@ -39,7 +40,7 @@ export const VolumeStore = signalStore(
     ),
     loadById: rxMethod<number>(
       pipe(
-        tap(() => patchState(store, { loading: true, selectedVolume: null })),
+        tap(() => { if (!store.selectedVolume()) patchState(store, { loading: true }); }),
         switchMap((id) =>
           volumeApi.getById(id).pipe(
             tapResponse({
@@ -54,4 +55,5 @@ export const VolumeStore = signalStore(
       patchState(store, { selectedVolume: null });
     },
   })),
+  withTransferState('volume-store'),
 );

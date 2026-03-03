@@ -22,7 +22,7 @@
 } @else if (article(); as a) {
   <app-page-header [breadcrumbs]="breadcrumbs()" [title]="a.title">
     <!-- Hero metadata -->
-    <div class="hero-meta">
+    <div class="flex flex-col items-center gap-3.5 mt-5">
       <!-- Author -->
       <a [routerLink]="['/authors', a.author_id]" class="hero-author">
         <app-avatar [name]="a.author?.full_name ?? ''" size="md" />
@@ -35,7 +35,7 @@
       </a>
 
       <!-- Meta chips -->
-      <div class="hero-chips">
+      <div class="flex flex-wrap justify-center gap-2">
         @if (a.category?.name) {
           <a [routerLink]="['/categories', a.categoryId]" class="hero-chip hero-chip--category">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
@@ -68,7 +68,7 @@
 
       <!-- DOI -->
       @if (a.doi) {
-        <div class="hero-doi">
+        <div class="flex items-center gap-2">
           <span class="hero-doi-label">DOI</span>
           <a href="https://doi.org/{{ a.doi }}" target="_blank" rel="noopener noreferrer" class="hero-doi-link">
             {{ a.doi }}
@@ -79,7 +79,7 @@
   </app-page-header>
 
   <!-- Toolbar -->
-  <div class="toolbar-strip no-print">
+  <div class="bg-white border-b border-alabaster py-2.5 no-print">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-end gap-2">
       <!-- Reading mode toggle -->
       <button (click)="readingMode.set(!readingMode())" class="toolbar-btn" [class.toolbar-btn--active]="readingMode()" aria-label="Toggle reading mode" [attr.aria-pressed]="readingMode()">
@@ -119,20 +119,20 @@
         }
 
         @if (showShareMenu()) {
-          <div class="share-dropdown" role="menu">
-            <button (click)="copyLink()" class="share-item" role="menuitem">
+          <div class="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-lg border border-alabaster py-1.5 z-50" role="menu">
+            <button (click)="copyLink()" class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-ink hover:bg-black/[0.03] transition-colors" role="menuitem">
               <svg class="w-4 h-4 text-lavender" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
               Copy Link
             </button>
-            <button (click)="shareToTelegram()" class="share-item" role="menuitem">
+            <button (click)="shareToTelegram()" class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-ink hover:bg-black/[0.03] transition-colors" role="menuitem">
               <svg class="w-4 h-4 text-[#2AABEE]" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
               Telegram
             </button>
-            <button (click)="shareToTwitter()" class="share-item" role="menuitem">
+            <button (click)="shareToTwitter()" class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-ink hover:bg-black/[0.03] transition-colors" role="menuitem">
               <svg class="w-4 h-4 text-ink" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
               X (Twitter)
             </button>
-            <button (click)="shareToFacebook()" class="share-item" role="menuitem">
+            <button (click)="shareToFacebook()" class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-ink hover:bg-black/[0.03] transition-colors" role="menuitem">
               <svg class="w-4 h-4 text-[#1877F2]" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
               Facebook
             </button>
@@ -150,7 +150,7 @@
       <article class="content-main">
 
         <!-- Author Bar -->
-        <div class="author-bar" appScrollAnimate="fade-up">
+        <div class="flex flex-wrap items-center gap-4 pb-6 mb-7 border-b border-alabaster" appScrollAnimate="fade-up">
           <a [routerLink]="['/authors', a.author_id]" class="flex items-center gap-3 group">
             <app-avatar [name]="a.author?.full_name ?? ''" size="md" />
             <div>
@@ -179,7 +179,7 @@
         <!-- Article Source File -->
         @if (pdfUrl()) {
           @defer (on viewport) {
-            <section class="content-section no-print" appScrollAnimate="fade-up">
+            <section class="mb-9 no-print" appScrollAnimate="fade-up">
               <app-collapsible [title]="('article.source_file' | translate)" [open]="true">
                 <ng-template #icon>
                   <svg class="w-5 h-5 text-dusk" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -194,9 +194,9 @@
 
         <!-- Abstract -->
         @if (a.abstract) {
-          <section class="content-section" appScrollAnimate="fade-up">
+          <section class="mb-9" appScrollAnimate="fade-up">
             <h2 class="section-title">{{ 'article.abstract' | translate }}</h2>
-            <div class="abstract-block">
+            <div class="bg-black/[0.015] border-l-3 border-dusk rounded-r-[0.625rem] p-5">
               <p class="text-dusk leading-relaxed">{{ a.abstract }}</p>
             </div>
           </section>
@@ -204,7 +204,7 @@
 
         <!-- Keywords -->
         @if (keywords().length) {
-          <section class="content-section" appScrollAnimate="fade-up">
+          <section class="mb-9" appScrollAnimate="fade-up">
             <h2 class="section-title">{{ 'article.keywords' | translate }}</h2>
             <div class="flex flex-wrap gap-2">
               @for (kw of keywords(); track kw) {
@@ -216,16 +216,16 @@
 
         <!-- Body -->
         @if (a.description) {
-          <section class="content-section" appScrollAnimate="fade-up">
+          <section class="mb-9" appScrollAnimate="fade-up">
             <div class="article-content" [innerHTML]="a.description | safeHtml"></div>
           </section>
         }
 
         <!-- References -->
         @if (a.references) {
-          <section class="content-section" appScrollAnimate="fade-up">
+          <section class="mb-9" appScrollAnimate="fade-up">
             <h2 class="section-title">{{ 'article.references' | translate }}</h2>
-            <div class="references-block">
+            <div class="bg-black/[0.015] rounded-[0.625rem] p-5">
               <div class="text-sm text-dusk leading-relaxed whitespace-pre-line">{{ a.references }}</div>
             </div>
           </section>
@@ -233,7 +233,7 @@
 
         <!-- Citation -->
         @defer (on viewport) {
-          <section class="content-section no-print" appScrollAnimate="fade-up">
+          <section class="mb-9 no-print" appScrollAnimate="fade-up">
             <h2 class="section-title">{{ 'article.citation' | translate }}</h2>
             <div class="citation-block">
               <div class="citation-header">
@@ -305,10 +305,10 @@
         }
 
         <!-- License -->
-        <section class="content-section" appScrollAnimate="fade-up">
+        <section class="mb-9" appScrollAnimate="fade-up">
           <h2 class="section-title">{{ 'article.license' | translate }}</h2>
-          <div class="license-block">
-            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" class="license-badge">
+          <div class="flex flex-col items-center text-center lg:flex-row lg:items-start lg:text-left gap-4 bg-black/[0.015] rounded-xl p-5 border border-alabaster">
+            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" class="shrink-0 hover:opacity-80 transition-opacity">
               <svg class="w-20 h-7" viewBox="0 0 120 42" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Creative Commons Attribution 4.0">
                 <rect width="120" height="42" rx="4" fill="#EF9421"/>
                 <text x="8" y="16" font-size="9" font-weight="700" fill="white" font-family="Arial, sans-serif">CREATIVE</text>
@@ -319,7 +319,7 @@
                 <text x="101" y="25" font-size="10" font-weight="700" fill="#EF9421" font-family="Arial, sans-serif">BY</text>
               </svg>
             </a>
-            <div class="license-content">
+            <div class="min-w-0">
               <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-dusk hover:text-ink transition-colors">
                 Creative Commons Attribution 4.0 International (CC BY 4.0)
               </a>
@@ -332,7 +332,7 @@
         @if (a.certificates?.length) {
           @defer (on viewport) {
             @for (cert of a.certificates; track cert.id) {
-              <section class="content-section no-print" appScrollAnimate="fade-up">
+              <section class="mb-9 no-print" appScrollAnimate="fade-up">
                 <app-collapsible [title]="('article.certificate.for' | translate) + ' ' + (cert.author?.full_name ?? '')">
                   <ng-template #icon>
                     <svg class="w-5 h-5 text-dusk" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
@@ -352,67 +352,67 @@
         <div class="sticky top-24 space-y-5">
 
           <!-- Article Info -->
-          <div class="sidebar-card" appScrollAnimate="fade-up">
+          <div class="bg-white border border-alabaster rounded-[0.875rem] overflow-hidden" appScrollAnimate="fade-up">
             @if (a.image?.file_path) {
-              <div class="sidebar-card-img">
+              <div class="aspect-[16/10] overflow-hidden">
                 <app-image [src]="a.image!.file_path" [alt]="a.title" [priority]="true" />
               </div>
             }
             <div class="p-5 space-y-3.5">
-              <div class="info-row">
-                <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <div class="flex items-start gap-2.5">
+                <svg class="w-4 h-4 text-lavender mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 <div>
-                  <div class="info-label">{{ 'article.published' | translate }}</div>
-                  <div class="info-value">{{ a.publish_date | dateLocale:'long' }}</div>
+                  <div class="text-[0.6875rem] text-lavender leading-none mb-0.5">{{ 'article.published' | translate }}</div>
+                  <div class="text-[0.8125rem] text-ink font-medium">{{ a.publish_date | dateLocale:'long' }}</div>
                 </div>
               </div>
 
               @if (a.category?.name) {
-                <div class="info-row">
-                  <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                <div class="flex items-start gap-2.5">
+                  <svg class="w-4 h-4 text-lavender mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
                   <div>
-                    <div class="info-label">{{ 'article.category' | translate }}</div>
-                    <a [routerLink]="['/categories', a.categoryId]" class="info-value text-dusk hover:text-ink transition-colors">{{ a.category!.name }}</a>
+                    <div class="text-[0.6875rem] text-lavender leading-none mb-0.5">{{ 'article.category' | translate }}</div>
+                    <a [routerLink]="['/categories', a.categoryId]" class="text-[0.8125rem] text-ink font-medium text-dusk hover:text-ink transition-colors">{{ a.category!.name }}</a>
                   </div>
                 </div>
               }
 
               @if (a.volume?.title) {
-                <div class="info-row">
-                  <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                <div class="flex items-start gap-2.5">
+                  <svg class="w-4 h-4 text-lavender mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                   <div>
-                    <div class="info-label">{{ 'article.volume' | translate }}</div>
-                    <a [routerLink]="['/volumes', a.volume_id]" class="info-value text-dusk hover:text-ink transition-colors">{{ a.volume!.title }}</a>
+                    <div class="text-[0.6875rem] text-lavender leading-none mb-0.5">{{ 'article.volume' | translate }}</div>
+                    <a [routerLink]="['/volumes', a.volume_id]" class="text-[0.8125rem] text-ink font-medium text-dusk hover:text-ink transition-colors">{{ a.volume!.title }}</a>
                   </div>
                 </div>
               }
 
               @if (a.first_page_in_volume && a.last_page_in_volume) {
-                <div class="info-row">
-                  <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <div class="flex items-start gap-2.5">
+                  <svg class="w-4 h-4 text-lavender mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                   <div>
-                    <div class="info-label">{{ 'article.pages' | translate }}</div>
-                    <div class="info-value">{{ a.first_page_in_volume }} – {{ a.last_page_in_volume }}</div>
+                    <div class="text-[0.6875rem] text-lavender leading-none mb-0.5">{{ 'article.pages' | translate }}</div>
+                    <div class="text-[0.8125rem] text-ink font-medium">{{ a.first_page_in_volume }} – {{ a.last_page_in_volume }}</div>
                   </div>
                 </div>
               }
 
-              <div class="info-row">
-                <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              <div class="flex items-start gap-2.5">
+                <svg class="w-4 h-4 text-lavender mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                 <div>
-                  <div class="info-label">{{ 'article.views' | translate }}</div>
-                  <div class="info-value">{{ a.viewsCount }}</div>
+                  <div class="text-[0.6875rem] text-lavender leading-none mb-0.5">{{ 'article.views' | translate }}</div>
+                  <div class="text-[0.8125rem] text-ink font-medium">{{ a.viewsCount }}</div>
                 </div>
               </div>
 
               @if (a.doi) {
-                <div class="info-row">
-                  <svg class="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                <div class="flex items-start gap-2.5">
+                  <svg class="w-4 h-4 text-lavender mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
                   <div class="min-w-0 flex-1">
-                    <div class="info-label">{{ 'article.doi' | translate }}</div>
+                    <div class="text-[0.6875rem] text-lavender leading-none mb-0.5">{{ 'article.doi' | translate }}</div>
                     <div class="flex items-center gap-1.5">
-                      <a href="https://doi.org/{{ a.doi }}" target="_blank" rel="noopener noreferrer" class="info-value text-dusk font-mono text-xs hover:text-ink transition-colors break-all flex-1">{{ a.doi }}</a>
-                      <button (click)="copyDoi()" class="doi-copy-btn" [attr.aria-label]="'article.copy_doi' | translate">
+                      <a href="https://doi.org/{{ a.doi }}" target="_blank" rel="noopener noreferrer" class="text-[0.8125rem] text-ink font-medium text-dusk font-mono text-xs hover:text-ink transition-colors break-all flex-1">{{ a.doi }}</a>
+                      <button (click)="copyDoi()" class="inline-flex items-center justify-center w-6 h-6 rounded bg-transparent text-lavender cursor-pointer hover:bg-black/5 hover:text-dusk shrink-0 transition-colors" [attr.aria-label]="'article.copy_doi' | translate">
                         @if (copiedDoi()) {
                           <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         } @else {
@@ -427,7 +427,7 @@
           </div>
 
           <!-- Author Card -->
-          <div class="sidebar-card p-5" appScrollAnimate="fade-up">
+          <div class="bg-white border border-alabaster rounded-[0.875rem] overflow-hidden p-5" appScrollAnimate="fade-up">
             <h3 class="text-xs font-semibold text-lavender uppercase tracking-wider mb-4">{{ 'article.author' | translate }}</h3>
             <a [routerLink]="['/authors', a.author_id]" class="flex items-center gap-3 group mb-3">
               <app-avatar [name]="a.author?.full_name ?? ''" size="lg" />
@@ -473,7 +473,7 @@
 
           <!-- Download Card -->
           @if (a.file?.file_path) {
-            <div class="download-card" appScrollAnimate="fade-up">
+            <div class="bg-gradient-to-br from-ink to-prussian rounded-[0.875rem] p-5 text-white" appScrollAnimate="fade-up">
               <div class="flex items-center gap-3 mb-3">
                 <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
                   <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -495,24 +495,24 @@
     <!-- Related Articles -->
     @if (relatedArticles().length || relatedLoading()) {
       @defer (on viewport) {
-        <section class="related-section no-print" appScrollAnimate="fade-up">
-          <div class="related-header">
+        <section class="mt-12 pt-10 border-t border-alabaster no-print" appScrollAnimate="fade-up">
+          <div class="related-header flex items-center justify-between mb-4">
             <h2 class="section-title">{{ 'article.related' | translate }}</h2>
             @if (relatedArticles().length > 2) {
-              <div class="slider-nav">
-                <button (click)="slidePrev()" class="slider-nav-btn" aria-label="Previous">
+              <div class="flex gap-2">
+                <button (click)="slidePrev()" class="inline-flex items-center justify-center w-9 h-9 rounded-full border border-alabaster bg-white text-dusk cursor-pointer hover:bg-ink hover:border-ink hover:text-white transition-colors" aria-label="Previous">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 </button>
-                <button (click)="slideNext()" class="slider-nav-btn" aria-label="Next">
+                <button (click)="slideNext()" class="inline-flex items-center justify-center w-9 h-9 rounded-full border border-alabaster bg-white text-dusk cursor-pointer hover:bg-ink hover:border-ink hover:text-white transition-colors" aria-label="Next">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
               </div>
             }
           </div>
           @if (relatedLoading()) {
-            <div class="related-slider" #relatedSlider>
+            <div class="flex gap-5 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2" #relatedSlider>
               @for (_ of [1,2,3,4]; track $index) {
-                <div class="related-slide">
+                <div class="flex-none w-[17rem] sm:w-[19rem] snap-start">
                   <div class="bg-white rounded-xl border border-alabaster/60 overflow-hidden h-full">
                     <p-skeleton width="100%" height="10rem" />
                     <div class="p-5 space-y-2">
@@ -525,9 +525,9 @@
               }
             </div>
           } @else {
-            <div class="related-slider" #relatedSlider>
+            <div class="flex gap-5 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2" #relatedSlider>
               @for (rel of relatedArticles(); track rel.id) {
-                <div class="related-slide">
+                <div class="flex-none w-[17rem] sm:w-[19rem] snap-start">
                   <app-article-card [article]="rel" />
                 </div>
               }

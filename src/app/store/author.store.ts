@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
+import { withTransferState } from '@core/utils/transfer-state.util';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap } from 'rxjs';
 import { tapResponse } from '@ngrx/operators';
@@ -30,7 +31,7 @@ export const AuthorStore = signalStore(
   withMethods((store, authorApi = inject(AuthorApiService)) => ({
     loadAuthors: rxMethod<{ page?: number; limit?: number }>(
       pipe(
-        tap(() => patchState(store, { loading: true })),
+        tap(() => { if (!store.authors().length) patchState(store, { loading: true }); }),
         switchMap((params) =>
           authorApi.getAll(params).pipe(
             tapResponse({
@@ -48,7 +49,7 @@ export const AuthorStore = signalStore(
     ),
     loadById: rxMethod<string>(
       pipe(
-        tap(() => patchState(store, { loading: true, selectedAuthor: null })),
+        tap(() => { if (!store.selectedAuthor()) patchState(store, { loading: true }); }),
         switchMap((id) =>
           authorApi.getById(id).pipe(
             tapResponse({
@@ -63,4 +64,5 @@ export const AuthorStore = signalStore(
       patchState(store, { selectedAuthor: null });
     },
   })),
+  withTransferState('author-store'),
 );

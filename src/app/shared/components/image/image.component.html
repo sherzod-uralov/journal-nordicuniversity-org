@@ -3,25 +3,18 @@
   [style.aspect-ratio]="ratio() || null"
   [style.border-radius]="rounded() || null"
 >
-  <!-- Skeleton placeholder -->
-  @if (!loaded()) {
-    <div class="img-skeleton" aria-hidden="true">
-      <div class="img-skeleton-shimmer"></div>
-    </div>
-  }
-
-  <!-- Actual image -->
+  <!-- Optimized image -->
   @if (shouldLoad() && !error()) {
     <img
-      [src]="resolvedSrc()"
+      [src]="optimizedSrc()"
+      [srcset]="srcSet()"
+      [sizes]="sizes()"
       [alt]="alt()"
       [class]="'img-el ' + imgClass()"
       [style.object-fit]="fit()"
       [loading]="priority() ? 'eager' : 'lazy'"
       [attr.fetchpriority]="priority() ? 'high' : null"
       [attr.decoding]="priority() ? null : 'async'"
-      [class.img-el--loaded]="loaded()"
-      (load)="onLoad()"
       (error)="onError()"
     />
   }

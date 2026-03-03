@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, input, signal , ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, input, signal, effect, ChangeDetectionStrategy } from '@angular/core';
 import { AuthorStore } from '@store/author.store';
 import { ArticleApiService } from '@services/api/article-api.service';
 import { Article } from '@core/models/article.model';
@@ -8,6 +8,7 @@ import { BreadcrumbComponent, BreadcrumbItem } from '@shared/components/breadcru
 import { AvatarComponent } from '@shared/components/avatar/avatar.component';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { SeoService } from '@core/services/seo.service';
+import { environment } from '@env';
 
 @Component({
   selector: 'app-author-detail',
@@ -24,12 +25,32 @@ export class AuthorDetailComponent implements OnInit, OnDestroy {
   private readonly seo = inject(SeoService);
   readonly articles = signal<Article[]>([]);
 
+  constructor() {
+    effect(() => {
+      const a = this.authorStore.selectedAuthor();
+      if (a) {
+        const apiBase = environment.apiUrl.replace(/\/+$/, '');
+        const ogImage = a.file?.file_path
+          ? `${apiBase}/${a.file.file_path.replace(/^\/+/, '')}`
+          : undefined;
+        this.seo.update({
+          title: a.full_name,
+          description: [a.science_degree, a.job, a.place_position].filter(Boolean).join(' — '),
+          ogImage,
+          ogType: 'profile',
+        });
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.authorStore.loadById(this.id());
     this.articleApi.getByAuthor(this.id()).subscribe(a => this.articles.set(a));
   }
 
-  ngOnDestroy(): void { this.authorStore.clearSelected(); }
+  ngOnDestroy(): void {
+    this.seo.resetMeta();
+  }
 
   get breadcrumbs(): BreadcrumbItem[] {
     return [{ label: 'Home', translateKey: 'nav.home', route: '/' }, { label: 'Authors', translateKey: 'nav.authors', route: '/authors' }, { label: this.authorStore.selectedAuthor()?.full_name || '...' }];

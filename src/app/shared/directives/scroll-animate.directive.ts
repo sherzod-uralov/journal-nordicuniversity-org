@@ -1,6 +1,34 @@
 import { Directive, ElementRef, inject, OnInit, OnDestroy, PLATFORM_ID, input } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
+let sharedObserver: IntersectionObserver | null = null;
+const observedElements = new Map<Element, () => void>();
+
+function getSharedObserver(): IntersectionObserver {
+  if (!sharedObserver) {
+    sharedObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const callback = observedElements.get(entry.target);
+            if (callback) {
+              callback();
+              sharedObserver!.unobserve(entry.target);
+              observedElements.delete(entry.target);
+            }
+          }
+        }
+        if (observedElements.size === 0) {
+          sharedObserver!.disconnect();
+          sharedObserver = null;
+        }
+      },
+      { threshold: 0.1 },
+    );
+  }
+  return sharedObserver;
+}
+
 @Directive({
   selector: '[appScrollAnimate]',
   standalone: true,
@@ -8,7 +36,6 @@ import { isPlatformBrowser } from '@angular/common';
 export class ScrollAnimateDirective implements OnInit, OnDestroy {
   private readonly el = inject(ElementRef);
   private readonly platformId = inject(PLATFORM_ID);
-  private observer: IntersectionObserver | null = null;
 
   readonly appScrollAnimate = input<'fade-up' | 'fade-in' | 'slide-left' | 'slide-right'>('fade-up');
 
@@ -20,21 +47,17 @@ export class ScrollAnimateDirective implements OnInit, OnDestroy {
     el.style.transform = this.getInitialTransform();
     el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
 
-    this.observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.style.opacity = '1';
-          el.style.transform = 'none';
-          this.observer?.unobserve(el);
-        }
-      },
-      { threshold: 0.1 },
-    );
-    this.observer.observe(el);
+    observedElements.set(el, () => {
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+    });
+    getSharedObserver().observe(el);
   }
 
   ngOnDestroy(): void {
-    this.observer?.disconnect();
+    const el = this.el.nativeElement as HTMLElement;
+    observedElements.delete(el);
+    sharedObserver?.unobserve(el);
   }
 
   private getInitialTransform(): string {

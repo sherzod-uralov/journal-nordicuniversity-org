@@ -32,6 +32,7 @@
   overflow: hidden;
   aspect-ratio: 3 / 4;
   max-height: 20rem;
+  display: flex;
 }
 
 @media (min-width: 768px) {

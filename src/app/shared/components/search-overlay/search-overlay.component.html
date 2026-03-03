@@ -115,10 +115,10 @@
           <!-- Suggestions -->
           @if (searchStore.suggestions().length > 0) {
             <!-- Group: Articles -->
-            @if (getArticleSuggestions().length > 0) {
+            @if (articleSuggestions().length > 0) {
               <div class="px-4 pt-3 pb-1">
                 <span class="text-[11px] text-lavender uppercase tracking-wider font-semibold block mb-2">{{ 'search.articles' | translate }}</span>
-                @for (item of getArticleSuggestions(); track item.id; let i = $index) {
+                @for (item of articleSuggestions(); track item.id; let i = $index) {
                   <button
                     class="search-item"
                     [class.search-item--active]="searchStore.activeSuggestionIndex() === getGlobalIndex('article', i)"
@@ -140,10 +140,10 @@
             }
 
             <!-- Group: Categories -->
-            @if (getCategorySuggestions().length > 0) {
+            @if (categorySuggestions().length > 0) {
               <div class="px-4 pt-3 pb-1">
                 <span class="text-[11px] text-lavender uppercase tracking-wider font-semibold block mb-2">{{ 'search.categories' | translate }}</span>
-                @for (item of getCategorySuggestions(); track item.id; let i = $index) {
+                @for (item of categorySuggestions(); track item.id; let i = $index) {
                   <button
                     class="search-item"
                     [class.search-item--active]="searchStore.activeSuggestionIndex() === getGlobalIndex('category', i)"
@@ -161,10 +161,10 @@
             }
 
             <!-- Group: History matches -->
-            @if (getHistorySuggestions().length > 0) {
+            @if (historySuggestions().length > 0) {
               <div class="px-4 pt-3 pb-1">
                 <span class="text-[11px] text-lavender uppercase tracking-wider font-semibold block mb-2">{{ 'search.recent' | translate }}</span>
-                @for (item of getHistorySuggestions(); track item.id; let i = $index) {
+                @for (item of historySuggestions(); track item.id; let i = $index) {
                   <button
                     class="search-item"
                     [class.search-item--active]="searchStore.activeSuggestionIndex() === getGlobalIndex('history', i)"

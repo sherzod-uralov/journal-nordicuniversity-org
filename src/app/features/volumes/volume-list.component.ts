@@ -37,7 +37,7 @@ export class VolumeListComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.seo.update({ title: 'Volumes' });
+    this.seo.update({ title: 'Volumes', description: 'Browse all published volumes of the journal' });
     this.volumeStore.loadVolumes();
   }
 }

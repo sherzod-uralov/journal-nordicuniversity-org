@@ -26,7 +26,7 @@ export class CategoryListComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.seo.update({ title: 'Categories' });
+    this.seo.update({ title: 'Categories', description: 'Browse articles by research categories and fields' });
     this.categoryStore.loadCategories();
   }
 

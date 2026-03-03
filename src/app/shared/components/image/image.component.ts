@@ -5,6 +5,8 @@ import {
 import { isPlatformBrowser } from '@angular/common';
 import { environment } from '@env';
 
+const BREAKPOINTS = [640, 750, 828, 1080, 1200, 1920];
+
 @Component({
   selector: 'app-image',
   standalone: true,
@@ -13,34 +15,54 @@ import { environment } from '@env';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ImageComponent implements AfterViewInit, OnDestroy {
-  /** Image path — raw API path or full URL */
   readonly src = input.required<string>();
   readonly alt = input('');
-  /** CSS object-fit */
   readonly fit = input<'cover' | 'contain' | 'fill' | 'none'>('cover');
-  /** Aspect ratio string e.g. '16/9', '4/3', '1/1'. If empty, fills parent. */
   readonly ratio = input('');
-  /** Mark as LCP / above-fold image — disables lazy loading, sets fetchpriority high */
   readonly priority = input(false);
-  /** Border radius token */
   readonly rounded = input('');
-  /** Extra CSS class on the <img> */
   readonly imgClass = input('');
+  readonly width = input(0);
+  readonly quality = input(75);
 
   private readonly el = inject(ElementRef);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private observer: IntersectionObserver | null = null;
 
-  readonly loaded = signal(false);
   readonly error = signal(false);
   readonly inView = signal(false);
 
-  readonly resolvedSrc = computed(() => {
+  private readonly rawUrl = computed(() => {
     const path = this.src();
     if (!path) return '';
     if (path.startsWith('http')) return path;
     const base = environment.apiUrl.replace(/\/+$/, '');
     return `${base}/${path.replace(/^\/+/, '')}`;
+  });
+
+  readonly optimizedSrc = computed(() => {
+    const raw = this.rawUrl();
+    if (!raw) return '';
+    const w = this.width() || 828;
+    return `/_img?url=${encodeURIComponent(raw)}&w=${w}&q=${this.quality()}`;
+  });
+
+  /** srcset for responsive images */
+  readonly srcSet = computed(() => {
+    const raw = this.rawUrl();
+    if (!raw) return '';
+    const q = this.quality();
+    const encoded = encodeURIComponent(raw);
+    return BREAKPOINTS
+      .map(w => `/_img?url=${encoded}&w=${w}&q=${q} ${w}w`)
+      .join(', ');
+  });
+
+  /** sizes attribute */
+  readonly sizes = computed(() => {
+    const w = this.width();
+    if (w > 0) return `${w}px`;
+    return '100vw';
   });
 
   readonly shouldLoad = computed(() => this.priority() || this.inView());
@@ -68,12 +90,7 @@ export class ImageComponent implements AfterViewInit, OnDestroy {
     this.observer?.disconnect();
   }
 
-  onLoad(): void {
-    this.loaded.set(true);
-  }
-
   onError(): void {
     this.error.set(true);
-    this.loaded.set(true);
   }
 }

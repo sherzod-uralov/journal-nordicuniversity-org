@@ -25,6 +25,7 @@ export class SelectInputComponent implements ControlValueAccessor {
   readonly placeholder = input<string>('Select...');
   readonly filter = input<boolean>(false);
   readonly fieldId = input<string>('');
+  readonly disabled = input<boolean>(false);
 
   readonly itemTpl = contentChild<TemplateRef<any>>('itemTpl');
 
@@ -76,7 +77,7 @@ export class SelectInputComponent implements ControlValueAccessor {
   }
 
   toggleDropdown(): void {
-    if (this.isDisabled()) return;
+    if (this.isDisabled() || this.disabled()) return;
     this.dropdownOpen.update(v => !v);
     if (!this.dropdownOpen()) {
       this.searchQuery.set('');

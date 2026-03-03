@@ -13,10 +13,12 @@ import { TranslatePipe } from '@shared/pipes/translate.pipe';
 export class SearchTriggerComponent {
   readonly searchStore = inject(SearchStore);
   readonly isMac = signal(false);
+  readonly ready = signal(false);
 
   constructor() {
     afterNextRender(() => {
       this.isMac.set(navigator.platform.toUpperCase().includes('MAC'));
+      this.ready.set(true);
     });
   }
 

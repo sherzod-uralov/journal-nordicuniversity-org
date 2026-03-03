@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { securityHeaders } from './server/security';
 import { createSsrCache } from './server/cache';
 import { registerSitemap } from './server/sitemap';
+import { registerImageOptimizer } from './server/image-optimizer';
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
@@ -23,7 +24,7 @@ const angularApp = new AngularNodeAppEngine();
 app.use(compression());
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
-app.use(securityHeaders());
+app.use(securityHeaders(API_URL));
 
 app.use(express.static(browserDistFolder, {
   maxAge: '1y',
@@ -34,6 +35,7 @@ app.use(express.static(browserDistFolder, {
 }));
 
 registerSitemap(app, SITE_URL, API_URL);
+registerImageOptimizer(app, API_URL);
 
 const ssrCache = createSsrCache(angularApp);
 app.get('{*path}', ssrCache.handler);

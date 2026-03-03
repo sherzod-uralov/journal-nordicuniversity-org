@@ -8,44 +8,13 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  background: rgba(224, 225, 221, 0.15);
 }
 
-/* ── Skeleton placeholder ── */
-.img-skeleton {
-  position: absolute;
-  inset: 0;
-  background: rgba(224, 225, 221, 0.3);
-  z-index: 1;
-}
-
-.img-skeleton-shimmer {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.4) 50%,
-    transparent 100%
-  );
-  animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-/* ── Image element ── */
 .img-el {
   display: block;
   width: 100%;
   height: 100%;
-  opacity: 0;
-  transition: opacity 0.35s ease;
-}
-
-.img-el--loaded {
-  opacity: 1;
 }
 
 /* ── Error fallback ── */

@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
+import { withTransferState } from '@core/utils/transfer-state.util';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap } from 'rxjs';
 import { tapResponse } from '@ngrx/operators';
@@ -32,7 +33,7 @@ export const NewsStore = signalStore(
   withMethods((store, newsApi = inject(NewsApiService)) => ({
     loadNews: rxMethod<{ page?: number; limit?: number }>(
       pipe(
-        tap(() => patchState(store, { loading: true })),
+        tap(() => { if (!store.newsList().length) patchState(store, { loading: true }); }),
         switchMap((params) =>
           newsApi.getList(params).pipe(
             tapResponse({
@@ -51,7 +52,7 @@ export const NewsStore = signalStore(
     ),
     loadBySlug: rxMethod<string>(
       pipe(
-        tap(() => patchState(store, { loading: true, selectedNews: null })),
+        tap(() => { if (!store.selectedNews()) patchState(store, { loading: true }); }),
         switchMap((slug) =>
           newsApi.getBySlug(slug).pipe(
             tapResponse({
@@ -66,4 +67,5 @@ export const NewsStore = signalStore(
       patchState(store, { selectedNews: null });
     },
   })),
+  withTransferState('news-store'),
 );

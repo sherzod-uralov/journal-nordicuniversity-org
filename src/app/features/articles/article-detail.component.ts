@@ -1,6 +1,7 @@
 import { Component, inject, input, OnDestroy, signal, computed, effect, ChangeDetectionStrategy, PLATFORM_ID, viewChild, ElementRef } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ArticleStore } from '@store/article.store';
 import { BookmarkStore } from '@store/bookmark.store';
 import { ArticleApiService } from '@services/api/article-api.service';
@@ -15,7 +16,7 @@ import { ArticleCardComponent } from '@shared/components/article-card/article-ca
 import { DateLocalePipe } from '@shared/pipes/date-locale.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { SafeHtmlPipe } from '@shared/pipes/safe-html.pipe';
-import { FileUrlPipe } from '@shared/pipes/file-url.pipe';
+
 import { ImageComponent } from '@shared/components/image/image.component';
 import { ScrollAnimateDirective } from '@shared/directives/scroll-animate.directive';
 import { ClickOutsideDirective } from '@shared/directives/click-outside.directive';
@@ -38,7 +39,7 @@ import {
     PageHeaderComponent, Skeleton,
     CollapsibleComponent,
     AvatarComponent, ArticleCardComponent, DateLocalePipe, TranslatePipe,
-    SafeHtmlPipe, FileUrlPipe, ImageComponent,
+    SafeHtmlPipe, ImageComponent,
     ScrollAnimateDirective, ClickOutsideDirective, PdfViewerComponent,
   ],
   templateUrl: './article-detail.component.html',
@@ -79,20 +80,26 @@ export class ArticleDetailComponent implements OnDestroy {
 
   readonly article = computed(() => this.articleStore.selectedArticle());
 
+  private lastArticleId: string | null = null;
+  private relatedSub?: Subscription;
+
   constructor() {
-    // Reload when slug changes (related article click)
     effect(() => {
       const slug = this.slug();
       if (slug) {
-        this.articleStore.loadBySlug(slug);
+        this.lastArticleId = null;
+        this.relatedSub?.unsubscribe();
         this.relatedArticles.set([]);
+        this.relatedLoading.set(false);
         this.sliderIndex.set(0);
+        this.articleStore.loadBySlug(slug);
       }
     });
 
     effect(() => {
       const a = this.article();
-      if (a) {
+      if (a && a.id !== this.lastArticleId) {
+        this.lastArticleId = a.id;
         this.applyArticleSeo(a);
         this.loadRelatedArticles(a);
       }
@@ -155,8 +162,8 @@ export class ArticleDetailComponent implements OnDestroy {
   });
 
   ngOnDestroy(): void {
-    this.articleStore.clearSelected();
     this.seo.resetMeta();
+    this.relatedSub?.unsubscribe();
   }
 
   downloadPdf(): void {
@@ -186,8 +193,9 @@ export class ArticleDetailComponent implements OnDestroy {
 
   private loadRelatedArticles(a: Article): void {
     if (!a.categoryId) return;
+    this.relatedSub?.unsubscribe();
     this.relatedLoading.set(true);
-    this.articleApi.getByCategory(a.categoryId).subscribe({
+    this.relatedSub = this.articleApi.getByCategory(a.categoryId).subscribe({
       next: (articles) => {
         this.relatedArticles.set(articles.filter(r => r.id !== a.id).slice(0, 8));
         this.relatedLoading.set(false);
@@ -311,7 +319,7 @@ export class ArticleDetailComponent implements OnDestroy {
 
   private applyArticleSeo(a: Article): void {
     const base = this.apiUrl.replace(/\/+$/, '');
-    const articleUrl = typeof window !== 'undefined' ? window.location.href : `https://journal.nordicun.uz/articles/${a.slug}`;
+    const articleUrl = this.seo.getFullUrl(`/articles/${a.slug}`);
 
     const authors: { name: string; orcid?: string }[] = [];
     if (a.author) {

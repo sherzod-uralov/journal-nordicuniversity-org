@@ -12,7 +12,12 @@ export function createSsrCache(angularApp: AngularNodeAppEngine, ttl = 60_000, m
   const cache = new Map<string, CacheEntry>();
 
   function getKey(req: Request): string {
-    return req.originalUrl || req.url;
+    const url = req.originalUrl || req.url;
+    const cookies = req.headers.cookie || '';
+    const langMatch = cookies.match(/(?:^|;\s*)lang=(uz|ru|en)/);
+    const lang = langMatch ? langMatch[1] : 'en';
+    const loggedIn = /(?:^|;\s*)logged_in=1/.test(cookies) ? '1' : '0';
+    return `${url}|${lang}|${loggedIn}`;
   }
 
   function evictOldest(): void {

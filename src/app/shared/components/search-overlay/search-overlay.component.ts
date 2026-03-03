@@ -1,4 +1,4 @@
-import { Component, inject, afterNextRender, DestroyRef, signal, ElementRef, viewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, afterNextRender, DestroyRef, signal, computed, ElementRef, viewChild, ChangeDetectionStrategy } from '@angular/core';
 import { SearchStore } from '@store/search.store';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { HighlightPipe } from '@shared/pipes/highlight.pipe';
@@ -118,29 +118,32 @@ export class SearchOverlayComponent {
     this.searchStore.clearHistory();
   }
 
-  getArticleSuggestions(): SearchSuggestion[] {
-    return this.searchStore.suggestions().filter(s => s.type === 'article');
-  }
+  readonly articleSuggestions = computed(() =>
+    this.searchStore.suggestions().filter(s => s.type === 'article')
+  );
 
-  getCategorySuggestions(): SearchSuggestion[] {
-    return this.searchStore.suggestions().filter(s => s.type === 'category');
-  }
+  readonly categorySuggestions = computed(() =>
+    this.searchStore.suggestions().filter(s => s.type === 'category')
+  );
 
-  getHistorySuggestions(): SearchSuggestion[] {
-    return this.searchStore.suggestions().filter(s => s.type === 'history');
-  }
+  readonly historySuggestions = computed(() =>
+    this.searchStore.suggestions().filter(s => s.type === 'history')
+  );
+
+  private readonly globalIndexMap = computed(() => {
+    const map = new Map<string, number>();
+    const suggestions = this.searchStore.suggestions();
+    const counts: Record<string, number> = {};
+    for (let i = 0; i < suggestions.length; i++) {
+      const type = suggestions[i].type;
+      const localIdx = counts[type] ?? 0;
+      map.set(`${type}:${localIdx}`, i);
+      counts[type] = localIdx + 1;
+    }
+    return map;
+  });
 
   getGlobalIndex(type: string, localIndex: number): number {
-    const suggestions = this.searchStore.suggestions();
-    let count = 0;
-    for (const s of suggestions) {
-      if (s.type === type) {
-        if (count === localIndex) {
-          return suggestions.indexOf(s);
-        }
-        count++;
-      }
-    }
-    return -1;
+    return this.globalIndexMap().get(`${type}:${localIndex}`) ?? -1;
   }
 }

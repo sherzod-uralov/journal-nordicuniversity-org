@@ -3,7 +3,7 @@ import { NewsStore } from '@store/news.store';
 import { NewsCardComponent } from '@shared/components/news-card/news-card.component';
 import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
 import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
-import { TranslatePipe } from '@shared/pipes/translate.pipe';
+
 import { SeoService } from '@core/services/seo.service';
 import { Skeleton } from 'primeng/skeleton';
 import { PaginationComponent } from '@shared/components/pagination/pagination.component';
@@ -11,7 +11,7 @@ import { PaginationComponent } from '@shared/components/pagination/pagination.co
 @Component({
   selector: 'app-news-list',
   standalone: true,
-  imports: [NewsCardComponent, PageHeaderComponent, TranslatePipe, Skeleton, PaginationComponent],
+  imports: [NewsCardComponent, PageHeaderComponent, Skeleton, PaginationComponent],
   templateUrl: './news-list.component.html',
   styleUrl: './news-list.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,7 +22,7 @@ export class NewsListComponent implements OnInit {
   readonly breadcrumbs: BreadcrumbItem[] = [{ label: 'Home', translateKey: 'nav.home', route: '/' }, { label: 'News', translateKey: 'nav.news' }];
 
   ngOnInit(): void {
-    this.seo.update({ title: 'News' });
+    this.seo.update({ title: 'News', description: 'Latest news and announcements from the journal' });
     this.newsStore.loadNews({ page: 1, limit: 12 });
   }
 

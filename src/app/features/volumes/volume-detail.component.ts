@@ -1,5 +1,5 @@
-import { Component, inject, OnInit, OnDestroy, input, signal, computed , ChangeDetectionStrategy } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject, OnInit, OnDestroy, input, signal, computed, effect, ChangeDetectionStrategy } from '@angular/core';
+
 import { VolumeStore } from '@store/volume.store';
 import { ArticleApiService } from '@services/api/article-api.service';
 import { Article } from '@core/models/article.model';
@@ -8,7 +8,7 @@ import { Skeleton } from 'primeng/skeleton';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
 import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
-import { FileUrlPipe } from '@shared/pipes/file-url.pipe';
+
 import { ImageComponent } from '@shared/components/image/image.component';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { SafeHtmlPipe } from '@shared/pipes/safe-html.pipe';
@@ -21,8 +21,8 @@ import { environment } from '@env';
   selector: 'app-volume-detail',
   standalone: true,
   imports: [
-    RouterLink, ArticleCardComponent, Skeleton,
-    EmptyStateComponent, PageHeaderComponent, FileUrlPipe, ImageComponent,
+    ArticleCardComponent, Skeleton,
+    EmptyStateComponent, PageHeaderComponent, ImageComponent,
     TranslatePipe, SafeHtmlPipe, DateLocalePipe, ScrollAnimateDirective,
   ],
   templateUrl: './volume-detail.component.html',
@@ -46,6 +46,23 @@ export class VolumeDetailComponent implements OnInit, OnDestroy {
     { label: this.volume()?.title || '...' },
   ]);
 
+  constructor() {
+    effect(() => {
+      const v = this.volume();
+      if (v) {
+        const apiBase = environment.apiUrl.replace(/\/+$/, '');
+        const ogImage = v.image?.file_path
+          ? `${apiBase}/${v.image.file_path.replace(/^\/+/, '')}`
+          : undefined;
+        this.seo.update({
+          title: v.title,
+          description: v.description || v.text?.substring(0, 200) || '',
+          ogImage,
+        });
+      }
+    });
+  }
+
   ngOnInit(): void {
     const numId = Number(this.id());
     this.volumeStore.loadById(numId);
@@ -59,7 +76,6 @@ export class VolumeDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.volumeStore.clearSelected();
     this.seo.resetMeta();
   }
 

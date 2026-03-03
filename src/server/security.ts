@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express';
 
-export function securityHeaders(): RequestHandler {
+export function securityHeaders(apiUrl = 'https://journal2.nordicun.uz'): RequestHandler {
   return (_req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'SAMEORIGIN');
@@ -14,10 +14,10 @@ export function securityHeaders(): RequestHandler {
       "script-src 'self' 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
-      "img-src 'self' https://journal2.nordicun.uz data:",
-      "connect-src 'self' https://journal2.nordicun.uz",
-      "frame-src 'self' https://journal2.nordicun.uz",
-      "object-src 'self' https://journal2.nordicun.uz",
+      `img-src 'self' ${apiUrl} data:`,
+      `connect-src 'self' ${apiUrl}`,
+      `frame-src 'self' ${apiUrl}`,
+      `object-src 'self' ${apiUrl}`,
       "base-uri 'self'",
       "form-action 'self'",
     ].join('; '));

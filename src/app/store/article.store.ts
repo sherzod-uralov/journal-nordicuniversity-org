@@ -1,5 +1,6 @@
 import { computed, inject } from '@angular/core';
 import { signalStore, withState, withMethods, withComputed, patchState } from '@ngrx/signals';
+import { withTransferState } from '@core/utils/transfer-state.util';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap } from 'rxjs';
 import { tapResponse } from '@ngrx/operators';
@@ -40,7 +41,10 @@ export const ArticleStore = signalStore(
   withMethods((store, articleApi = inject(ArticleApiService)) => ({
     loadArticles: rxMethod<{ page?: number; limit?: number; order?: 'ASC' | 'DESC' }>(
       pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
+        tap(() => {
+          if (!store.articles().length) patchState(store, { loading: true });
+          patchState(store, { error: null });
+        }),
         switchMap((params) =>
           articleApi.getAll(params).pipe(
             tapResponse({
@@ -59,7 +63,7 @@ export const ArticleStore = signalStore(
     ),
     loadMulti: rxMethod<void>(
       pipe(
-        tap(() => patchState(store, { loading: true })),
+        tap(() => { if (!store.multiData()) patchState(store, { loading: true }); }),
         switchMap(() =>
           articleApi.getNecessary().pipe(
             tapResponse({
@@ -72,7 +76,7 @@ export const ArticleStore = signalStore(
     ),
     loadBySlug: rxMethod<string>(
       pipe(
-        tap(() => patchState(store, { loading: true, selectedArticle: null })),
+        tap(() => { if (!store.selectedArticle()) patchState(store, { loading: true }); }),
         switchMap((slug) =>
           articleApi.getBySlug(slug).pipe(
             tapResponse({
@@ -85,7 +89,10 @@ export const ArticleStore = signalStore(
     ),
     searchArticles: rxMethod<{ body: ArticleFilterBody; page?: number; limit?: number }>(
       pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
+        tap(() => {
+          if (!store.articles().length) patchState(store, { loading: true });
+          patchState(store, { error: null });
+        }),
         switchMap(({ body, page, limit }) =>
           articleApi.multiSearch(body, page ?? 1, limit ?? 12).pipe(
             tapResponse({
@@ -106,4 +113,5 @@ export const ArticleStore = signalStore(
       patchState(store, { selectedArticle: null });
     },
   })),
+  withTransferState('article-store'),
 );

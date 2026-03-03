@@ -37,7 +37,17 @@ export class HeaderComponent {
   constructor() {
     afterNextRender(() => {
       this.bookmarkStore.load();
-      const onScroll = () => this.scrolled.set(window.scrollY > 50);
+
+      let ticking = false;
+      const onScroll = () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(() => {
+            this.scrolled.set(window.scrollY > 50);
+            ticking = false;
+          });
+        }
+      };
       window.addEventListener('scroll', onScroll, { passive: true });
       onScroll();
       this.destroyRef.onDestroy(() => window.removeEventListener('scroll', onScroll));

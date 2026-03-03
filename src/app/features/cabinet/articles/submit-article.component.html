@@ -75,7 +75,7 @@
           [required]="true"
           [error]="errors()['categoryId'] ?? ''">
           <app-select-input
-            [options]="categoryOptions"
+            [options]="categoryOptions()"
             [ngModel]="selectedCategory()"
             (ngModelChange)="onCategoryChange($event)"
             name="category"
@@ -88,12 +88,13 @@
           [required]="true"
           [error]="errors()['subcategoryId'] ?? ''">
           <app-select-input
-            [options]="subcategoryOptions"
+            [options]="subcategoryOptions()"
             [ngModel]="selectedSubcategory()"
             (ngModelChange)="selectedSubcategory.set($event)"
             name="subcategory"
             [placeholder]="'cabinet.submit.placeholder.subcategory' | translate"
-            [filter]="true" />
+            [filter]="true"
+            [disabled]="!selectedCategory()" />
         </app-form-field>
       </div>
     </div>

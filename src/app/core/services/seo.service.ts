@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { DOCUMENT } from '@angular/common';
+import { Router } from '@angular/router';
 
 export interface SeoData {
   title: string;
@@ -36,13 +37,20 @@ export class SeoService {
   private readonly meta = inject(Meta);
   private readonly title = inject(Title);
   private readonly doc = inject(DOCUMENT);
+  private readonly router = inject(Router);
 
   private readonly defaultTitle = 'International Nordic University Scientific Journal';
   private readonly journalTitle = 'International Nordic University Scientific Journal';
   private readonly publisher = 'International Nordic University';
-  private readonly siteUrl = 'https://journal.nordicun.uz';
+  private readonly siteUrl = 'https://journal.nordicuniversity.org';
+  private readonly defaultImage = 'https://journal.nordicuniversity.org/og-image.png';
 
   private addedMetaTags: string[] = [];
+
+  /** Build a full URL from the current route path */
+  getFullUrl(path?: string): string {
+    return `${this.siteUrl}${path || this.router.url}`;
+  }
 
   update(data: SeoData): void {
     this.title.setTitle(data.title ? `${data.title} | ${this.defaultTitle}` : this.defaultTitle);
@@ -56,22 +64,23 @@ export class SeoService {
       this.meta.updateTag({ name: 'keywords', content: data.keywords });
     }
 
+    const ogUrl = data.ogUrl || this.getFullUrl();
+    const ogImage = data.ogImage || this.defaultImage;
+
     this.meta.updateTag({ property: 'og:title', content: data.title || this.defaultTitle });
     this.meta.updateTag({ property: 'og:type', content: data.ogType || 'website' });
     this.meta.updateTag({ property: 'og:site_name', content: this.journalTitle });
+    this.meta.updateTag({ property: 'og:url', content: ogUrl });
+    this.meta.updateTag({ property: 'og:image', content: ogImage });
 
-    if (data.ogUrl) {
-      this.meta.updateTag({ property: 'og:url', content: data.ogUrl });
+    this.meta.updateTag({ name: 'twitter:card', content: data.ogImage ? 'summary_large_image' : 'summary' });
+    this.meta.updateTag({ name: 'twitter:title', content: data.title || this.defaultTitle });
+    if (data.description) {
+      this.meta.updateTag({ name: 'twitter:description', content: data.description });
     }
+    this.meta.updateTag({ name: 'twitter:image', content: ogImage });
 
-    if (data.ogImage) {
-      this.meta.updateTag({ property: 'og:image', content: data.ogImage });
-      this.meta.updateTag({ name: 'twitter:image', content: data.ogImage });
-    }
-
-    if (data.canonicalUrl) {
-      this.updateCanonical(data.canonicalUrl);
-    }
+    this.updateCanonical(data.canonicalUrl || ogUrl);
   }
 
   /**
@@ -192,14 +201,13 @@ export class SeoService {
     }
 
     // --- Open Graph (article type) ---
+    const ogImage = data.imageUrl || this.defaultImage;
     this.meta.updateTag({ property: 'og:title', content: data.title });
     this.meta.updateTag({ property: 'og:description', content: data.abstract.substring(0, 200) });
     this.meta.updateTag({ property: 'og:type', content: 'article' });
     this.meta.updateTag({ property: 'og:url', content: data.articleUrl });
     this.meta.updateTag({ property: 'og:site_name', content: this.journalTitle });
-    if (data.imageUrl) {
-      this.meta.updateTag({ property: 'og:image', content: data.imageUrl });
-    }
+    this.meta.updateTag({ property: 'og:image', content: ogImage });
     if (data.publishDate) {
       this.meta.updateTag({ property: 'article:published_time', content: new Date(data.publishDate).toISOString() });
     }
@@ -216,9 +224,7 @@ export class SeoService {
     this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
     this.meta.updateTag({ name: 'twitter:title', content: data.title });
     this.meta.updateTag({ name: 'twitter:description', content: data.abstract.substring(0, 200) });
-    if (data.imageUrl) {
-      this.meta.updateTag({ name: 'twitter:image', content: data.imageUrl });
-    }
+    this.meta.updateTag({ name: 'twitter:image', content: ogImage });
 
     // --- Canonical URL ---
     this.updateCanonical(data.articleUrl);

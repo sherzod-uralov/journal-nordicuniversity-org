@@ -4,8 +4,10 @@
   <router-outlet />
 </main>
 <app-footer />
-<app-toast />
-<p-confirmdialog />
-<app-search-overlay />
-<app-scroll-to-top />
-<app-render-mode-indicator />
+@defer (on idle) {
+  <app-toast />
+  <p-confirmdialog />
+  <app-search-overlay />
+  <app-scroll-to-top />
+  <app-render-mode-indicator />
+}

@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { ArticleStore } from '@store/article.store';
 import { VolumeStore } from '@store/volume.store';
 import { StatisticsApiService, StatisticsData } from '@services/api/statistics-api.service';
+import { SeoService } from '@core/services/seo.service';
 import { ArticleCardComponent } from '@shared/components/article-card/article-card.component';
 import { VolumeCardComponent } from '@shared/components/volume-card/volume-card.component';
 import { Skeleton } from 'primeng/skeleton';
@@ -32,6 +33,7 @@ export class HomeComponent implements OnInit {
   readonly volumeStore = inject(VolumeStore);
   private readonly statsApi = inject(StatisticsApiService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly seo = inject(SeoService);
 
   readonly stats = signal<StatisticsData | null>(null);
   readonly currentSlide = signal(0);
@@ -53,17 +55,41 @@ export class HomeComponent implements OnInit {
 
   constructor() {
     afterNextRender(() => {
-      const interval = setInterval(() => {
-        const len = this.sliderArticles().length;
-        if (len > 1) {
-          this.currentSlide.update(i => (i + 1) % len);
+      let interval: ReturnType<typeof setInterval> | null = null;
+
+      const startSlider = () => {
+        if (interval) return;
+        interval = setInterval(() => {
+          const len = this.sliderArticles().length;
+          if (len > 1) {
+            this.currentSlide.update(i => (i + 1) % len);
+          }
+        }, 4000);
+      };
+
+      const stopSlider = () => {
+        if (interval) {
+          clearInterval(interval);
+          interval = null;
         }
-      }, 4000);
-      this.destroyRef.onDestroy(() => clearInterval(interval));
+      };
+
+      const onVisibility = () => document.hidden ? stopSlider() : startSlider();
+      document.addEventListener('visibilitychange', onVisibility);
+      startSlider();
+
+      this.destroyRef.onDestroy(() => {
+        stopSlider();
+        document.removeEventListener('visibilitychange', onVisibility);
+      });
     });
   }
 
   ngOnInit(): void {
+    this.seo.update({
+      title: '',
+      description: 'International Nordic University Scientific Journal — peer-reviewed academic research publications',
+    });
     this.articleStore.loadMulti();
     this.volumeStore.loadVolumes();
     this.statsApi.getStatistics()

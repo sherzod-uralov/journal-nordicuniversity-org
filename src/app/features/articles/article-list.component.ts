@@ -84,6 +84,18 @@ export class ArticleListComponent implements OnInit {
     return subs.filter(s => cats.includes(s.categoryId));
   });
 
+  private readonly categoryNameMap = computed(() =>
+    new Map(this.categoryStore.categories().map(c => [c.id, c.name]))
+  );
+
+  private readonly subcategoryNameMap = computed(() =>
+    new Map(this.subcategories().map(s => [s.id, s.name]))
+  );
+
+  private readonly volumeNameMap = computed(() =>
+    new Map(this.volumeStore.volumes().map(v => [v.id, v.title]))
+  );
+
   readonly activeFilterCount = computed(() => {
     let count = 0;
     if (this.searchQuery()) count++;
@@ -224,15 +236,15 @@ export class ArticleListComponent implements OnInit {
   }
 
   getCategoryName(id: number): string {
-    return this.categoryStore.categories().find(c => c.id === id)?.name ?? '';
+    return this.categoryNameMap().get(id) ?? '';
   }
 
   getSubCategoryName(id: number): string {
-    return this.subcategories().find(s => s.id === id)?.name ?? '';
+    return this.subcategoryNameMap().get(id) ?? '';
   }
 
   getVolumeName(id: number): string {
-    return this.volumeStore.volumes().find(v => v.id === id)?.title ?? '';
+    return this.volumeNameMap().get(id) ?? '';
   }
 
   clearDates(): void {

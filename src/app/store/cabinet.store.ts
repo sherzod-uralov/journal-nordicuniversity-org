@@ -31,7 +31,7 @@ export const CabinetStore = signalStore(
   withMethods((store, authorApi = inject(AuthorApiService), authService = inject(AuthService)) => ({
     loadMyArticles: rxMethod<string>(
       pipe(
-        tap(() => patchState(store, { loading: true })),
+        tap(() => { if (!store.myArticles().length) patchState(store, { loading: true }); }),
         switchMap((authorId) =>
           authorApi.getMyArticles(authorId).pipe(
             tapResponse({
