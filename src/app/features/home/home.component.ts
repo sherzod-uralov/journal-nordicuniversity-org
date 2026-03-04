@@ -96,6 +96,7 @@ export class HomeComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => this.stats.set(res.data),
+        error: () => { /* statistics endpoint may require auth — ignore gracefully */ },
       });
   }
 

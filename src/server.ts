@@ -19,7 +19,10 @@ const SITE_URL = process.env['SITE_URL']
 const API_URL = process.env['API_URL'] || 'https://journal2.nordicun.uz';
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+
+const angularApp = new AngularNodeAppEngine({
+  allowedHosts: ['localhost', 'journal.nordicuniversity.org'],
+});
 
 app.use(compression());
 app.use(express.json({ limit: '1mb' }));
