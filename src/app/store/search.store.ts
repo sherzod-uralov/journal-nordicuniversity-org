@@ -74,12 +74,18 @@ export const SearchStore = signalStore(
         }),
       )
     ),
-    loadTrending(): void {
-      searchService.getTrendingSearches().subscribe({
-        next: (trending) => patchState(store, { trendingSearches: trending }),
-        error: () => patchState(store, { trendingSearches: [] }),
-      });
-    },
+    loadTrending: rxMethod<void>(
+      pipe(
+        switchMap(() =>
+          searchService.getTrendingSearches().pipe(
+            tapResponse({
+              next: (trending) => patchState(store, { trendingSearches: trending }),
+              error: () => patchState(store, { trendingSearches: [] }),
+            })
+          )
+        ),
+      )
+    ),
     navigateSuggestion(direction: 'up' | 'down'): void {
       const suggestions = store.suggestions();
       const history = store.searchHistory();

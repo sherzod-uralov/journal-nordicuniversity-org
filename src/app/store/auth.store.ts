@@ -56,7 +56,12 @@ export const AuthStore = signalStore(
           authorApi.getProfile().pipe(
             tapResponse({
               next: (profile) => patchState(store, { profile, loading: false }),
-              error: (err: Error) => patchState(store, { error: err.message, loading: false }),
+              error: (err: HttpErrorResponse) => {
+                if (err.status !== 401) {
+                  toast.error('auth.profile.error');
+                }
+                patchState(store, { loading: false });
+              },
             })
           )
         ),

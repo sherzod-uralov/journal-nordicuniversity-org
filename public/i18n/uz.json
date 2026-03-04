@@ -96,6 +96,7 @@
   "auth.login.no_account": "Akkauntingiz yo'qmi?",
   "auth.login.invalid_credentials": "Telefon raqam yoki parol noto'g'ri",
   "auth.login.error": "Kirishda xatolik yuz berdi. Qayta urinib ko'ring",
+  "auth.profile.error": "Profil ma'lumotlarini yuklashda xatolik",
   "auth.register.title": "Ro'yxatdan o'tish",
   "auth.register.phone": "Telefon raqam",
   "auth.register.name": "To'liq ism",

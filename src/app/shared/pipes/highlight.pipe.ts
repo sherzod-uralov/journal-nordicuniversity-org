@@ -9,9 +9,19 @@ export class HighlightPipe implements PipeTransform {
     if (!query?.trim() || !text) {
       return text;
     }
-    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`(${escaped})`, 'gi');
-    const highlighted = text.replace(regex, '<mark class="search-highlight bg-dusk/10 text-dusk font-semibold rounded-sm px-0.5">$1</mark>');
+    // HTML-escape both text and query BEFORE regex replacement to prevent XSS.
+    // Only the <mark> tags we add ourselves will be actual HTML in the output.
+    const escapeHtml = (s: string) =>
+      s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] ?? c));
+
+    const safeText = escapeHtml(text);
+    const safeQuery = escapeHtml(query);
+    const regexEscaped = safeQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${regexEscaped})`, 'gi');
+    const highlighted = safeText.replace(
+      regex,
+      '<mark class="search-highlight bg-dusk/10 text-dusk font-semibold rounded-sm px-0.5">$1</mark>',
+    );
     return this.sanitizer.bypassSecurityTrustHtml(highlighted);
   }
 }
