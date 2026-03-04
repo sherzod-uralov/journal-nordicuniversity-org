@@ -3,8 +3,10 @@ import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap } from 'rxjs';
 import { tapResponse } from '@ngrx/operators';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AuthorApiService } from '@services/api/author-api.service';
 import { AuthService } from '@core/services/auth.service';
+import { ToastService } from '@core/services/toast.service';
 import { Author } from '@core/models/author.model';
 import { Router } from '@angular/router';
 
@@ -23,7 +25,7 @@ const initialState: AuthState = {
 export const AuthStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withMethods((store, authorApi = inject(AuthorApiService), authService = inject(AuthService), router = inject(Router)) => ({
+  withMethods((store, authorApi = inject(AuthorApiService), authService = inject(AuthService), toast = inject(ToastService), router = inject(Router)) => ({
     login: rxMethod<{ phone_number: string; password: string }>(
       pipe(
         tap(() => patchState(store, { loading: true, error: null })),
@@ -35,7 +37,13 @@ export const AuthStore = signalStore(
                 patchState(store, { profile: res.login_data.ExistAuthor, loading: false });
                 router.navigate(['/cabinet/dashboard']);
               },
-              error: (err: Error) => patchState(store, { error: err.message, loading: false }),
+              error: (err: HttpErrorResponse) => {
+                const key = (err.status === 422 || err.status === 401)
+                  ? 'auth.login.invalid_credentials'
+                  : 'auth.login.error';
+                toast.error(key);
+                patchState(store, { loading: false });
+              },
             })
           )
         ),

@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { withTransferState } from '@core/utils/transfer-state.util';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, tap } from 'rxjs';
+import { EMPTY, pipe, switchMap, tap } from 'rxjs';
 import { tapResponse } from '@ngrx/operators';
 import { NewsApiService } from '@services/api/news-api.service';
 import { NewsItem } from '@core/models/news.model';
@@ -54,15 +54,21 @@ export const NewsStore = signalStore(
       pipe(
         tap(() => { if (!store.selectedNews()) patchState(store, { loading: true }); }),
         switchMap((slug) =>
-          newsApi.getBySlug(slug).pipe(
-            tapResponse({
-              next: (news) => patchState(store, { selectedNews: news, loading: false }),
-              error: (err: Error) => patchState(store, { error: err.message, loading: false }),
-            })
-          )
+          // Skip HTTP request if resolver already pre-loaded this news item
+          store.selectedNews()?.slug === slug
+            ? EMPTY
+            : newsApi.getBySlug(slug).pipe(
+                tapResponse({
+                  next: (news) => patchState(store, { selectedNews: news, loading: false }),
+                  error: (err: Error) => patchState(store, { error: err.message, loading: false }),
+                })
+              )
         ),
       )
     ),
+    setSelected(news: NewsItem): void {
+      patchState(store, { selectedNews: news, loading: false });
+    },
     clearSelected(): void {
       patchState(store, { selectedNews: null });
     },

@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '@core/guards/auth.guard';
 import { guestGuard } from '@core/guards/guest.guard';
+import { articleResolver } from '@features/articles/article.resolver';
+import { newsResolver } from '@features/news/news.resolver';
 
 export const routes: Routes = [
   {
@@ -14,6 +16,7 @@ export const routes: Routes = [
   {
     path: 'articles/:slug',
     loadComponent: () => import('@features/articles/article-detail.component').then(m => m.ArticleDetailComponent),
+    resolve: { preloadedArticle: articleResolver },
   },
   {
     path: 'volumes',
@@ -42,6 +45,7 @@ export const routes: Routes = [
   {
     path: 'news/:slug',
     loadComponent: () => import('@features/news/news-detail.component').then(m => m.NewsDetailComponent),
+    resolve: { preloadedNews: newsResolver },
   },
   {
     path: 'guidelines',

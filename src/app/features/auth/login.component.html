@@ -12,13 +12,6 @@
 
     <!-- Card -->
     <div class="bg-white rounded-2xl shadow-xl shadow-ink/5 border border-alabaster/40 p-8">
-      @if (authStore.error()) {
-        <div class="mb-5 flex items-center gap-3 p-3.5 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm" role="alert" aria-live="assertive">
-          <i class="pi pi-exclamation-circle text-lg"></i>
-          <span>{{ authStore.error() }}</span>
-        </div>
-      }
-
       <form (ngSubmit)="onSubmit()" class="space-y-6">
         <!-- Phone -->
         <div>

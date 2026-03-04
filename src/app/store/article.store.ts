@@ -2,7 +2,7 @@ import { computed, inject } from '@angular/core';
 import { signalStore, withState, withMethods, withComputed, patchState } from '@ngrx/signals';
 import { withTransferState } from '@core/utils/transfer-state.util';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, tap } from 'rxjs';
+import { EMPTY, pipe, switchMap, tap } from 'rxjs';
 import { tapResponse } from '@ngrx/operators';
 import { ArticleApiService } from '@services/api/article-api.service';
 import { Article, ArticleFilterBody, MultiArticlesResponse } from '@core/models/article.model';
@@ -78,15 +78,21 @@ export const ArticleStore = signalStore(
       pipe(
         tap(() => { if (!store.selectedArticle()) patchState(store, { loading: true }); }),
         switchMap((slug) =>
-          articleApi.getBySlug(slug).pipe(
-            tapResponse({
-              next: (article) => patchState(store, { selectedArticle: article, loading: false }),
-              error: (err: Error) => patchState(store, { error: err.message, loading: false }),
-            })
-          )
+          // Skip HTTP request if resolver already pre-loaded this article
+          store.selectedArticle()?.slug === slug
+            ? EMPTY
+            : articleApi.getBySlug(slug).pipe(
+                tapResponse({
+                  next: (article) => patchState(store, { selectedArticle: article, loading: false }),
+                  error: (err: Error) => patchState(store, { error: err.message, loading: false }),
+                })
+              )
         ),
       )
     ),
+    setSelected(article: Article): void {
+      patchState(store, { selectedArticle: article, loading: false });
+    },
     searchArticles: rxMethod<{ body: ArticleFilterBody; page?: number; limit?: number }>(
       pipe(
         tap(() => {

@@ -1,4 +1,4 @@
-import { Component, inject, input, OnDestroy, signal, computed, effect, ChangeDetectionStrategy, PLATFORM_ID, viewChild, ElementRef } from '@angular/core';
+import { Component, inject, input, OnInit, OnDestroy, signal, computed, effect, untracked, ChangeDetectionStrategy, PLATFORM_ID, viewChild, ElementRef } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -46,8 +46,10 @@ import {
   styleUrl: './article-detail.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ArticleDetailComponent implements OnDestroy {
+export class ArticleDetailComponent implements OnInit, OnDestroy {
   readonly slug = input.required<string>();
+  /** Pre-fetched by articleResolver — available synchronously in ngOnInit for SSR SEO */
+  readonly preloadedArticle = input<Article | null>(null);
   readonly articleStore = inject(ArticleStore);
   readonly bookmarkStore = inject(BookmarkStore);
   private readonly articleApi = inject(ArticleApiService);
@@ -84,26 +86,47 @@ export class ArticleDetailComponent implements OnDestroy {
   private relatedSub?: Subscription;
 
   constructor() {
+    // Only track slug() — wrap everything else in untracked to prevent
+    // loadBySlug's tap (which reads store.selectedArticle()) from being
+    // accidentally tracked, which would cause an infinite fetch loop.
     effect(() => {
       const slug = this.slug();
-      if (slug) {
-        this.lastArticleId = null;
-        this.relatedSub?.unsubscribe();
-        this.relatedArticles.set([]);
-        this.relatedLoading.set(false);
-        this.sliderIndex.set(0);
-        this.articleStore.loadBySlug(slug);
-      }
+      untracked(() => {
+        if (slug) {
+          this.lastArticleId = null;
+          this.relatedSub?.unsubscribe();
+          this.relatedArticles.set([]);
+          this.relatedLoading.set(false);
+          this.sliderIndex.set(0);
+          // loadBySlug skips HTTP if resolver already pre-loaded this slug
+          this.articleStore.loadBySlug(slug);
+        }
+      });
     });
 
+    // Only track article() — SEO is set in ngOnInit from preloadedArticle.
+    // This effect handles the fallback case (e.g., SPA navigation without resolver cache).
     effect(() => {
       const a = this.article();
-      if (a && a.id !== this.lastArticleId) {
-        this.lastArticleId = a.id;
-        this.applyArticleSeo(a);
-        this.loadRelatedArticles(a);
-      }
+      untracked(() => {
+        if (a && a.id !== this.lastArticleId) {
+          this.lastArticleId = a.id;
+          this.applyArticleSeo(a);
+          this.loadRelatedArticles(a);
+        }
+      });
     });
+  }
+
+  ngOnInit(): void {
+    // Set SEO synchronously from resolver data — this runs in ngOnInit which
+    // is zone-tracked, so Angular SSR serializes HTML AFTER this executes.
+    const preloaded = this.preloadedArticle();
+    if (preloaded) {
+      this.lastArticleId = preloaded.id;
+      this.applyArticleSeo(preloaded);
+      this.loadRelatedArticles(preloaded);
+    }
   }
 
   readonly breadcrumbs = computed<BreadcrumbItem[]>(() => {

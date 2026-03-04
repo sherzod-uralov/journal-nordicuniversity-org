@@ -94,6 +94,8 @@
   "auth.login.password": "Пароль",
   "auth.login.submit": "Войти",
   "auth.login.no_account": "Нет аккаунта?",
+  "auth.login.invalid_credentials": "Неверный номер телефона или пароль",
+  "auth.login.error": "Ошибка входа. Попробуйте ещё раз",
   "auth.register.title": "Создать аккаунт",
   "auth.register.phone": "Номер телефона",
   "auth.register.name": "ФИО",

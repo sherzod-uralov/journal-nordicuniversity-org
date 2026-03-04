@@ -1,5 +1,6 @@
-import { Component, inject, OnInit, OnDestroy, input, computed, effect, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, input, computed, effect, untracked, ChangeDetectionStrategy } from '@angular/core';
 import { NewsStore } from '@store/news.store';
+import { NewsItem } from '@core/models/news.model';
 import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
 import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
 import { Skeleton } from 'primeng/skeleton';
@@ -19,8 +20,11 @@ import { environment } from '@env';
 })
 export class NewsDetailComponent implements OnInit, OnDestroy {
   readonly slug = input.required<string>();
+  /** Pre-fetched by newsResolver — available synchronously in ngOnInit for SSR SEO */
+  readonly preloadedNews = input<NewsItem | null>(null);
   readonly newsStore = inject(NewsStore);
   private readonly seo = inject(SeoService);
+  private readonly apiBase = environment.apiUrl.replace(/\/+$/, '');
 
   readonly breadcrumbs = computed<BreadcrumbItem[]>(() => {
     const n = this.newsStore.selectedNews();
@@ -32,25 +36,36 @@ export class NewsDetailComponent implements OnInit, OnDestroy {
   });
 
   constructor() {
+    // Fallback: apply SEO whenever selectedNews updates (handles edge cases
+    // where resolver failed or SPA navigation bypassed the cache).
     effect(() => {
       const n = this.newsStore.selectedNews();
-      if (n) {
-        const apiBase = environment.apiUrl.replace(/\/+$/, '');
-        const ogImage = n.source?.file_path
-          ? `${apiBase}/${n.source.file_path.replace(/^\/+/, '')}`
-          : undefined;
-        this.seo.update({
-          title: n.title,
-          description: n.description?.substring(0, 200) || '',
-          ogImage,
-          ogType: 'article',
-        });
-      }
+      untracked(() => {
+        if (n) this.applyNewsSeo(n);
+      });
     });
   }
 
   ngOnInit(): void {
+    // Set SEO synchronously from resolver data — zone-tracked, runs before SSR serialization
+    const preloaded = this.preloadedNews();
+    if (preloaded) {
+      this.applyNewsSeo(preloaded);
+    }
+    // loadBySlug skips HTTP if resolver already pre-loaded this slug
     this.newsStore.loadBySlug(this.slug());
+  }
+
+  private applyNewsSeo(n: NewsItem): void {
+    const ogImage = n.source?.file_path
+      ? `${this.apiBase}/${n.source.file_path.replace(/^\/+/, '')}`
+      : undefined;
+    this.seo.update({
+      title: n.title,
+      description: n.description?.substring(0, 200) || '',
+      ogImage,
+      ogType: 'article',
+    });
   }
 
   ngOnDestroy(): void {
