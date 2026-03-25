@@ -1,6 +1,7 @@
 import { Injectable, signal, computed, inject, PLATFORM_ID, TransferState, makeStateKey, REQUEST } from '@angular/core';
 import { isPlatformBrowser, isPlatformServer, DOCUMENT } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 
 export type Language = 'uz' | 'ru' | 'en';
 
@@ -18,6 +19,7 @@ export class LanguageService {
 
   private readonly currentLang = signal<Language>('en');
   private readonly translations = signal<Record<string, string>>({});
+  private translationSub?: Subscription;
 
   readonly language = this.currentLang.asReadonly();
   readonly lang = computed(() => this.currentLang());
@@ -67,10 +69,10 @@ export class LanguageService {
   }
 
   private loadTranslations(lang: Language): void {
-    this.http.get<Record<string, string>>(`/i18n/${lang}.json`).subscribe({
+    this.translationSub?.unsubscribe();
+    this.translationSub = this.http.get<Record<string, string>>(`/i18n/${lang}.json`).subscribe({
       next: (data) => {
         this.translations.set(data);
-        // Server: save translations to TransferState for client
         if (this.isServer) {
           this.transferState.set(TRANSLATIONS_KEY, data);
         }
