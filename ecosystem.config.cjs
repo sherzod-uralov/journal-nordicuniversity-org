@@ -1,10 +1,33 @@
+const fs = require('fs');
+const path = require('path');
+
+function loadDotenv(filePath) {
+  if (!fs.existsSync(filePath)) return {};
+  const result = {};
+  for (const raw of fs.readFileSync(filePath, 'utf8').split('\n')) {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) continue;
+    const idx = line.indexOf('=');
+    if (idx === -1) continue;
+    const key = line.slice(0, idx).trim();
+    let value = line.slice(idx + 1).trim();
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    result[key] = value;
+  }
+  return result;
+}
+
+const appDir = __dirname;
+const envFromFile = loadDotenv(path.join(appDir, '.env'));
+
 module.exports = {
   apps: [
     {
       name: 'journal-nordicuniversity',
-      cwd: '/opt/apps/journal-nordicuniversity-org',
+      cwd: appDir,
       script: 'dist/journal-nordicuniversity-org/server/server.mjs',
-      node_args: '--experimental-global-webcrypto --env-file=/opt/apps/journal-nordicuniversity-org/.env',
       instances: 1,
       exec_mode: 'fork',
       autorestart: true,
@@ -12,9 +35,8 @@ module.exports = {
       max_memory_restart: '1G',
       env: {
         NODE_ENV: 'production',
+        ...envFromFile,
       },
-      error_file: '/home/uni/.pm2/logs/journal-nordicuniversity-error.log',
-      out_file: '/home/uni/.pm2/logs/journal-nordicuniversity-out.log',
       time: true,
     },
   ],
