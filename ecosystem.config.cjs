@@ -35,6 +35,7 @@ module.exports = {
       max_memory_restart: '1G',
       env: {
         NODE_ENV: 'production',
+        SSR_FORCE_LISTEN: '1',
         ...envFromFile,
       },
       time: true,

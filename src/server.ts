@@ -54,7 +54,10 @@ const ssrCache = createSsrCache(angularApp, {
 });
 app.get('{*path}', ssrCache.handler);
 
-if (isMainModule(import.meta.url)) {
+const shouldListen =
+  isMainModule(import.meta.url) || process.env['SSR_FORCE_LISTEN'] === '1';
+
+if (shouldListen) {
   app.listen(PORT, () => {
     console.log(`SSR server listening on http://localhost:${PORT}`);
     console.log(`Cache: TTL=${ssrCache.ttl / 1000}s, max=${ssrCache.maxSize} entries`);
