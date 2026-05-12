@@ -342,7 +342,7 @@ export class ArticleDetailComponent implements OnInit, OnDestroy {
 
   private applyArticleSeo(a: Article): void {
     const base = this.apiUrl.replace(/\/+$/, '');
-    const articleUrl = this.seo.getFullUrl(`/articles/${a.slug}`);
+    const articleUrl = this.seo.getFullUrl(`/article/${a.slug}`);
 
     const authors: { name: string; orcid?: string }[] = [];
     if (a.author) {

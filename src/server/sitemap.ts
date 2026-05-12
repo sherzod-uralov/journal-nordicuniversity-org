@@ -136,7 +136,7 @@ export function registerSitemap(app: Application, siteUrl: string, apiUrl: strin
       const entries: string[] = [];
       for (const a of Array.isArray(articles) ? articles : []) {
         if (a.slug) {
-          entries.push(buildUrlEntry(`${siteUrl}/articles/${a.slug}`, a.updatedAt, 'monthly', '0.7'));
+          entries.push(buildUrlEntry(`${siteUrl}/article/${a.slug}`, a.updatedAt, 'monthly', '0.7'));
         }
       }
 

@@ -9,12 +9,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const token = authService.getToken();
 
-  if (token && req.url.startsWith(apiUrl)) {
-    const cloned = req.clone({
-      setHeaders: { authorization: `Bearer ${token}` },
-    });
-    return next(cloned);
+  if (!token || !req.url.startsWith(apiUrl)) {
+    return next(req);
   }
 
-  return next(req);
+  const authReq = req.clone({
+    headers: req.headers.set('Authorization', `Bearer ${token}`),
+  });
+  return next(authReq);
 };

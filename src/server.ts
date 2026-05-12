@@ -40,7 +40,18 @@ app.use(express.static(browserDistFolder, {
 registerSitemap(app, SITE_URL, API_URL);
 registerImageOptimizer(app, API_URL);
 
-const ssrCache = createSsrCache(angularApp);
+const ssrCache = createSsrCache(angularApp, {
+  ttl: 30_000,
+  skipPaths: [
+    '/',
+    '/volumes',
+    '/articles',
+    '/article',
+    '/news',
+    '/categories',
+    '/authors',
+  ],
+});
 app.get('{*path}', ssrCache.handler);
 
 if (isMainModule(import.meta.url)) {

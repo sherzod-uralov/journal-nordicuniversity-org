@@ -63,7 +63,7 @@
         @if (sliderArticles().length > 0) {
           <div class="hero-card-stack">
             @for (article of sliderArticles(); track article.id; let i = $index) {
-              <a [routerLink]="['/articles', article.slug]"
+              <a [routerLink]="['/article', article.slug]"
                  class="hero-card"
                  [attr.data-pos]="getCardPos(i)">
                 <div class="flex items-center gap-2 mb-3">

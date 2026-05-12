@@ -14,9 +14,14 @@ export const routes: Routes = [
     loadComponent: () => import('@features/articles/article-list.component').then(m => m.ArticleListComponent),
   },
   {
-    path: 'articles/:slug',
+    path: 'article/:slug',
     loadComponent: () => import('@features/articles/article-detail.component').then(m => m.ArticleDetailComponent),
     resolve: { preloadedArticle: articleResolver },
+  },
+  {
+    path: 'articles/:slug',
+    redirectTo: 'article/:slug',
+    pathMatch: 'full',
   },
   {
     path: 'volumes',

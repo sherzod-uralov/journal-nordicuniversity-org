@@ -56,7 +56,7 @@ export class SearchService {
         id: a.id,
         label: a.title,
         subtitle: a.author?.full_name ?? '',
-        route: `/articles/${a.slug}`,
+        route: `/article/${a.slug}`,
       })))
     );
 
@@ -96,7 +96,7 @@ export class SearchService {
         id: a.id,
         label: a.title,
         subtitle: a.author?.full_name ?? '',
-        route: `/articles/${a.slug}`,
+        route: `/article/${a.slug}`,
       })))
     );
   }
