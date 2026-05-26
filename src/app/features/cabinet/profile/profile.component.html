@@ -1,7 +1,19 @@
 <div>
-  <h1 class="font-heading text-2xl font-bold text-ink mb-8">{{ 'cabinet.profile.title' | translate }}</h1>
+  <div class="flex items-center justify-between mb-8 gap-4 flex-wrap">
+    <h1 class="font-heading text-2xl font-bold text-ink">{{ 'cabinet.profile.title' | translate }}</h1>
+    @if (profile() && !editMode()) {
+      <p-button
+        type="button"
+        (onClick)="startEdit()"
+        [label]="'cabinet.profile.edit' | translate"
+        icon="pi pi-pencil"
+        severity="secondary"
+        size="small"
+      />
+    }
+  </div>
 
-  <!-- Loading -->
+  <!-- Loading skeleton -->
   @if (!profile()) {
     <div class="bg-white rounded-xl border border-alabaster/60 p-6 animate-pulse">
       <div class="flex items-center gap-5 mb-6">
@@ -20,57 +32,129 @@
     </div>
   }
 
-  <!-- Profile View -->
+  <!-- Profile view -->
   @if (profile(); as p) {
-    <div class="bg-white rounded-xl border border-alabaster/60 overflow-hidden">
-      <!-- Header with avatar -->
-      <div class="px-6 py-5 border-b border-alabaster/40">
-        <div class="flex items-center gap-5">
-          <div class="profile-avatar">
-            {{ avatarLetter() }}
+    @if (!editMode()) {
+      <div class="bg-white rounded-xl border border-alabaster/60 overflow-hidden">
+        <div class="px-6 py-5 border-b border-alabaster/40">
+          <div class="flex items-center gap-5">
+            <div class="profile-avatar">{{ avatarLetter() }}</div>
+            <div>
+              <h2 class="text-xl font-bold text-ink">{{ p.full_name }}</h2>
+              <p class="text-sm text-lavender mt-0.5">{{ p.phone_number }}</p>
+              @if (p.createdAt) {
+                <p class="text-xs text-lavender/70 mt-1 inline-flex items-center gap-1.5">
+                  <i class="pi pi-calendar text-[10px]"></i>
+                  {{ p.createdAt | dateLocale: 'long' }}
+                </p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="info-item">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-lavender">{{ 'auth.register.degree' | translate }}</span>
+              <span class="text-sm font-medium text-ink mt-1">{{ p.science_degree || ('cabinet.profile.not_specified' | translate) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-lavender">{{ 'auth.register.job' | translate }}</span>
+              <span class="text-sm font-medium text-ink mt-1">{{ p.job || ('cabinet.profile.not_specified' | translate) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-lavender">{{ 'auth.register.position' | translate }}</span>
+              <span class="text-sm font-medium text-ink mt-1">{{ p.place_position || ('cabinet.profile.not_specified' | translate) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-lavender">{{ 'auth.register.birthday' | translate }}</span>
+              <span class="text-sm font-medium text-ink mt-1">{{ (p.birthday | dateLocale) || ('cabinet.profile.not_specified' | translate) }}</span>
+            </div>
+            <div class="info-item sm:col-span-2">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-lavender">{{ 'auth.register.orcid' | translate }}</span>
+              @if (p.OrcID) {
+                <span class="text-sm font-medium text-ink mt-1 font-mono tracking-wider">{{ p.OrcID }}</span>
+              } @else {
+                <span class="text-sm text-lavender/70 mt-1">{{ 'cabinet.profile.not_specified' | translate }}</span>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Edit form -->
+    @if (editMode()) {
+      <form (ngSubmit)="save()" class="bg-white rounded-xl border border-alabaster/60 p-6 space-y-5">
+        <div class="flex items-center gap-5 pb-5 border-b border-alabaster/40">
+          <div class="profile-avatar">{{ avatarLetter() }}</div>
+          <div>
+            <h2 class="text-lg font-semibold text-ink">{{ 'cabinet.profile.edit' | translate }}</h2>
+            <p class="text-xs text-lavender mt-0.5">{{ p.phone_number }}</p>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.name' | translate }}</label>
+          <app-text-input [(ngModel)]="full_name" name="full_name" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.phone' | translate }}</label>
+          <app-phone-input [(ngModel)]="phone_number" name="phone_number" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.degree' | translate }}</label>
+            <app-text-input [(ngModel)]="science_degree" name="science_degree" />
           </div>
           <div>
-            <h2 class="text-xl font-bold text-ink">{{ p.full_name }}</h2>
-            <p class="text-sm text-lavender mt-0.5">{{ p.phone_number }}</p>
-            @if (p.createdAt) {
-              <p class="text-xs text-lavender/70 mt-1 inline-flex items-center gap-1.5">
-                <i class="pi pi-calendar text-[10px]"></i>
-                {{ p.createdAt | dateLocale: 'long' }}
-              </p>
-            }
+            <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.job' | translate }}</label>
+            <app-text-input [(ngModel)]="job" name="job" />
           </div>
         </div>
-      </div>
 
-      <!-- Info Grid -->
-      <div class="p-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div class="info-item">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-lavender">{{ 'auth.register.degree' | translate }}</span>
-            <span class="text-sm font-medium text-ink mt-1">{{ p.science_degree || ('cabinet.profile.not_specified' | translate) }}</span>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.position' | translate }}</label>
+            <app-text-input [(ngModel)]="place_position" name="place_position" />
           </div>
-          <div class="info-item">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-lavender">{{ 'auth.register.job' | translate }}</span>
-            <span class="text-sm font-medium text-ink mt-1">{{ p.job || ('cabinet.profile.not_specified' | translate) }}</span>
-          </div>
-          <div class="info-item">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-lavender">{{ 'auth.register.position' | translate }}</span>
-            <span class="text-sm font-medium text-ink mt-1">{{ p.place_position || ('cabinet.profile.not_specified' | translate) }}</span>
-          </div>
-          <div class="info-item">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-lavender">{{ 'auth.register.birthday' | translate }}</span>
-            <span class="text-sm font-medium text-ink mt-1">{{ (p.birthday | dateLocale) || ('cabinet.profile.not_specified' | translate) }}</span>
-          </div>
-          <div class="info-item sm:col-span-2">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-lavender">{{ 'auth.register.orcid' | translate }}</span>
-            @if (p.OrcID) {
-              <span class="text-sm font-medium text-ink mt-1 font-mono tracking-wider">{{ p.OrcID }}</span>
-            } @else {
-              <span class="text-sm text-lavender/70 mt-1">{{ 'cabinet.profile.not_specified' | translate }}</span>
-            }
+          <div>
+            <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.birthday' | translate }}</label>
+            <app-date-input [(ngModel)]="birthdayDate" name="birthday" [maxDate]="maxDate" />
           </div>
         </div>
-      </div>
-    </div>
+
+        <div>
+          <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.orcid' | translate }}</label>
+          <app-text-input [(ngModel)]="OrcID" name="OrcID" placeholder="0000-0000-0000-0000" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-ink mb-1.5">
+            {{ 'auth.register.password' | translate }}
+            <span class="text-xs text-lavender font-normal ml-1">({{ 'cabinet.profile.password_hint' | translate }})</span>
+          </label>
+          <app-password-input [(ngModel)]="password" name="password" />
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-alabaster/40">
+          <p-button
+            type="button"
+            (onClick)="cancelEdit()"
+            [label]="'cabinet.profile.cancel' | translate"
+            severity="secondary"
+            [outlined]="true"
+          />
+          <p-button
+            type="submit"
+            [label]="'cabinet.profile.save' | translate"
+            icon="pi pi-check"
+            [loading]="loading()"
+          />
+        </div>
+      </form>
+    }
   }
 </div>

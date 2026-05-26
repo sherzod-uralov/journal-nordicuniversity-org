@@ -6,6 +6,18 @@ import { Author, AuthorLoginResponse } from '@core/models/author.model';
 import { Article } from '@core/models/article.model';
 import { PaginatedResponse } from '@core/models/api-response.model';
 
+export interface UpdateAuthorPayload {
+  full_name?: string;
+  phone_number?: string;
+  science_degree?: string;
+  birthday?: string;
+  job?: string;
+  OrcID?: string;
+  place_position?: string;
+  password?: string;
+  source_id?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthorApiService {
   private readonly http = inject(HttpClient);
@@ -28,6 +40,12 @@ export class AuthorApiService {
 
   register(data: { phone_number: string; full_name: string; password: string; science_degree: string; job: string; birthday: string; place_position: string; OrcID?: string }): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.baseUrl}/create`, data);
+  }
+
+  updateProfile(data: UpdateAuthorPayload): Observable<Author> {
+    return this.http.patch<{ data: Author }>(`${this.baseUrl}/profile`, data).pipe(
+      map((res) => res.data)
+    );
   }
 
   getProfile(): Observable<Author> {

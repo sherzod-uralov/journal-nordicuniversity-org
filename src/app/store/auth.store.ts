@@ -4,7 +4,7 @@ import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap } from 'rxjs';
 import { tapResponse } from '@ngrx/operators';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AuthorApiService } from '@services/api/author-api.service';
+import { AuthorApiService, UpdateAuthorPayload } from '@services/api/author-api.service';
 import { AuthService } from '@core/services/auth.service';
 import { ToastService } from '@core/services/toast.service';
 import { Author } from '@core/models/author.model';
@@ -60,6 +60,28 @@ export const AuthStore = signalStore(
                 if (err.status !== 401) {
                   toast.error('auth.profile.error');
                 }
+                patchState(store, { loading: false });
+              },
+            })
+          )
+        ),
+      )
+    ),
+    updateProfile: rxMethod<UpdateAuthorPayload>(
+      pipe(
+        tap(() => patchState(store, { loading: true, error: null })),
+        switchMap((data) =>
+          authorApi.updateProfile(data).pipe(
+            tapResponse({
+              next: (updated) => {
+                patchState(store, { profile: { ...store.profile()!, ...updated }, loading: false });
+                toast.success('cabinet.profile.updated');
+              },
+              error: (err: HttpErrorResponse) => {
+                const msg = (err.error && typeof err.error === 'object' && 'message' in err.error)
+                  ? String((err.error as { message?: string }).message)
+                  : '';
+                toast.error(msg || 'cabinet.profile.update_error');
                 patchState(store, { loading: false });
               },
             })
