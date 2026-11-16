@@ -14,6 +14,12 @@ const LANG_KEY = 'lang';
 const LANG_COOKIE_MAX_AGE = 31536000; // 1 year
 const LANG_COOKIE_PATTERN = /(?:^|;\s*)lang=(uz|ru|en)(?:;|$)/;
 const SERVER_TRANSLATIONS_TIMEOUT_MS = 5000;
+/**
+ * Cache-busting version for /i18n/*.json. Before 2026-11 these files were served
+ * `immutable` for a year, so returning browsers would never refetch the old URL.
+ * They are now served `no-cache`, so this only needs a bump if that ever changes.
+ */
+const I18N_VERSION = '2';
 const TRANSLATIONS_KEY = makeStateKey<{ lang: Language; data: Translations }>('app-translations');
 
 /**
@@ -114,7 +120,7 @@ export class LanguageService {
 
     // Translations are transferred explicitly (with their language), so keep them
     // out of the HTTP transfer cache to avoid embedding the JSON twice in the HTML.
-    let request$: Observable<Translations> = this.http.get<Translations>(`/i18n/${lang}.json`, { transferCache: false });
+    let request$: Observable<Translations> = this.http.get<Translations>(`/i18n/${lang}.json?v=${I18N_VERSION}`, { transferCache: false });
     if (this.isServer) {
       request$ = request$.pipe(timeout(SERVER_TRANSLATIONS_TIMEOUT_MS));
     }
