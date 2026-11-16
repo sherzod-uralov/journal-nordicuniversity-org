@@ -1,5 +1,5 @@
 @if (src()) {
-  <app-image [src]="src()!" [alt]="name()" [class]="sizeClasses()" rounded="9999px" ratio="1/1" />
+  <app-image [src]="src()!" [alt]="name()" [class]="sizeClasses()" rounded="9999px" ratio="1/1" [width]="pixelSize()" [height]="pixelSize()" />
 } @else {
   <div role="img" [attr.aria-label]="name()" [class]="sizeClasses() + ' rounded-full bg-dusk/10 flex items-center justify-center text-dusk font-semibold'">
     {{ initials() }}

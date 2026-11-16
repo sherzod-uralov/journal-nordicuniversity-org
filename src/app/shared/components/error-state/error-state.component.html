@@ -1,0 +1,23 @@
+<div
+  role="alert"
+  class="flex flex-col items-center justify-center text-center bg-white rounded-xl border border-alabaster/60"
+  [class.py-12]="!compact()"
+  [class.px-6]="!compact()"
+  [class.py-4]="compact()"
+  [class.px-4]="compact()"
+>
+  @if (!compact()) {
+    <div class="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mb-4">
+      <i class="pi pi-exclamation-triangle text-xl text-red-500" aria-hidden="true"></i>
+    </div>
+  }
+  <p class="text-sm text-dusk mb-4">{{ message() | translate }}</p>
+  <button
+    type="button"
+    (click)="retry.emit()"
+    class="inline-flex items-center gap-2 px-4 py-2 bg-dusk text-white text-sm font-medium rounded-lg hover:bg-prussian transition-colors cursor-pointer"
+  >
+    <i class="pi pi-refresh text-xs" aria-hidden="true"></i>
+    {{ 'common.retry' | translate }}
+  </button>
+</div>

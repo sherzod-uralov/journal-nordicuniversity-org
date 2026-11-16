@@ -1,6 +1,7 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Article } from '@core/models/article.model';
+import { safeStorage } from '@core/utils/safe-storage.util';
 
 const STORAGE_KEY = 'journal_bookmarks';
 
@@ -10,12 +11,8 @@ export class BookmarkService {
 
   getBookmarks(): Article[] {
     if (!this.isBrowser) return [];
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
+    const bookmarks = safeStorage.getJson<Article[]>(STORAGE_KEY, []);
+    return Array.isArray(bookmarks) ? bookmarks : [];
   }
 
   addBookmark(article: Article): Article[] {
@@ -53,8 +50,6 @@ export class BookmarkService {
 
   private save(bookmarks: Article[]): void {
     if (!this.isBrowser) return;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks));
-    } catch { /* quota exceeded */ }
+    safeStorage.setJson(STORAGE_KEY, bookmarks);
   }
 }

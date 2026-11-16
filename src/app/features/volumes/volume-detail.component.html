@@ -1,4 +1,4 @@
-@if (volumeStore.loading()) {
+@if (volumeStore.loading() && !volume()) {
   <app-page-header [breadcrumbs]="breadcrumbs()" title="..." />
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="flex flex-col md:flex-row gap-8">
@@ -20,7 +20,7 @@
       <!-- Cover Image -->
       <div class="vol-cover">
         @if (v.image?.file_path) {
-          <app-image [src]="v.image!.file_path" [alt]="v.title" [priority]="true" rounded="0.5rem" />
+          <app-image [src]="v.image!.file_path" [alt]="v.title" [priority]="true" rounded="0.5rem" ratio="3/4" sizes="(min-width: 768px) 224px, 192px" />
         } @else {
           <div class="vol-cover-fallback">
             <svg class="w-10 h-10 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -83,14 +83,14 @@
       </div>
     } @else if (articles().length === 0) {
       <app-empty-state
-        title="No articles yet"
-        message="This volume doesn't have any articles yet."
+        [title]="'volume.no_articles' | translate"
+        [message]="'volume.no_articles_desc' | translate"
       />
     } @else {
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        @for (article of articles(); track article.id) {
+        @for (article of articles(); track article.id; let first = $first) {
           <div appScrollAnimate="fade-up">
-            <app-article-card [article]="article" />
+            <app-article-card [article]="article" [priority]="first" />
           </div>
         }
       </div>
@@ -107,4 +107,16 @@
       </div>
     </div>
   }
+} @else {
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    @if (notFound()) {
+      <app-empty-state [title]="'not_found.title' | translate" [message]="'common.not_found_desc' | translate">
+        <a routerLink="/volumes" class="text-sm font-medium text-dusk hover:text-ink transition-colors">{{ 'nav.volumes' | translate }} &rarr;</a>
+      </app-empty-state>
+    } @else {
+      <app-empty-state [title]="'common.error' | translate" [message]="'common.load_error_desc' | translate">
+        <button type="button" (click)="retry()" class="text-sm font-medium text-dusk hover:text-ink transition-colors cursor-pointer">{{ 'common.retry' | translate }}</button>
+      </app-empty-state>
+    }
+  </div>
 }

@@ -1,11 +1,11 @@
 import { Component, inject, OnInit, computed , ChangeDetectionStrategy } from '@angular/core';
-import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { VolumeStore } from '@store/volume.store';
 import { Skeleton } from 'primeng/skeleton';
 import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
 import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
+import { DateLocalePipe } from '@shared/pipes/date-locale.pipe';
 import { ImageComponent } from '@shared/components/image/image.component';
 import { ScrollAnimateDirective } from '@shared/directives/scroll-animate.directive';
 import { SeoService } from '@core/services/seo.service';
@@ -13,7 +13,7 @@ import { SeoService } from '@core/services/seo.service';
 @Component({
   selector: 'app-volume-list',
   standalone: true,
-  imports: [DatePipe, RouterLink, Skeleton, PageHeaderComponent, TranslatePipe, ImageComponent, ScrollAnimateDirective],
+  imports: [DateLocalePipe, RouterLink, Skeleton, PageHeaderComponent, TranslatePipe, ImageComponent, ScrollAnimateDirective],
   templateUrl: './volume-list.component.html',
   styleUrl: './volume-list.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

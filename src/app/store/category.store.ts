@@ -1,10 +1,10 @@
 import { inject } from '@angular/core';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
-import { withTransferState } from '@core/utils/transfer-state.util';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap } from 'rxjs';
 import { tapResponse } from '@ngrx/operators';
 import { CategoryApiService } from '@services/api/category-api.service';
+import { errorMessage, isNotFoundError } from '@services/api/api-error.util';
 import { Category } from '@core/models/category.model';
 
 interface CategoryState {
@@ -12,6 +12,8 @@ interface CategoryState {
   selectedCategory: Category | null;
   loading: boolean;
   error: string | null;
+  /** The last requested category doesn't exist (API 404 / empty body). */
+  notFound: boolean;
 }
 
 const initialState: CategoryState = {
@@ -19,6 +21,7 @@ const initialState: CategoryState = {
   selectedCategory: null,
   loading: false,
   error: null,
+  notFound: false,
 };
 
 export const CategoryStore = signalStore(
@@ -40,20 +43,29 @@ export const CategoryStore = signalStore(
     ),
     loadById: rxMethod<number>(
       pipe(
-        tap(() => { if (!store.selectedCategory()) patchState(store, { loading: true }); }),
+        tap((id) => {
+          // Never show the previous category under a new URL
+          if (store.selectedCategory()?.id !== id) {
+            patchState(store, { selectedCategory: null, loading: true, error: null, notFound: false });
+          }
+        }),
         switchMap((id) =>
           categoryApi.getById(id).pipe(
             tapResponse({
-              next: (category) => patchState(store, { selectedCategory: category, loading: false }),
-              error: (err: Error) => patchState(store, { error: err.message, loading: false }),
+              next: (category) => patchState(store, { selectedCategory: category ?? null, notFound: !category, loading: false }),
+              error: (err: unknown) => patchState(store, {
+                selectedCategory: null,
+                error: errorMessage(err),
+                notFound: isNotFoundError(err),
+                loading: false,
+              }),
             })
           )
         ),
       )
     ),
     clearSelected(): void {
-      patchState(store, { selectedCategory: null });
+      patchState(store, { selectedCategory: null, notFound: false });
     },
   })),
-  withTransferState('category-store'),
 );

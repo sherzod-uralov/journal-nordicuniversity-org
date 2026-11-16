@@ -1,29 +1,47 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { AngularNodeAppEngine } from '@angular/ssr/node';
 
-interface CacheEntry {
+interface RenderResult {
   html: string;
   headers: [string, string][];
   status: number;
+}
+
+interface CacheEntry extends RenderResult {
   createdAt: number;
+  size: number;
 }
 
 interface CacheOptions {
   ttl?: number;
   maxSize?: number;
+  /** Upper bound for the memory held by cached HTML (approximate, in bytes). */
+  maxBytes?: number;
   skipPaths?: (string | RegExp)[];
+  /** Same list passed to AngularNodeAppEngine; requests for other hosts never touch the cache. */
+  allowedHosts?: string[];
 }
+
+// Browsers may keep the page (bfcache) but must revalidate before reuse; never stored by shared caches.
+const HTML_CACHE_CONTROL = 'private, no-cache';
 
 export function createSsrCache(angularApp: AngularNodeAppEngine, options: CacheOptions = {}) {
   const ttl = options.ttl ?? 60_000;
   const maxSize = options.maxSize ?? 200;
+  const maxBytes = options.maxBytes ?? 64 * 1024 * 1024;
   const skipPaths = options.skipPaths ?? [];
+  const allowedHosts = options.allowedHosts ? new Set(options.allowedHosts) : null;
+  // Map iteration order = insertion order; entries are re-inserted on use, so the first key is the LRU one.
   const cache = new Map<string, CacheEntry>();
+  const inFlight = new Map<string, Promise<RenderResult | null>>();
+  let totalBytes = 0;
 
   function getPath(req: Request): string {
     const url = req.originalUrl || req.url;
     const qIndex = url.indexOf('?');
-    return qIndex === -1 ? url : url.slice(0, qIndex);
+    const path = qIndex === -1 ? url : url.slice(0, qIndex);
+    // '/articles/' must match like '/articles'; keep the root as '/'
+    return path.length > 1 ? path.replace(/\/+$/, '') || '/' : path;
   }
 
   function shouldSkipCache(req: Request): boolean {
@@ -37,6 +55,33 @@ export function createSsrCache(angularApp: AngularNodeAppEngine, options: CacheO
     });
   }
 
+  function hostnameOf(value: string | string[] | undefined): string | null {
+    const first = (Array.isArray(value) ? value[0] : value)?.split(',', 1)[0]?.trim();
+    if (!first) return null;
+    try {
+      return new URL(`http://${first}`).hostname;
+    } catch {
+      return '';
+    }
+  }
+
+  function isHostAllowed(hostname: string): boolean {
+    if (!allowedHosts || allowedHosts.has(hostname)) return true;
+    for (const allowed of allowedHosts) {
+      if (allowed.startsWith('*.') && hostname.endsWith(allowed.slice(1))) return true;
+    }
+    return false;
+  }
+
+  /** Mirrors Angular's host validation so rejected requests (400) can't read or refresh cache entries. */
+  function isTrustedHost(req: Request): boolean {
+    for (const name of ['host', 'x-forwarded-host']) {
+      const hostname = hostnameOf(req.headers[name]);
+      if (hostname !== null && !isHostAllowed(hostname)) return false;
+    }
+    return true;
+  }
+
   function getKey(req: Request): string {
     const url = req.originalUrl || req.url;
     const cookies = req.headers.cookie || '';
@@ -46,67 +91,88 @@ export function createSsrCache(angularApp: AngularNodeAppEngine, options: CacheO
     return `${url}|${lang}|${loggedIn}`;
   }
 
-  function evictOldest(): void {
-    if (cache.size <= maxSize) return;
-    const oldest = cache.keys().next().value;
-    if (oldest) cache.delete(oldest);
-  }
-
   function isStale(entry: CacheEntry): boolean {
     return Date.now() - entry.createdAt > ttl;
   }
 
-  function applyHeaders(res: Response, headers: [string, string][]): void {
-    for (const [key, value] of headers) {
+  function isCacheable(result: RenderResult): boolean {
+    let isHtml = false;
+    for (const [name, value] of result.headers) {
+      if (name === 'set-cookie') return false;
+      if (name === 'content-type' && value.includes('text/html')) isHtml = true;
+    }
+    return result.status === 200 && isHtml;
+  }
+
+  function remove(key: string): void {
+    const entry = cache.get(key);
+    if (!entry) return;
+    cache.delete(key);
+    totalBytes -= entry.size;
+  }
+
+  function store(key: string, result: RenderResult): void {
+    // V8 may store non-Latin1 HTML as two-byte strings, so count 2 bytes per char.
+    const size = result.html.length * 2;
+    if (size > maxBytes) return;
+    remove(key);
+    while (cache.size > 0 && (cache.size >= maxSize || totalBytes + size > maxBytes)) {
+      remove(cache.keys().next().value!);
+    }
+    cache.set(key, { ...result, createdAt: Date.now(), size });
+    totalBytes += size;
+  }
+
+  function touch(key: string, entry: CacheEntry): void {
+    cache.delete(key);
+    cache.set(key, entry);
+  }
+
+  function send(res: Response, result: RenderResult, cacheStatus: 'HIT' | 'MISS' | 'BYPASS'): void {
+    res.status(result.status);
+    for (const [key, value] of result.headers) {
       res.setHeader(key, value);
     }
+    if (result.headers.some(([name, value]) => name === 'content-type' && value.includes('text/html'))) {
+      res.setHeader('Cache-Control', HTML_CACHE_CONTROL);
+    }
+    res.setHeader('X-SSR-Cache', cacheStatus);
+    res.send(result.html);
   }
 
-  function serveCached(res: Response, entry: CacheEntry): void {
-    res.status(entry.status);
-    applyHeaders(res, entry.headers);
-    res.setHeader('X-SSR-Cache', 'HIT');
-    res.send(entry.html);
-  }
-
-  async function render(req: Request): Promise<{ html: string; headers: [string, string][]; status: number } | null> {
+  async function render(req: Request): Promise<RenderResult | null> {
     const response = await angularApp.handle(req);
     if (!response) return null;
 
     const html = await response.text();
     const headers: [string, string][] = [];
     response.headers.forEach((value, name) => {
-      if (name !== 'transfer-encoding') {
+      if (name !== 'transfer-encoding' && name !== 'content-length') {
         headers.push([name, value]);
       }
     });
     return { html, headers, status: response.status };
   }
 
-  async function renderAndCache(req: Request, key: string): Promise<CacheEntry | null> {
-    const result = await render(req);
-    if (!result) return null;
+  /** Renders once per key at a time; only 200 text/html results replace the cached entry. */
+  function renderAndCache(req: Request, key: string): Promise<RenderResult | null> {
+    const pending = inFlight.get(key);
+    if (pending) return pending;
 
-    const entry: CacheEntry = { ...result, createdAt: Date.now() };
-    evictOldest();
-    cache.set(key, entry);
-    return entry;
+    const promise = render(req)
+      .then((result) => {
+        if (result && isCacheable(result)) store(key, result);
+        return result;
+      })
+      .finally(() => inFlight.delete(key));
+    inFlight.set(key, promise);
+    return promise;
   }
 
   function handler(req: Request, res: Response, next: NextFunction): void {
-    if (shouldSkipCache(req)) {
+    if (!isTrustedHost(req) || shouldSkipCache(req)) {
       render(req)
-        .then((result) => {
-          if (!result) {
-            next();
-            return;
-          }
-          res.status(result.status);
-          applyHeaders(res, result.headers);
-          res.setHeader('X-SSR-Cache', 'BYPASS');
-          res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-          res.send(result.html);
-        })
+        .then((result) => (result ? send(res, result, 'BYPASS') : next()))
         .catch(next);
       return;
     }
@@ -115,24 +181,17 @@ export function createSsrCache(angularApp: AngularNodeAppEngine, options: CacheO
     const cached = cache.get(key);
 
     if (cached) {
-      serveCached(res, cached);
+      touch(key, cached);
+      send(res, cached, 'HIT');
       if (isStale(cached)) {
-        renderAndCache(req, key).catch(() => cache.delete(key));
+        // stale-while-revalidate: on failure / non-200 the old entry stays and is retried next hit
+        renderAndCache(req, key).catch((err) => console.error('SSR cache refresh failed:', err));
       }
       return;
     }
 
-    res.setHeader('X-SSR-Cache', 'MISS');
     renderAndCache(req, key)
-      .then((entry) => {
-        if (entry) {
-          res.status(entry.status);
-          applyHeaders(res, entry.headers);
-          res.send(entry.html);
-        } else {
-          next();
-        }
-      })
+      .then((result) => (result ? send(res, result, 'MISS') : next()))
       .catch(next);
   }
 
@@ -140,17 +199,18 @@ export function createSsrCache(angularApp: AngularNodeAppEngine, options: CacheO
     if (!predicate) {
       const size = cache.size;
       cache.clear();
+      totalBytes = 0;
       return size;
     }
     let count = 0;
-    for (const key of cache.keys()) {
+    for (const key of [...cache.keys()]) {
       if (predicate(key)) {
-        cache.delete(key);
+        remove(key);
         count++;
       }
     }
     return count;
   }
 
-  return { handler, invalidate, ttl, maxSize, skipPaths };
+  return { handler, invalidate, ttl, maxSize, maxBytes, skipPaths };
 }

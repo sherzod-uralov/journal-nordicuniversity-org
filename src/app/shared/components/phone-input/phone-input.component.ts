@@ -1,13 +1,13 @@
-import { Component, forwardRef, signal, PLATFORM_ID, inject , ChangeDetectionStrategy } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Component, forwardRef, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/forms';
 import { ClickOutsideDirective } from '@shared/directives/click-outside.directive';
-import { ALL_COUNTRIES, DEFAULT_COUNTRY, CountryCode } from '@shared/data/countries';
+import { TranslatePipe } from '@shared/pipes/translate.pipe';
+import { ALL_COUNTRIES, DEFAULT_COUNTRY, CountryCode, findCountryByPhone, phoneLocalLength } from '@shared/data/countries';
 
 @Component({
   selector: 'app-phone-input',
   standalone: true,
-  imports: [FormsModule, ClickOutsideDirective],
+  imports: [FormsModule, ClickOutsideDirective, TranslatePipe],
   templateUrl: './phone-input.component.html',
   styleUrl: './phone-input.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,14 +20,16 @@ import { ALL_COUNTRIES, DEFAULT_COUNTRY, CountryCode } from '@shared/data/countr
   ],
 })
 export class PhoneInputComponent implements ControlValueAccessor {
-  private readonly platformId = inject(PLATFORM_ID);
-
   readonly countries = ALL_COUNTRIES;
   readonly selectedCountry = signal<CountryCode>(DEFAULT_COUNTRY);
   readonly phoneLocal = signal('');
   readonly isDisabled = signal(false);
   readonly dropdownOpen = signal(false);
   readonly searchQuery = signal('');
+
+  /** Max local digits for the selected country (E.164 fallback for unknown ones). */
+  readonly maxDigits = computed(() => phoneLocalLength(this.selectedCountry()).max);
+  readonly placeholder = computed(() => this.formatDigits('901234567890123'.slice(0, this.maxDigits())));
 
   private onChange: (val: string) => void = () => {};
   private onTouched: () => void = () => {};
@@ -46,7 +48,7 @@ export class PhoneInputComponent implements ControlValueAccessor {
       return;
     }
     // Try to parse incoming full phone number
-    const country = this.countries.find(c => val.startsWith(c.dialCode));
+    const country = findCountryByPhone(val, this.selectedCountry());
     if (country) {
       this.selectedCountry.set(country);
       const local = val.slice(country.dialCode.length);
@@ -70,7 +72,17 @@ export class PhoneInputComponent implements ControlValueAccessor {
 
   onPhoneInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const digits = input.value.replace(/\D/g, '').slice(0, 9);
+    const raw = input.value.trim();
+    // A pasted international number ("+7 701 …") switches the country.
+    if (raw.startsWith('+')) {
+      const full = '+' + raw.replace(/\D/g, '');
+      const country = findCountryByPhone(full, this.selectedCountry());
+      if (country) {
+        this.selectedCountry.set(country);
+        input.value = full.slice(country.dialCode.length);
+      }
+    }
+    const digits = input.value.replace(/\D/g, '').slice(0, this.maxDigits());
     const formatted = this.formatDigits(digits);
     this.phoneLocal.set(formatted);
     input.value = formatted;
@@ -81,7 +93,8 @@ export class PhoneInputComponent implements ControlValueAccessor {
     this.selectedCountry.set(country);
     this.dropdownOpen.set(false);
     this.searchQuery.set('');
-    const digits = this.phoneLocal().replace(/\D/g, '');
+    const digits = this.phoneLocal().replace(/\D/g, '').slice(0, this.maxDigits());
+    this.phoneLocal.set(this.formatDigits(digits));
     this.emitValue(digits);
   }
 
@@ -109,12 +122,16 @@ export class PhoneInputComponent implements ControlValueAccessor {
 
   private formatDigits(digits: string): string {
     if (!digits) return '';
-    const d = digits.replace(/\D/g, '').slice(0, 9);
-    const parts: string[] = [];
-    if (d.length > 0) parts.push(d.slice(0, 2));
-    if (d.length > 2) parts.push(d.slice(2, 5));
-    if (d.length > 5) parts.push(d.slice(5, 7));
-    if (d.length > 7) parts.push(d.slice(7, 9));
-    return parts.join(' ');
+    const d = digits.replace(/\D/g, '').slice(0, this.maxDigits());
+    if (this.selectedCountry().code === 'UZ') {
+      // 90 123 45 67
+      return [d.slice(0, 2), d.slice(2, 5), d.slice(5, 7), d.slice(7, 9)].filter(Boolean).join(' ');
+    }
+    // Generic: groups of three, a trailing single digit joins the previous group.
+    const groups = d.match(/.{1,3}/g) ?? [];
+    if (groups.length > 1 && groups[groups.length - 1].length === 1) {
+      groups[groups.length - 2] += groups.pop();
+    }
+    return groups.join(' ');
   }
 }

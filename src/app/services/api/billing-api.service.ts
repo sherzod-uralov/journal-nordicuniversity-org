@@ -14,7 +14,7 @@ export class BillingApiService {
   }
 
   getTransaction(id: number): Observable<Transaction> {
-    return this.http.get<Transaction>(`${this.baseUrl}/${id}`);
+    return this.http.get<Transaction>(`${this.baseUrl}/${encodeURIComponent(id)}`);
   }
 
   getMyTransactions(): Observable<Transaction[]> {

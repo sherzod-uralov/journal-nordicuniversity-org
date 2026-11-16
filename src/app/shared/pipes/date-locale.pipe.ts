@@ -16,6 +16,24 @@ const MONTHS: Record<string, { short: string[]; long: string[] }> = {
   },
 };
 
+/**
+ * Calendar parts in the journal's time zone. Server (UTC) and browser (any zone) must
+ * render the same day, otherwise hydration flips the text near midnight.
+ */
+const DISPLAY_TIME_ZONE = 'Asia/Tashkent';
+const partsFormatter = new Intl.DateTimeFormat('en-US', {
+  timeZone: DISPLAY_TIME_ZONE,
+  year: 'numeric',
+  month: 'numeric',
+  day: 'numeric',
+});
+
+function zonedParts(date: Date): { year: number; month: number; day: number } {
+  const parts = partsFormatter.formatToParts(date);
+  const get = (type: Intl.DateTimeFormatPartTypes) => Number(parts.find(p => p.type === type)?.value);
+  return { year: get('year'), month: get('month') - 1, day: get('day') };
+}
+
 @Pipe({ name: 'dateLocale', pure: false, standalone: true })
 export class DateLocalePipe implements PipeTransform {
   private readonly languageService = inject(LanguageService);
@@ -27,9 +45,10 @@ export class DateLocalePipe implements PipeTransform {
 
     const lang = this.languageService.lang();
     const m = MONTHS[lang] ?? MONTHS['en'];
-    const day = date.getDate();
-    const month = m[format][date.getMonth()];
-    const year = date.getFullYear();
+    const parts = zonedParts(date);
+    const day = parts.day;
+    const month = m[format][parts.month];
+    const year = parts.year;
 
     if (lang === 'en') {
       return format === 'long'

@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, signal, computed, input , ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, input, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { ArticleApiService } from '@services/api/article-api.service';
 import { FileApiService } from '@services/api/file-api.service';
@@ -7,6 +8,7 @@ import { ArticleStatusBadgeComponent } from '@shared/components/article-status-b
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { DateLocalePipe } from '@shared/pipes/date-locale.pipe';
 import { DecimalPipe } from '@angular/common';
+import { ErrorStateComponent } from '@shared/components/error-state/error-state.component';
 
 interface StatusStep {
   key: ArticleStatus;
@@ -17,7 +19,7 @@ interface StatusStep {
 @Component({
   selector: 'app-article-detail',
   standalone: true,
-  imports: [RouterLink, ArticleStatusBadgeComponent, TranslatePipe, DateLocalePipe, DecimalPipe],
+  imports: [RouterLink, ArticleStatusBadgeComponent, TranslatePipe, DateLocalePipe, DecimalPipe, ErrorStateComponent],
   templateUrl: './article-detail.component.html',
   styleUrl: './article-detail.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,9 +29,11 @@ export class ArticleDetailComponent implements OnInit {
 
   private readonly articleApi = inject(ArticleApiService);
   private readonly fileApi = inject(FileApiService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly article = signal<Article | null>(null);
   readonly loading = signal(true);
+  readonly loadError = signal(false);
 
   readonly steps: StatusStep[] = [
     { key: 'NEW', labelKey: 'cabinet.articles.step_new', icon: 'pi-send' },
@@ -53,12 +57,21 @@ export class ArticleDetailComponent implements OnInit {
   readonly isRejected = computed(() => this.article()?.status === 'REJECTED');
 
   ngOnInit(): void {
-    this.articleApi.getUserArticleById(this.id()).subscribe({
+    this.load();
+  }
+
+  load(): void {
+    this.loading.set(true);
+    this.loadError.set(false);
+    this.articleApi.getUserArticleById(this.id()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (article) => {
         this.article.set(article);
         this.loading.set(false);
       },
-      error: () => this.loading.set(false),
+      error: () => {
+        this.loading.set(false);
+        this.loadError.set(true);
+      },
     });
   }
 

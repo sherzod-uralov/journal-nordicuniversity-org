@@ -1,7 +1,6 @@
 import { Component, inject, OnInit, computed, signal, ChangeDetectionStrategy, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AuthStore } from '@store/auth.store';
-import { UpdateAuthorPayload } from '@services/api/author-api.service';
+import { AuthStore, ProfileUpdatePayload } from '@store/auth.store';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { DateLocalePipe } from '@shared/pipes/date-locale.pipe';
 import { TextInputComponent } from '@shared/components/text-input/text-input.component';
@@ -9,6 +8,11 @@ import { PasswordInputComponent } from '@shared/components/password-input/passwo
 import { DateInputComponent } from '@shared/components/date-input/date-input.component';
 import { PhoneInputComponent } from '@shared/components/phone-input/phone-input.component';
 import { Button } from 'primeng/button';
+import { ErrorStateComponent } from '@shared/components/error-state/error-state.component';
+import { parseLocalDate, toLocalDateString } from '@core/utils/date.util';
+import {
+  AuthorFormErrors, AuthorFormField, hasErrors, validateAuthorForm, withoutError,
+} from '@shared/validators/author-form.validators';
 
 @Component({
   selector: 'app-profile',
@@ -22,6 +26,7 @@ import { Button } from 'primeng/button';
     DateInputComponent,
     PhoneInputComponent,
     Button,
+    ErrorStateComponent,
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css',
@@ -31,8 +36,10 @@ export class ProfileComponent implements OnInit {
   readonly authStore = inject(AuthStore);
 
   readonly profile = this.authStore.profile;
-  readonly loading = this.authStore.loading;
+  readonly saving = this.authStore.saving;
+  readonly loadFailed = this.authStore.profileLoadFailed;
   readonly editMode = signal(false);
+  readonly errors = signal<AuthorFormErrors>({});
 
   readonly avatarLetter = computed(() => {
     const name = this.profile()?.full_name;
@@ -59,7 +66,7 @@ export class ProfileComponent implements OnInit {
         this.job = p.job ?? '';
         this.place_position = p.place_position ?? '';
         this.OrcID = p.OrcID ?? '';
-        this.birthdayDate = p.birthday ? new Date(p.birthday) : null;
+        this.birthdayDate = parseLocalDate(p.birthday);
         this.password = '';
       }
     });
@@ -71,12 +78,18 @@ export class ProfileComponent implements OnInit {
     }
   }
 
+  retryLoad(): void {
+    this.authStore.loadProfile();
+  }
+
   startEdit(): void {
+    this.errors.set({});
     this.editMode.set(true);
   }
 
   cancelEdit(): void {
     this.editMode.set(false);
+    this.errors.set({});
     this.password = '';
     const p = this.profile();
     if (p) {
@@ -86,25 +99,46 @@ export class ProfileComponent implements OnInit {
       this.job = p.job ?? '';
       this.place_position = p.place_position ?? '';
       this.OrcID = p.OrcID ?? '';
-      this.birthdayDate = p.birthday ? new Date(p.birthday) : null;
+      this.birthdayDate = parseLocalDate(p.birthday);
     }
   }
 
-  save(): void {
-    const payload: UpdateAuthorPayload = {
+  clearError(field: AuthorFormField): void {
+    this.errors.update(errors => withoutError(errors, field));
+  }
+
+  async save(): Promise<void> {
+    if (this.saving()) return;
+    const errors = validateAuthorForm({
+      phone: this.phone_number,
+      password: this.password,
+      full_name: this.full_name,
+      science_degree: this.science_degree,
+      job: this.job,
+      place_position: this.place_position,
+      birthday: this.birthdayDate,
+    }, { mode: 'profile' });
+    this.errors.set(errors);
+    if (hasErrors(errors)) return;
+
+    const payload: ProfileUpdatePayload = {
       full_name: this.full_name.trim(),
       phone_number: this.phone_number.trim(),
       science_degree: this.science_degree.trim(),
       job: this.job.trim(),
       place_position: this.place_position.trim(),
-      OrcID: this.OrcID.trim() || undefined,
-      birthday: this.birthdayDate ? this.birthdayDate.toISOString().split('T')[0] : undefined,
+      // null (not undefined) so clearing an optional field actually reaches the API.
+      OrcID: this.OrcID.trim() || null,
+      birthday: toLocalDateString(this.birthdayDate) || null,
     };
     if (this.password.trim().length > 0) {
-      payload.password = this.password.trim();
+      payload.password = this.password;
     }
-    this.authStore.updateProfile(payload);
-    this.editMode.set(false);
-    this.password = '';
+    // Stay in edit mode until the API confirms, so nothing typed is lost on failure.
+    const ok = await this.authStore.updateProfile(payload);
+    if (ok) {
+      this.password = '';
+      this.editMode.set(false);
+    }
   }
 }

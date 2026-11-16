@@ -14,6 +14,6 @@ export class CategoryApiService {
   }
 
   getById(id: number): Observable<Category> {
-    return this.http.get<Category>(`${this.baseUrl}/${id}`);
+    return this.http.get<Category>(`${this.baseUrl}/${encodeURIComponent(id)}`);
   }
 }

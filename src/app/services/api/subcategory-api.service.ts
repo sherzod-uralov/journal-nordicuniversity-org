@@ -14,10 +14,10 @@ export class SubcategoryApiService {
   }
 
   getById(id: number): Observable<SubCategory> {
-    return this.http.get<SubCategory>(`${this.baseUrl}/${id}`);
+    return this.http.get<SubCategory>(`${this.baseUrl}/${encodeURIComponent(id)}`);
   }
 
   getByCategory(categoryId: number): Observable<SubCategory[]> {
-    return this.http.get<SubCategory[]>(`${this.baseUrl}/category/${categoryId}`);
+    return this.http.get<SubCategory[]>(`${this.baseUrl}/category/${encodeURIComponent(categoryId)}`);
   }
 }

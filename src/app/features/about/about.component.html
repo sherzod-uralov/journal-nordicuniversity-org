@@ -37,7 +37,7 @@
           <div class="director-featured" appScrollAnimate="fade-up">
             <div class="director-featured-img">
               @if (lead.image?.file_path) {
-                <app-image [src]="lead.image!.file_path" [alt]="lead.full_name" [priority]="true" />
+                <app-image [src]="lead.image!.file_path" [alt]="lead.full_name" [priority]="true" ratio="1/1" sizes="(min-width: 640px) 192px, 160px" />
               } @else {
                 <app-avatar [name]="lead.full_name" size="lg" />
               }
@@ -57,7 +57,7 @@
               <div class="director-card" appScrollAnimate="fade-up">
                 <div class="director-card-img">
                   @if (dir.image?.file_path) {
-                    <app-image [src]="dir.image!.file_path" [alt]="dir.full_name" />
+                    <app-image [src]="dir.image!.file_path" [alt]="dir.full_name" ratio="1/1" sizes="(min-width: 640px) 112px, 96px" />
                   } @else {
                     <app-avatar [name]="dir.full_name" size="lg" />
                   }
@@ -97,7 +97,7 @@
     </section>
   }
 
-  <!-- ══ International Advisory Board ══ -->
+  <!-- ══ Editorial Council Members ══ -->
   @if (data.members?.length) {
     <section class="about-section">
       <div class="about-container">

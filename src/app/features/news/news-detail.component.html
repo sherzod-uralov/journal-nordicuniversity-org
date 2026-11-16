@@ -1,4 +1,4 @@
-@if (newsStore.loading()) {
+@if (newsStore.loading() && !newsStore.selectedNews()) {
   <app-page-header [breadcrumbs]="breadcrumbs()" title="..." />
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="space-y-4">
@@ -17,11 +17,23 @@
 
       @if (news.source?.file_path) {
         <div class="mt-6 mb-8">
-          <app-image [src]="news.source!.file_path" [alt]="news.title" [priority]="true" rounded="0.75rem" />
+          <app-image [src]="news.source!.file_path" [alt]="news.title" [priority]="true" rounded="0.75rem" ratio="16/9" sizes="(min-width: 896px) 848px, 100vw" />
         </div>
       }
 
       <div class="prose prose-slate max-w-none text-dusk leading-relaxed" [innerHTML]="news.body | safeHtml"></div>
     </article>
+  </div>
+} @else {
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    @if (newsStore.notFound()) {
+      <app-empty-state [title]="'not_found.title' | translate" [message]="'common.not_found_desc' | translate">
+        <a routerLink="/news" class="text-sm font-medium text-dusk hover:text-ink transition-colors">{{ 'nav.news' | translate }} &rarr;</a>
+      </app-empty-state>
+    } @else {
+      <app-empty-state [title]="'common.error' | translate" [message]="'common.load_error_desc' | translate">
+        <button type="button" (click)="retry()" class="text-sm font-medium text-dusk hover:text-ink transition-colors cursor-pointer">{{ 'common.retry' | translate }}</button>
+      </app-empty-state>
+    }
   </div>
 }

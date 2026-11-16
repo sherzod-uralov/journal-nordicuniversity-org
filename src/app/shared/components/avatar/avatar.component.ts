@@ -20,6 +20,9 @@ export class AvatarComponent {
     return n.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase();
   });
 
+  /** Rendered size in px (matches the w-/h- classes) so only a tiny rendition is downloaded. */
+  readonly pixelSize = computed(() => ({ sm: 32, md: 40, lg: 56 })[this.size()]);
+
   sizeClasses(): string {
     const map = { sm: 'w-8 h-8 text-xs', md: 'w-10 h-10 text-sm', lg: 'w-14 h-14 text-base' };
     return map[this.size()];

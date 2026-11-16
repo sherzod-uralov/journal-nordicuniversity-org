@@ -4,6 +4,7 @@ import { Observable, forkJoin, of, map } from 'rxjs';
 import { SearchHistoryEntry, SearchSuggestion } from '@core/models/search.model';
 import { ArticleApiService } from '@services/api/article-api.service';
 import { CategoryStore } from '@store/category.store';
+import { safeStorage } from '@core/utils/safe-storage.util';
 
 const HISTORY_KEY = 'search_history';
 const MAX_HISTORY = 10;
@@ -17,12 +18,8 @@ export class SearchService {
 
   getHistory(): SearchHistoryEntry[] {
     if (!this.isBrowser) return [];
-    try {
-      const raw = localStorage.getItem(HISTORY_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
+    const history = safeStorage.getJson<SearchHistoryEntry[]>(HISTORY_KEY, []);
+    return Array.isArray(history) ? history : [];
   }
 
   addToHistory(query: string, resultCount?: number): void {
@@ -31,18 +28,18 @@ export class SearchService {
     history = history.filter(h => h.query.toLowerCase() !== query.toLowerCase());
     history.unshift({ query: query.trim(), timestamp: Date.now(), resultCount });
     if (history.length > MAX_HISTORY) history = history.slice(0, MAX_HISTORY);
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    safeStorage.setJson(HISTORY_KEY, history);
   }
 
   removeFromHistory(query: string): void {
     if (!this.isBrowser) return;
     const history = this.getHistory().filter(h => h.query !== query);
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    safeStorage.setJson(HISTORY_KEY, history);
   }
 
   clearHistory(): void {
     if (!this.isBrowser) return;
-    localStorage.removeItem(HISTORY_KEY);
+    safeStorage.remove(HISTORY_KEY);
   }
 
   getSuggestions(query: string): Observable<SearchSuggestion[]> {

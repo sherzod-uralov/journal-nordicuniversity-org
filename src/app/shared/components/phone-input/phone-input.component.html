@@ -1,4 +1,4 @@
-<div class="phone-wrapper" (appClickOutside)="closeDropdown()">
+<div class="phone-wrapper" (appClickOutside)="closeDropdown()" [appClickOutsideEnabled]="dropdownOpen()">
   <!-- Country selector -->
   <button
     type="button"
@@ -22,8 +22,9 @@
     (input)="onPhoneInput($event)"
     (blur)="onBlur()"
     [disabled]="isDisabled()"
-    placeholder="90 123 45 67"
-    maxlength="12"
+    inputmode="tel"
+    autocomplete="tel-national"
+    [placeholder]="placeholder()"
     class="phone-field"
   />
 
@@ -35,7 +36,7 @@
           type="text"
           [ngModel]="searchQuery()"
           (ngModelChange)="searchQuery.set($event)"
-          placeholder="Search countries..."
+          [placeholder]="'phone_input.search' | translate"
           class="search-input"
         />
       </div>
@@ -55,7 +56,7 @@
           </button>
         }
         @if (filteredCountries.length === 0) {
-          <div class="dropdown-empty">No countries found</div>
+          <div class="dropdown-empty">{{ 'phone_input.no_results' | translate }}</div>
         }
       </div>
     </div>

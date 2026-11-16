@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit, OnDestroy, signal, computed, effect, untracked, ChangeDetectionStrategy, PLATFORM_ID, viewChild, ElementRef } from '@angular/core';
+import { Component, inject, input, OnInit, OnDestroy, signal, computed, effect, untracked, afterNextRender, ChangeDetectionStrategy, PLATFORM_ID, viewChild, ElementRef } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -8,6 +8,7 @@ import { ArticleApiService } from '@services/api/article-api.service';
 import { SeoService } from '@core/services/seo.service';
 import { TagComponent } from '@shared/components/tag/tag.component';
 import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
 import { Skeleton } from 'primeng/skeleton';
 import { CollapsibleComponent } from '@shared/components/collapsible/collapsible.component';
@@ -36,7 +37,7 @@ import {
   standalone: true,
   imports: [
     RouterLink, TagComponent,
-    PageHeaderComponent, Skeleton,
+    PageHeaderComponent, EmptyStateComponent, Skeleton,
     CollapsibleComponent,
     AvatarComponent, ArticleCardComponent, DateLocalePipe, TranslatePipe,
     SafeHtmlPipe, ImageComponent,
@@ -83,50 +84,49 @@ export class ArticleDetailComponent implements OnInit, OnDestroy {
   readonly article = computed(() => this.articleStore.selectedArticle());
 
   private lastArticleId: string | null = null;
+  private relatedForId: string | null = null;
+  private hydrated = false;
   private relatedSub?: Subscription;
 
   constructor() {
-    // Only track slug() — wrap everything else in untracked to prevent
-    // loadBySlug's tap (which reads store.selectedArticle()) from being
-    // accidentally tracked, which would cause an infinite fetch loop.
+    // The resolver loads the article (or records the error) in ArticleStore for every
+    // slug, so this component never fetches it itself — no duplicate requests.
+    // Only track article()/notFound(); the component is reused article → article.
     effect(() => {
-      const slug = this.slug();
+      const a = this.article();
+      const notFound = this.articleStore.notFound();
       untracked(() => {
-        if (slug) {
+        if (a && a.id !== this.lastArticleId) {
+          this.applyArticleSeo(a);
+        } else if (!a && notFound && !this.articleStore.loading()) {
           this.lastArticleId = null;
-          this.relatedSub?.unsubscribe();
-          this.relatedArticles.set([]);
-          this.relatedLoading.set(false);
-          this.sliderIndex.set(0);
-          // loadBySlug skips HTTP if resolver already pre-loaded this slug
-          this.articleStore.loadBySlug(slug);
+          this.seo.resetMeta();
+          this.seo.update({ title: 'Article not found' });
+          this.seo.markNotFound();
         }
+        if (this.hydrated) this.loadRelatedOnce();
       });
     });
 
-    // Only track article() — SEO is set in ngOnInit from preloadedArticle.
-    // This effect handles the fallback case (e.g., SPA navigation without resolver cache).
-    effect(() => {
-      const a = this.article();
-      untracked(() => {
-        if (a && a.id !== this.lastArticleId) {
-          this.lastArticleId = a.id;
-          this.applyArticleSeo(a);
-          this.loadRelatedArticles(a);
-        }
-      });
+    // Related articles are only shown in a @defer block: fetch them in the browser,
+    // after hydration, once per article (never during SSR).
+    afterNextRender(() => {
+      this.hydrated = true;
+      this.loadRelatedOnce();
     });
   }
 
   ngOnInit(): void {
-    // Set SEO synchronously from resolver data — this runs in ngOnInit which
-    // is zone-tracked, so Angular SSR serializes HTML AFTER this executes.
+    // Set SEO synchronously from resolver data so it's in place before SSR serialization.
     const preloaded = this.preloadedArticle();
     if (preloaded) {
-      this.lastArticleId = preloaded.id;
       this.applyArticleSeo(preloaded);
-      this.loadRelatedArticles(preloaded);
     }
+  }
+
+  /** Retries a failed load (explicit user action). */
+  retry(): void {
+    this.articleStore.loadBySlug(this.slug());
   }
 
   readonly breadcrumbs = computed<BreadcrumbItem[]>(() => {
@@ -169,7 +169,7 @@ export class ArticleDetailComponent implements OnInit, OnDestroy {
       lastPage: a.last_page_in_volume,
       doi: a.doi,
       publishDate: a.publish_date,
-      url: typeof window !== 'undefined' ? window.location.href : undefined,
+      url: this.articleUrl(),
     };
   });
 
@@ -179,10 +179,8 @@ export class ArticleDetailComponent implements OnInit, OnDestroy {
     return formatCitation(data, this.selectedCitationStyle());
   });
 
-  readonly articleUrl = computed(() => {
-    if (typeof window === 'undefined') return '';
-    return window.location.href;
-  });
+  /** Canonical URL of the current article (follows the slug when the component is reused). */
+  readonly articleUrl = computed(() => this.seo.getFullUrl(`/article/${this.slug()}`));
 
   ngOnDestroy(): void {
     this.seo.resetMeta();
@@ -212,6 +210,17 @@ export class ArticleDetailComponent implements OnInit, OnDestroy {
       this.copiedDoi.set(true);
       setTimeout(() => this.copiedDoi.set(false), 2000);
     });
+  }
+
+  private loadRelatedOnce(): void {
+    const a = this.article();
+    if (!a || a.id === this.relatedForId) return;
+    this.relatedForId = a.id;
+    this.relatedSub?.unsubscribe();
+    this.relatedArticles.set([]);
+    this.relatedLoading.set(false);
+    this.sliderIndex.set(0);
+    this.loadRelatedArticles(a);
   }
 
   private loadRelatedArticles(a: Article): void {
@@ -341,6 +350,11 @@ export class ArticleDetailComponent implements OnInit, OnDestroy {
   }
 
   private applyArticleSeo(a: Article): void {
+    // Drop the previous article's citation_*/article:* tags before adding this one's
+    if (this.lastArticleId && this.lastArticleId !== a.id) {
+      this.seo.resetMeta();
+    }
+    this.lastArticleId = a.id;
     const base = this.apiUrl.replace(/\/+$/, '');
     const articleUrl = this.seo.getFullUrl(`/article/${a.slug}`);
 

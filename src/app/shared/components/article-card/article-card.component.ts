@@ -17,6 +17,8 @@ import { BookmarkStore } from '@store/bookmark.store';
 export class ArticleCardComponent {
   readonly article = input.required<Article>();
   readonly compact = input(false);
+  /** Eager/high-priority image for the first above-the-fold card (LCP). */
+  readonly priority = input(false);
   readonly bookmarkStore = inject(BookmarkStore);
 
   toggleBookmark(event: Event): void {

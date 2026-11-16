@@ -8,8 +8,8 @@
     </div>
   } @else {
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      @for (news of newsStore.newsList(); track news.id) {
-        <app-news-card [news]="news" />
+      @for (news of newsStore.newsList(); track news.id; let i = $index) {
+        <app-news-card [news]="news" [priority]="i < 2" />
       }
     </div>
     @if (newsStore.totalPages() > 1) {

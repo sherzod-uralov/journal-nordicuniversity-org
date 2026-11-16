@@ -52,7 +52,7 @@
       </div>
 
       <div class="dp-weekdays">
-        @for (d of DAYS; track d) {
+        @for (d of DAYS(); track $index) {
           <span>{{ d }}</span>
         }
       </div>

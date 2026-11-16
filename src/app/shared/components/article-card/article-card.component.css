@@ -29,6 +29,19 @@
   transform: scale(1);
 }
 
+/* Touch devices have no hover: keep the (clickable) button visible. */
+@media (hover: none) {
+  .bookmark-toggle {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.bookmark-toggle:focus-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
 .bookmark-toggle:hover {
   background: rgba(255, 255, 255, 0.95);
   color: #1b263b;

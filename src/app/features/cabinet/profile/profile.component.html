@@ -13,8 +13,13 @@
     }
   </div>
 
+  <!-- Load error -->
+  @if (!profile() && loadFailed()) {
+    <app-error-state message="auth.profile.error" (retry)="retryLoad()" />
+  }
+
   <!-- Loading skeleton -->
-  @if (!profile()) {
+  @if (!profile() && !loadFailed()) {
     <div class="bg-white rounded-xl border border-alabaster/60 p-6 animate-pulse">
       <div class="flex items-center gap-5 mb-6">
         <div class="w-16 h-16 bg-alabaster rounded-2xl"></div>
@@ -85,7 +90,7 @@
 
     <!-- Edit form -->
     @if (editMode()) {
-      <form (ngSubmit)="save()" class="bg-white rounded-xl border border-alabaster/60 p-6 space-y-5">
+      <form (ngSubmit)="save()" class="bg-white rounded-xl border border-alabaster/60 p-6 space-y-5" novalidate>
         <div class="flex items-center gap-5 pb-5 border-b border-alabaster/40">
           <div class="profile-avatar">{{ avatarLetter() }}</div>
           <div>
@@ -95,30 +100,45 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.name' | translate }}</label>
-          <app-text-input [(ngModel)]="full_name" name="full_name" />
+          <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.name' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
+          <app-text-input [(ngModel)]="full_name" (ngModelChange)="clearError('full_name')" name="full_name" />
+          @if (errors().full_name; as err) {
+            <p class="mt-1.5 text-xs text-red-600" role="alert">{{ err | translate }}</p>
+          }
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.phone' | translate }}</label>
-          <app-phone-input [(ngModel)]="phone_number" name="phone_number" />
+          <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.phone' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
+          <app-phone-input [(ngModel)]="phone_number" (ngModelChange)="clearError('phone')" name="phone_number" />
+          @if (errors().phone; as err) {
+            <p class="mt-1.5 text-xs text-red-600" role="alert">{{ err | translate }}</p>
+          }
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.degree' | translate }}</label>
-            <app-text-input [(ngModel)]="science_degree" name="science_degree" />
+            <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.degree' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
+            <app-text-input [(ngModel)]="science_degree" (ngModelChange)="clearError('science_degree')" name="science_degree" />
+            @if (errors().science_degree; as err) {
+              <p class="mt-1.5 text-xs text-red-600" role="alert">{{ err | translate }}</p>
+            }
           </div>
           <div>
-            <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.job' | translate }}</label>
-            <app-text-input [(ngModel)]="job" name="job" />
+            <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.job' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
+            <app-text-input [(ngModel)]="job" (ngModelChange)="clearError('job')" name="job" />
+            @if (errors().job; as err) {
+              <p class="mt-1.5 text-xs text-red-600" role="alert">{{ err | translate }}</p>
+            }
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.position' | translate }}</label>
-            <app-text-input [(ngModel)]="place_position" name="place_position" />
+            <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.position' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
+            <app-text-input [(ngModel)]="place_position" (ngModelChange)="clearError('place_position')" name="place_position" />
+            @if (errors().place_position; as err) {
+              <p class="mt-1.5 text-xs text-red-600" role="alert">{{ err | translate }}</p>
+            }
           </div>
           <div>
             <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.birthday' | translate }}</label>
@@ -136,13 +156,17 @@
             {{ 'auth.register.password' | translate }}
             <span class="text-xs text-lavender font-normal ml-1">({{ 'cabinet.profile.password_hint' | translate }})</span>
           </label>
-          <app-password-input [(ngModel)]="password" name="password" />
+          <app-password-input [(ngModel)]="password" (ngModelChange)="clearError('password')" name="password" />
+          @if (errors().password; as err) {
+            <p class="mt-1.5 text-xs text-red-600" role="alert">{{ err | translate }}</p>
+          }
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-4 border-t border-alabaster/40">
           <p-button
             type="button"
             (onClick)="cancelEdit()"
+            [disabled]="saving()"
             [label]="'cabinet.profile.cancel' | translate"
             severity="secondary"
             [outlined]="true"
@@ -151,7 +175,7 @@
             type="submit"
             [label]="'cabinet.profile.save' | translate"
             icon="pi pi-check"
-            [loading]="loading()"
+            [loading]="saving()"
           />
         </div>
       </form>

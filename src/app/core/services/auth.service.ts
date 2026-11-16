@@ -1,5 +1,8 @@
 import { Injectable, signal, computed, PLATFORM_ID, inject, REQUEST } from '@angular/core';
 import { isPlatformBrowser, isPlatformServer, DOCUMENT } from '@angular/common';
+import { safeStorage } from '@core/utils/safe-storage.util';
+
+const TOKEN_KEY = 'access_token';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -20,7 +23,7 @@ export class AuthService {
 
   private loadToken(): string | null {
     if (isPlatformBrowser(this.platformId)) {
-      return localStorage.getItem('access_token');
+      return safeStorage.get(TOKEN_KEY);
     }
     return null;
   }
@@ -45,7 +48,7 @@ export class AuthService {
   setToken(token: string): void {
     this.tokenSignal.set(token);
     if (this.isBrowser) {
-      localStorage.setItem('access_token', token);
+      safeStorage.set(TOKEN_KEY, token);
       this.doc.cookie = 'logged_in=1;path=/;max-age=31536000;SameSite=Lax';
     }
   }
@@ -53,7 +56,7 @@ export class AuthService {
   logout(): void {
     this.tokenSignal.set(null);
     if (this.isBrowser) {
-      localStorage.removeItem('access_token');
+      safeStorage.remove(TOKEN_KEY);
       this.doc.cookie = 'logged_in=;path=/;max-age=0;SameSite=Lax';
     }
   }

@@ -1,12 +1,22 @@
-import {
-  Component, input, signal, computed, ChangeDetectionStrategy,
-  ElementRef, inject, AfterViewInit, OnDestroy, PLATFORM_ID,
-} from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Component, input, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { environment } from '@env';
 
-const BREAKPOINTS = [640, 750, 828, 1080, 1200, 1920];
+/** Widths the /_img optimizer serves (keep in sync with src/server/image-optimizer.ts). */
+const ALLOWED_WIDTHS = [32, 48, 64, 96, 128, 256, 384, 640, 750, 828, 1080, 1200, 1920];
+/** Candidates for fluid images (no fixed `width`). */
+const FLUID_WIDTHS = [128, 256, 384, 640, 750, 828, 1080, 1200, 1920];
+/** Fluid default: full width on phones, about half the viewport on larger screens. */
+const DEFAULT_SIZES = '(max-width: 768px) 100vw, 50vw';
 
+function clampWidth(w: number): number {
+  return ALLOWED_WIDTHS.find(a => a >= w) ?? ALLOWED_WIDTHS[ALLOWED_WIDTHS.length - 1];
+}
+
+/**
+ * Optimized <img> that is always present in the server HTML (native lazy-loading,
+ * no IntersectionObserver gating). Pass `ratio` or `width`+`height` to reserve space,
+ * and `sizes`/`width` so small renditions (avatars, thumbnails) download small files.
+ */
 @Component({
   selector: 'app-image',
   standalone: true,
@@ -14,23 +24,24 @@ const BREAKPOINTS = [640, 750, 828, 1080, 1200, 1920];
   styleUrl: './image.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ImageComponent implements AfterViewInit, OnDestroy {
+export class ImageComponent {
   readonly src = input.required<string>();
   readonly alt = input('');
   readonly fit = input<'cover' | 'contain' | 'fill' | 'none'>('cover');
+  /** CSS aspect-ratio, e.g. "16/9". Defaults to width/height when both are set. */
   readonly ratio = input('');
   readonly priority = input(false);
   readonly rounded = input('');
   readonly imgClass = input('');
+  /** Rendered CSS width in px (fixed-size images such as avatars). */
   readonly width = input(0);
+  /** Rendered CSS height in px; with `width` it reserves the aspect ratio. */
+  readonly height = input(0);
+  /** `sizes` attribute; defaults to `${width}px` or a fluid default. */
+  readonly sizes = input('');
   readonly quality = input(75);
 
-  private readonly el = inject(ElementRef);
-  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
-  private observer: IntersectionObserver | null = null;
-
   readonly error = signal(false);
-  readonly inView = signal(false);
 
   private readonly rawUrl = computed(() => {
     const path = this.src();
@@ -43,52 +54,37 @@ export class ImageComponent implements AfterViewInit, OnDestroy {
   readonly optimizedSrc = computed(() => {
     const raw = this.rawUrl();
     if (!raw) return '';
-    const w = this.width() || 828;
+    const w = this.width() ? clampWidth(this.width()) : 828;
     return `/_img?url=${encodeURIComponent(raw)}&w=${w}&q=${this.quality()}`;
   });
 
-  /** srcset for responsive images */
+  /** srcset: for a fixed width only 1x–3x renditions, otherwise the fluid ladder. */
   readonly srcSet = computed(() => {
     const raw = this.rawUrl();
     if (!raw) return '';
     const q = this.quality();
     const encoded = encodeURIComponent(raw);
-    return BREAKPOINTS
-      .map(w => `/_img?url=${encoded}&w=${w}&q=${q} ${w}w`)
+    const w = this.width();
+    const widths = w > 0
+      ? ALLOWED_WIDTHS.filter(a => a >= clampWidth(w) && a <= clampWidth(w * 3))
+      : FLUID_WIDTHS;
+    return widths
+      .map(cw => `/_img?url=${encoded}&w=${cw}&q=${q} ${cw}w`)
       .join(', ');
   });
 
-  /** sizes attribute */
-  readonly sizes = computed(() => {
+  readonly sizesAttr = computed(() => {
+    if (this.sizes()) return this.sizes();
     const w = this.width();
-    if (w > 0) return `${w}px`;
-    return '100vw';
+    return w > 0 ? `${w}px` : DEFAULT_SIZES;
   });
 
-  readonly shouldLoad = computed(() => this.priority() || this.inView());
-
-  ngAfterViewInit(): void {
-    if (!this.isBrowser) return;
-    if (this.priority()) {
-      this.inView.set(true);
-      return;
-    }
-    const el = this.el.nativeElement as HTMLElement;
-    this.observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          this.inView.set(true);
-          this.observer?.disconnect();
-        }
-      },
-      { rootMargin: '200px' },
-    );
-    this.observer.observe(el);
-  }
-
-  ngOnDestroy(): void {
-    this.observer?.disconnect();
-  }
+  readonly aspectRatio = computed(() => {
+    if (this.ratio()) return this.ratio();
+    const w = this.width();
+    const h = this.height();
+    return w > 0 && h > 0 ? `${w} / ${h}` : null;
+  });
 
   onError(): void {
     this.error.set(true);

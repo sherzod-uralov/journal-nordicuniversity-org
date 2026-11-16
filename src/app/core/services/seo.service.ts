@@ -1,7 +1,9 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, RESPONSE_INIT } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Meta, Title } from '@angular/platform-browser';
 import { DOCUMENT } from '@angular/common';
-import { Router } from '@angular/router';
+import { NavigationStart, Router } from '@angular/router';
+import { filter } from 'rxjs';
 
 export interface SeoData {
   title: string;
@@ -38,6 +40,8 @@ export class SeoService {
   private readonly title = inject(Title);
   private readonly doc = inject(DOCUMENT);
   private readonly router = inject(Router);
+  /** Server only (null in the browser): lets the render set the HTTP status. */
+  private readonly responseInit = inject(RESPONSE_INIT, { optional: true });
 
   private readonly defaultTitle = 'International Nordic University Scientific Journal';
   private readonly journalTitle = 'International Nordic University Scientific Journal';
@@ -46,6 +50,14 @@ export class SeoService {
   private readonly defaultImage = 'https://journal.nordicuniversity.org/og-image.png';
 
   private addedMetaTags: string[] = [];
+  /** True once the current navigation was marked as 404 (keeps `noindex` until the next navigation). */
+  private notFound = false;
+
+  constructor() {
+    this.router.events
+      .pipe(filter((e) => e instanceof NavigationStart), takeUntilDestroyed())
+      .subscribe(() => (this.notFound = false));
+  }
 
   /** Build a full URL from the current route path */
   getFullUrl(path?: string): string {
@@ -53,6 +65,7 @@ export class SeoService {
   }
 
   update(data: SeoData): void {
+    this.clearNoindex();
     this.title.setTitle(data.title ? `${data.title} | ${this.defaultTitle}` : this.defaultTitle);
 
     if (data.description) {
@@ -378,28 +391,42 @@ export class SeoService {
     }
   }
 
+  /**
+   * Marks the current page as "not found": HTTP 404 during SSR and `noindex` for crawlers.
+   * Callers set the title via update(). Cleared by update()/resetMeta() on the next navigation.
+   */
+  markNotFound(): void {
+    this.notFound = true;
+    if (this.responseInit) {
+      this.responseInit.status = 404;
+    }
+    this.removeAllTags('name="robots"');
+    this.meta.addTag({ name: 'robots', content: 'noindex' });
+  }
+
   resetMeta(): void {
     this.title.setTitle(this.defaultTitle);
+    this.clearNoindex();
 
-    // Remove all tracked meta tags
+    // Remove all tracked meta tags (every instance — citation_author etc. appear many times)
     for (const tag of this.addedMetaTags) {
       if (tag.startsWith('property:')) {
         const prop = tag.replace('property:', '');
-        this.meta.removeTag(`property="${prop}"`);
+        this.removeAllTags(`property="${prop}"`);
       } else {
-        this.meta.removeTag(`name="${tag}"`);
+        this.removeAllTags(`name="${tag}"`);
       }
     }
     this.addedMetaTags = [];
 
     // Remove specific OG/Twitter article tags
-    this.meta.removeTag('property="article:published_time"');
-    this.meta.removeTag('property="article:author"');
-    this.meta.removeTag('property="article:tag"');
-    this.meta.removeTag('name="twitter:card"');
-    this.meta.removeTag('name="twitter:title"');
-    this.meta.removeTag('name="twitter:description"');
-    this.meta.removeTag('name="twitter:image"');
+    this.removeAllTags('property="article:published_time"');
+    this.removeAllTags('property="article:author"');
+    this.removeAllTags('property="article:tag"');
+    this.removeAllTags('name="twitter:card"');
+    this.removeAllTags('name="twitter:title"');
+    this.removeAllTags('name="twitter:description"');
+    this.removeAllTags('name="twitter:image"');
 
     // Remove JSON-LD
     const script = this.doc.querySelector('script[type="application/ld+json"]');
@@ -416,7 +443,21 @@ export class SeoService {
     // Reset basic OG
     this.meta.updateTag({ property: 'og:title', content: this.defaultTitle });
     this.meta.updateTag({ property: 'og:type', content: 'website' });
-    this.meta.removeTag('property="og:image"');
-    this.meta.removeTag('property="og:url"');
+    this.removeAllTags('property="og:image"');
+    this.removeAllTags('property="og:url"');
+  }
+
+  /** Meta.removeTag() only removes the first match; this removes every matching tag. */
+  private removeAllTags(selector: string): void {
+    this.meta.getTags(selector).forEach((tag) => this.meta.removeTagElement(tag));
+  }
+
+  /** Drops the 404 `noindex` robots tag unless the current navigation was marked not found. */
+  private clearNoindex(): void {
+    if (this.notFound) return;
+    this.meta
+      .getTags('name="robots"')
+      .filter((tag) => /noindex/i.test(tag.content))
+      .forEach((tag) => this.meta.removeTagElement(tag));
   }
 }

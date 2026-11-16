@@ -69,6 +69,9 @@
 
     <!-- ═══════ Category & Subcategory ═══════ -->
     <div class="bg-white rounded-xl border border-alabaster/60 p-6">
+      @if (categoriesError()) {
+        <app-error-state class="block mb-5" [compact]="true" (retry)="loadCategories()" />
+      }
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <app-form-field
           [label]="'cabinet.submit.category' | translate"
@@ -106,13 +109,14 @@
         [required]="true"
         [error]="errors()['articleFile'] ?? ''">
         <app-file-input
-          [ngModel]="articleFile"
+          [ngModel]="articleFile()"
           (ngModelChange)="onArticleFileChange($event)"
+          [disabled]="uploadingArticle()"
           name="articleFile"
           accept=".pdf,.doc,.docx"
           [maxSize]="10"
           [label]="'cabinet.submit.placeholder.file' | translate"
-          hint="PDF, DOC, DOCX — max 10 MB" />
+          hint="PDF, DOC, DOCX" />
         @if (uploadingArticle()) {
           <p class="text-xs text-dusk mt-1.5 flex items-center gap-1.5">
             <i class="pi pi-spinner pi-spin text-xs"></i>
@@ -130,13 +134,14 @@
       <app-form-field
         [label]="'cabinet.submit.image' | translate">
         <app-file-input
-          [ngModel]="imageFile"
+          [ngModel]="imageFile()"
           (ngModelChange)="onImageFileChange($event)"
+          [disabled]="uploadingImage()"
           name="imageFile"
           accept=".jpg,.jpeg,.png,.webp"
           [maxSize]="5"
           [label]="'cabinet.submit.placeholder.image' | translate"
-          hint="JPG, PNG, WEBP — max 5 MB" />
+          hint="JPG, PNG, WEBP" />
         @if (uploadingImage()) {
           <p class="text-xs text-dusk mt-1.5 flex items-center gap-1.5">
             <i class="pi pi-spinner pi-spin text-xs"></i>
@@ -163,6 +168,7 @@
           (ngModelChange)="referenceItems.set($event)"
           name="references"
           fieldId="refs"
+          [commaSeparator]="false"
           [placeholder]="'cabinet.submit.placeholder.reference' | translate" />
       </app-form-field>
     </div>

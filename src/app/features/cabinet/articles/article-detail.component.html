@@ -34,6 +34,10 @@
     </div>
   }
 
+  @if (loadError() && !article()) {
+    <app-error-state (retry)="load()" />
+  }
+
   @if (article(); as a) {
     <div class="space-y-4">
 

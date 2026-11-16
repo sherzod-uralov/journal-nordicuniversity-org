@@ -4,6 +4,7 @@ import {
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { LanguageService } from '@core/services/language.service';
 
 interface CalendarDay {
   day: number;
@@ -33,6 +34,7 @@ export class DatepickerComponent implements ControlValueAccessor, OnDestroy {
 
   private readonly el = inject(ElementRef);
   private readonly doc = inject(DOCUMENT);
+  private readonly lang = inject(LanguageService).lang;
 
   readonly isOpen = signal(false);
   readonly selected = signal<Date | null>(null);
@@ -45,7 +47,15 @@ export class DatepickerComponent implements ControlValueAccessor, OnDestroy {
   private onChange: (v: Date | null) => void = () => {};
   private onTouched: () => void = () => {};
 
-  readonly DAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+  /** Two-letter weekday labels (Mon → Sun) in the current UI language. */
+  readonly DAYS = computed(() => {
+    const fmt = new Intl.DateTimeFormat(this.lang(), { weekday: 'short' });
+    // 2024-01-01 is a Monday.
+    return Array.from({ length: 7 }, (_, i) => {
+      const label = fmt.format(new Date(2024, 0, 1 + i)).slice(0, 2);
+      return label.charAt(0).toUpperCase() + label.slice(1);
+    });
+  });
 
   readonly displayValue = computed(() => {
     const d = this.selected();
@@ -53,11 +63,12 @@ export class DatepickerComponent implements ControlValueAccessor, OnDestroy {
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   });
 
-  readonly monthLabel = computed(() =>
-    new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric' }).format(
+  readonly monthLabel = computed(() => {
+    const label = new Intl.DateTimeFormat(this.lang(), { month: 'long', year: 'numeric' }).format(
       new Date(this.viewYear(), this.viewMonth())
-    )
-  );
+    );
+    return label.charAt(0).toUpperCase() + label.slice(1);
+  });
 
   readonly weeks = computed<CalendarDay[][]>(() => {
     const y = this.viewYear();

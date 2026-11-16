@@ -85,6 +85,8 @@ export class SelectInputComponent implements ControlValueAccessor {
   }
 
   closeDropdown(): void {
+    // Only a dropdown that was actually open counts as "touched".
+    if (!this.dropdownOpen()) return;
     this.dropdownOpen.set(false);
     this.searchQuery.set('');
     this.onTouched();

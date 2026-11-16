@@ -18,6 +18,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 export class TagInputComponent implements ControlValueAccessor {
   readonly placeholder = input('');
   readonly fieldId = input('');
+  /** Commit a tag on ",". Disable for values that contain commas (e.g. references). */
+  readonly commaSeparator = input(true);
 
   readonly tags = signal<string[]>([]);
   readonly inputValue = signal('');
@@ -44,7 +46,7 @@ export class TagInputComponent implements ControlValueAccessor {
   }
 
   onKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter' || event.key === ',') {
+    if (event.key === 'Enter' || (event.key === ',' && this.commaSeparator())) {
       event.preventDefault();
       this.addTag();
     }
@@ -54,7 +56,8 @@ export class TagInputComponent implements ControlValueAccessor {
   }
 
   addTag(): void {
-    const val = this.inputValue().trim().replace(/,+$/, '').trim();
+    const raw = this.inputValue().trim();
+    const val = this.commaSeparator() ? raw.replace(/,+$/, '').trim() : raw;
     if (val && !this.tags().includes(val)) {
       const newTags = [...this.tags(), val];
       this.tags.set(newTags);

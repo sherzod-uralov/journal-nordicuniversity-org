@@ -1,33 +1,72 @@
-import type { Application } from 'express';
+import type { Application, Response } from 'express';
 import { sitemapIndexXsl, URLSET_XSL } from './sitemap-xsl';
 
 const SITEMAP_TTL = 86_400_000;
+const FETCH_TIMEOUT = 15_000;
+// Last good copy per sitemap; kept after expiry so API outages serve stale data instead of an empty urlset.
 const sitemapCache = new Map<string, { xml: string; createdAt: number }>();
+const inFlight = new Map<string, Promise<string>>();
 
-function getCached(key: string): string | null {
-  const entry = sitemapCache.get(key);
-  if (!entry) return null;
-  if (Date.now() - entry.createdAt > SITEMAP_TTL) {
-    sitemapCache.delete(key);
-    return null;
+function regenerate(key: string, generate: () => Promise<string>): Promise<string> {
+  let pending = inFlight.get(key);
+  if (!pending) {
+    pending = generate()
+      .then((xml) => {
+        sitemapCache.set(key, { xml, createdAt: Date.now() });
+        return xml;
+      })
+      .finally(() => inFlight.delete(key));
+    inFlight.set(key, pending);
   }
-  return entry.xml;
+  return pending;
 }
 
-function setCache(key: string, xml: string): void {
-  sitemapCache.set(key, { xml, createdAt: Date.now() });
+/** Serves the cached sitemap (refreshing it in the background when expired), or 503 if none could be built. */
+function serveSitemap(res: Response, key: string, generate: () => Promise<string>): void {
+  const entry = sitemapCache.get(key);
+  if (entry) {
+    if (Date.now() - entry.createdAt > SITEMAP_TTL) {
+      regenerate(key, generate).catch((err) => console.error(`Sitemap ${key}.xml refresh error:`, err));
+    }
+    res.set('Content-Type', 'application/xml');
+    res.send(entry.xml);
+    return;
+  }
+
+  regenerate(key, generate)
+    .then((xml) => {
+      res.set('Content-Type', 'application/xml');
+      res.send(xml);
+    })
+    .catch((err) => {
+      console.error(`Sitemap ${key}.xml error:`, err);
+      res.status(503).set('Retry-After', '300').type('text/plain').send(`Failed to generate ${key} sitemap`);
+    });
 }
 
-function toDateStr(date: string | undefined): string {
-  if (!date) return new Date().toISOString().split('T')[0];
-  return new Date(date).toISOString().split('T')[0];
+async function fetchJson(url: string, init?: RequestInit): Promise<any> {
+  const res = await fetch(url, { ...init, signal: AbortSignal.timeout(FETCH_TIMEOUT) });
+  if (!res.ok) {
+    throw new Error(`${init?.method ?? 'GET'} ${url} responded ${res.status}`);
+  }
+  return res.json();
+}
+
+function escapeXml(value: string): string {
+  return value.replace(/[&<>"']/g, (c) => `&${({ '&': 'amp', '<': 'lt', '>': 'gt', '"': 'quot', "'": 'apos' } as Record<string, string>)[c]};`);
+}
+
+/** Today's date when `date` is missing; null (no <lastmod>) when it is not a valid date. */
+function toDateStr(date: string | undefined): string | null {
+  const parsed = date ? new Date(date) : new Date();
+  return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString().split('T')[0];
 }
 
 function buildUrlEntry(loc: string, lastmod?: string, changefreq = 'monthly', priority = '0.5'): string {
+  const date = toDateStr(lastmod);
   return `  <url>
-    <loc>${loc}</loc>
-    <lastmod>${toDateStr(lastmod)}</lastmod>
-    <changefreq>${changefreq}</changefreq>
+    <loc>${escapeXml(loc)}</loc>
+${date ? `    <lastmod>${date}</lastmod>\n` : ''}    <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
   </url>`;
 }
@@ -57,15 +96,15 @@ export function registerSitemap(app: Application, siteUrl: string, apiUrl: strin
 <?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
-    <loc>${siteUrl}/static.xml</loc>
+    <loc>${escapeXml(`${siteUrl}/static.xml`)}</loc>
     <lastmod>${now}</lastmod>
   </sitemap>
   <sitemap>
-    <loc>${siteUrl}/articles.xml</loc>
+    <loc>${escapeXml(`${siteUrl}/articles.xml`)}</loc>
     <lastmod>${now}</lastmod>
   </sitemap>
   <sitemap>
-    <loc>${siteUrl}/news.xml</loc>
+    <loc>${escapeXml(`${siteUrl}/news.xml`)}</loc>
     <lastmod>${now}</lastmod>
   </sitemap>
 </sitemapindex>`;
@@ -73,22 +112,12 @@ export function registerSitemap(app: Application, siteUrl: string, apiUrl: strin
     res.send(xml);
   });
 
-  app.get('/static.xml', async (_req, res): Promise<void> => {
-    const cached = getCached('static');
-    if (cached) {
-      res.set('Content-Type', 'application/xml');
-      res.send(cached);
-      return;
-    }
-
-    try {
-      const [volumesRes, categoriesRes] = await Promise.all([
-        fetch(`${apiUrl}/volume`),
-        fetch(`${apiUrl}/category`),
+  app.get('/static.xml', (_req, res) => {
+    serveSitemap(res, 'static', async () => {
+      const [volumesData, categoriesData] = await Promise.all([
+        fetchJson(`${apiUrl}/volume`),
+        fetchJson(`${apiUrl}/category`),
       ]);
-
-      const volumesData = await volumesRes.json() as any;
-      const categoriesData = await categoriesRes.json() as any;
 
       const entries: string[] = [
         buildUrlEntry(`${siteUrl}/`, undefined, 'daily', '1.0'),
@@ -102,85 +131,53 @@ export function registerSitemap(app: Application, siteUrl: string, apiUrl: strin
 
       const volumes = volumesData?.data ?? volumesData ?? [];
       for (const v of Array.isArray(volumes) ? volumes : []) {
-        entries.push(buildUrlEntry(`${siteUrl}/volumes/${v.id}`, v.updatedAt, 'monthly', '0.6'));
+        if (v?.id == null) continue;
+        entries.push(buildUrlEntry(`${siteUrl}/volumes/${encodeURIComponent(v.id)}`, v.updatedAt, 'monthly', '0.6'));
       }
 
       const categories = categoriesData?.data ?? categoriesData ?? [];
       for (const c of Array.isArray(categories) ? categories : []) {
-        entries.push(buildUrlEntry(`${siteUrl}/categories/${c.id}`, c.updatedAt, 'monthly', '0.6'));
+        if (c?.id == null) continue;
+        entries.push(buildUrlEntry(`${siteUrl}/categories/${encodeURIComponent(c.id)}`, c.updatedAt, 'monthly', '0.6'));
       }
 
-      const xml = wrapUrlset(entries);
-      setCache('static', xml);
-      res.set('Content-Type', 'application/xml');
-      res.send(xml);
-    } catch (err) {
-      console.error('Sitemap static.xml error:', err);
-      res.status(500).send('Failed to generate static sitemap');
-    }
+      return wrapUrlset(entries);
+    });
   });
 
-  app.get('/articles.xml', async (_req, res): Promise<void> => {
-    const cached = getCached('articles');
-    if (cached) {
-      res.set('Content-Type', 'application/xml');
-      res.send(cached);
-      return;
-    }
-
-    try {
-      const articlesRes = await fetch(`${apiUrl}/article?page=1&limit=9999`);
-      const articlesData = await articlesRes.json() as any;
+  app.get('/articles.xml', (_req, res) => {
+    serveSitemap(res, 'articles', async () => {
+      const articlesData = await fetchJson(`${apiUrl}/article?page=1&limit=9999`);
       const articles = articlesData?.data ?? articlesData ?? [];
 
       const entries: string[] = [];
       for (const a of Array.isArray(articles) ? articles : []) {
-        if (a.slug) {
-          entries.push(buildUrlEntry(`${siteUrl}/article/${a.slug}`, a.updatedAt, 'monthly', '0.7'));
+        if (a?.slug) {
+          entries.push(buildUrlEntry(`${siteUrl}/article/${encodeURIComponent(a.slug)}`, a.updatedAt, 'monthly', '0.7'));
         }
       }
 
-      const xml = wrapUrlset(entries);
-      setCache('articles', xml);
-      res.set('Content-Type', 'application/xml');
-      res.send(xml);
-    } catch (err) {
-      console.error('Sitemap articles.xml error:', err);
-      res.status(500).send('Failed to generate articles sitemap');
-    }
+      return wrapUrlset(entries);
+    });
   });
 
-  app.get('/news.xml', async (_req, res): Promise<void> => {
-    const cached = getCached('news');
-    if (cached) {
-      res.set('Content-Type', 'application/xml');
-      res.send(cached);
-      return;
-    }
-
-    try {
-      const newsRes = await fetch(`${apiUrl}/news/list?lang=uz&page=1&limit=9999`, {
+  app.get('/news.xml', (_req, res) => {
+    serveSitemap(res, 'news', async () => {
+      const newsData = await fetchJson(`${apiUrl}/news/list?lang=uz&page=1&limit=9999`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),
       });
-      const newsData = await newsRes.json() as any;
       const news = newsData?.data ?? newsData ?? [];
 
       const entries: string[] = [];
       for (const n of Array.isArray(news) ? news : []) {
-        if (n.slug) {
-          entries.push(buildUrlEntry(`${siteUrl}/news/${n.slug}`, n.updatedAt, 'weekly', '0.6'));
+        if (n?.slug) {
+          entries.push(buildUrlEntry(`${siteUrl}/news/${encodeURIComponent(n.slug)}`, n.updatedAt, 'weekly', '0.6'));
         }
       }
 
-      const xml = wrapUrlset(entries);
-      setCache('news', xml);
-      res.set('Content-Type', 'application/xml');
-      res.send(xml);
-    } catch (err) {
-      console.error('Sitemap news.xml error:', err);
-      res.status(500).send('Failed to generate news sitemap');
-    }
+      return wrapUrlset(entries);
+    });
   });
 }

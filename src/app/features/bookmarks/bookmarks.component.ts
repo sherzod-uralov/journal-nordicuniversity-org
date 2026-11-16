@@ -5,6 +5,7 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
 import { BreadcrumbItem } from '@shared/components/breadcrumb/breadcrumb.component';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { BookmarkStore } from '@store/bookmark.store';
+import { SeoService } from '@core/services/seo.service';
 
 @Component({
   selector: 'app-bookmarks',
@@ -16,6 +17,7 @@ import { BookmarkStore } from '@store/bookmark.store';
 })
 export class BookmarksComponent implements OnInit {
   readonly bookmarkStore = inject(BookmarkStore);
+  private readonly seo = inject(SeoService);
 
   readonly breadcrumbs: BreadcrumbItem[] = [
     { label: 'Home', translateKey: 'nav.home', route: '/' },
@@ -23,6 +25,7 @@ export class BookmarksComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    this.seo.update({ title: 'Bookmarks', description: 'Articles you saved for later' });
     this.bookmarkStore.load();
   }
 

@@ -10,7 +10,7 @@
 
     <!-- Card -->
     <div class="bg-white rounded-2xl shadow-xl shadow-ink/5 border border-alabaster/40 p-8">
-      <form (ngSubmit)="register()" class="space-y-5">
+      <form (ngSubmit)="register()" class="space-y-5" novalidate>
         <div class="text-center mb-2">
           <div class="w-12 h-12 bg-dusk/10 rounded-xl flex items-center justify-center mx-auto mb-3">
             <i class="pi pi-user text-xl text-dusk"></i>
@@ -20,38 +20,59 @@
 
         <div>
           <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.phone' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
-          <app-phone-input [(ngModel)]="phone" name="phone" />
+          <app-phone-input [(ngModel)]="phone" (ngModelChange)="clearError('phone')" name="phone" />
+          @if (errors().phone; as err) {
+            <p class="mt-1.5 text-xs text-red-600" role="alert">{{ err | translate }}</p>
+          }
         </div>
 
         <div>
           <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.name' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
-          <app-text-input [(ngModel)]="full_name" name="name" />
+          <app-text-input [(ngModel)]="full_name" (ngModelChange)="clearError('full_name')" name="name" />
+          @if (errors().full_name; as err) {
+            <p class="mt-1.5 text-xs text-red-600" role="alert">{{ err | translate }}</p>
+          }
         </div>
 
         <div>
           <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.password' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
-          <app-password-input [(ngModel)]="password" name="password" />
+          <app-password-input [(ngModel)]="password" (ngModelChange)="clearError('password')" name="password" />
+          @if (errors().password; as err) {
+            <p class="mt-1.5 text-xs text-red-600" role="alert">{{ err | translate }}</p>
+          }
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.degree' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
-            <app-text-input [(ngModel)]="science_degree" name="degree" />
+            <app-text-input [(ngModel)]="science_degree" (ngModelChange)="clearError('science_degree')" name="degree" />
+            @if (errors().science_degree; as err) {
+              <p class="mt-1.5 text-xs text-red-600" role="alert">{{ err | translate }}</p>
+            }
           </div>
           <div>
             <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.job' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
-            <app-text-input [(ngModel)]="job" name="job" />
+            <app-text-input [(ngModel)]="job" (ngModelChange)="clearError('job')" name="job" />
+            @if (errors().job; as err) {
+              <p class="mt-1.5 text-xs text-red-600" role="alert">{{ err | translate }}</p>
+            }
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.position' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
-            <app-text-input [(ngModel)]="place_position" name="position" />
+            <app-text-input [(ngModel)]="place_position" (ngModelChange)="clearError('place_position')" name="position" />
+            @if (errors().place_position; as err) {
+              <p class="mt-1.5 text-xs text-red-600" role="alert">{{ err | translate }}</p>
+            }
           </div>
           <div>
             <label class="block text-sm font-medium text-ink mb-1.5">{{ 'auth.register.birthday' | translate }} <span class="text-red-500" aria-hidden="true">*</span></label>
-            <app-date-input [(ngModel)]="birthdayDate" name="birthday" [maxDate]="maxDate" />
+            <app-date-input [(ngModel)]="birthdayDate" (ngModelChange)="clearError('birthday')" name="birthday" [maxDate]="maxDate" />
+            @if (errors().birthday; as err) {
+              <p class="mt-1.5 text-xs text-red-600" role="alert">{{ err | translate }}</p>
+            }
           </div>
         </div>
 

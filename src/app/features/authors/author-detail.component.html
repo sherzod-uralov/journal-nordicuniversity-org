@@ -1,14 +1,14 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <app-breadcrumb [items]="breadcrumbs" />
+  <app-breadcrumb [items]="breadcrumbs()" />
 
-  @if (authorStore.loading()) {
+  @if (authorStore.loading() && !author()) {
     <div class="mt-8 space-y-4">
       <div class="flex items-center gap-4">
         <p-skeleton shape="circle" size="3rem" />
         <div class="space-y-2 flex-1"><p-skeleton width="33%" height="1.75rem" /><p-skeleton width="25%" height="1rem" /></div>
       </div>
     </div>
-  } @else if (authorStore.selectedAuthor(); as author) {
+  } @else if (author(); as author) {
     <!-- Profile -->
     <div class="mt-6 bg-white rounded-xl border border-alabaster/60 p-6 md:p-8 mb-8">
       <div class="flex flex-col sm:flex-row items-start gap-6">
@@ -35,10 +35,26 @@
 
     <!-- Articles -->
     <h2 class="font-heading text-xl font-bold text-ink mb-6">{{ 'author.articles' | translate }}</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      @for (article of articles(); track article.id) {
-        <app-article-card [article]="article" />
-      }
-    </div>
+    @if (articlesLoading()) {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (i of [1,2,3]; track i) {
+          <p-skeleton height="200px" borderRadius="12px" />
+        }
+      </div>
+    } @else if (articles().length === 0) {
+      <app-empty-state [title]="'articles.no_results' | translate" />
+    } @else {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (article of articles(); track article.id) {
+          <app-article-card [article]="article" />
+        }
+      </div>
+    }
+  } @else if (authorStore.notFound()) {
+    <app-empty-state [title]="'not_found.title' | translate" [message]="'common.not_found_desc' | translate" />
+  } @else {
+    <app-empty-state [title]="'common.error' | translate" [message]="'common.load_error_desc' | translate">
+      <button type="button" (click)="retry()" class="text-sm font-medium text-dusk hover:text-ink transition-colors cursor-pointer">{{ 'common.retry' | translate }}</button>
+    </app-empty-state>
   }
 </div>

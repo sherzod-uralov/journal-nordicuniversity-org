@@ -1,4 +1,4 @@
-<div class="select-wrapper" (appClickOutside)="closeDropdown()">
+<div class="select-wrapper" (appClickOutside)="closeDropdown()" [appClickOutsideEnabled]="dropdownOpen()">
   <button
     type="button"
     [id]="fieldId()"

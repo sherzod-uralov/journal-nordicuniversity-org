@@ -9,6 +9,10 @@ import { PasswordInputComponent } from '@shared/components/password-input/passwo
 import { TextInputComponent } from '@shared/components/text-input/text-input.component';
 import { DateInputComponent } from '@shared/components/date-input/date-input.component';
 import { Button } from 'primeng/button';
+import { toLocalDateString } from '@core/utils/date.util';
+import {
+  AuthorFormErrors, AuthorFormField, hasErrors, validateAuthorForm, withoutError,
+} from '@shared/validators/author-form.validators';
 
 @Component({
   selector: 'app-register',
@@ -39,28 +43,46 @@ export class RegisterComponent {
   place_position = '';
   OrcID = '';
 
+  readonly errors = signal<AuthorFormErrors>({});
+
   register(): void {
-    if (!this.phone || !this.full_name || !this.password) return;
-    this.loading.set(true);
-    const birthday = this.birthdayDate ? this.birthdayDate.toISOString().split('T')[0] : '';
-    this.authorApi.register({
-      phone_number: this.phone,
-      full_name: this.full_name,
+    if (this.loading()) return;
+    const errors = validateAuthorForm({
+      phone: this.phone,
       password: this.password,
+      full_name: this.full_name,
       science_degree: this.science_degree,
       job: this.job,
-      birthday,
       place_position: this.place_position,
-      OrcID: this.OrcID || undefined,
+      birthday: this.birthdayDate,
+    }, { mode: 'register' });
+    this.errors.set(errors);
+    if (hasErrors(errors)) return;
+
+    this.loading.set(true);
+    this.authorApi.register({
+      phone_number: this.phone.trim(),
+      full_name: this.full_name.trim(),
+      password: this.password,
+      science_degree: this.science_degree.trim(),
+      job: this.job.trim(),
+      // Local calendar date — toISOString() would shift it a day back east of UTC.
+      birthday: toLocalDateString(this.birthdayDate),
+      place_position: this.place_position.trim(),
+      OrcID: this.OrcID.trim() || undefined,
     }).subscribe({
-      next: (res) => {
-        this.toast.success(res.message || 'Registration successful');
+      next: () => {
+        this.toast.success('auth.register.success');
         this.router.navigate(['/auth/login']);
       },
       error: (e) => {
-        this.toast.error(e.error?.message || 'Registration failed');
+        this.toast.error(e.error?.message || 'auth.register.error');
         this.loading.set(false);
       },
     });
+  }
+
+  clearError(field: AuthorFormField): void {
+    this.errors.update(errors => withoutError(errors, field));
   }
 }

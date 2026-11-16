@@ -15,31 +15,55 @@
         <div class="h-11 bg-alabaster rounded-lg"></div>
       </div>
     </div>
-  } @else if (transaction(); as t) {
+  } @else if (loadError()) {
+    <app-error-state (retry)="load()" />
+  } @else if (article(); as a) {
     <div class="bg-white rounded-xl border border-alabaster/60 overflow-hidden">
-      <div class="text-center py-8 px-6">
-        <p class="text-sm text-lavender mb-2">{{ 'cabinet.payment.amount' | translate }}</p>
-        <p class="text-4xl font-heading font-bold text-ink">{{ t.amount | number }} UZS</p>
-      </div>
+      @if (payment(); as p) {
+        <div class="text-center py-8 px-6">
+          <p class="text-sm text-lavender mb-2">{{ 'cabinet.payment.amount' | translate }}</p>
+          <p class="text-4xl font-heading font-bold text-ink">{{ p.amount | number }} UZS</p>
+        </div>
+      }
 
       <div class="text-sm text-dusk border-t border-alabaster/40 px-6 py-4">
-        <p><span class="text-lavender">Article:</span> {{ t.article?.title }}</p>
+        <p><span class="text-lavender">{{ 'cabinet.payment.article' | translate }}:</span> {{ a.title }}</p>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 px-6 py-5 bg-[#fafaf8] border-t border-alabaster/40">
-        <button
-          (click)="payWithClick()"
-          class="flex items-center justify-center px-5 py-3 bg-white rounded-lg border border-alabaster hover:border-[#0065FF] hover:shadow-md transition-all cursor-pointer"
-          aria-label="Pay with Click">
-          <img src="/logos/click.svg" alt="Click" class="h-8" loading="lazy">
-        </button>
-        <button
-          (click)="payWithPayme()"
-          class="flex items-center justify-center px-5 py-3 bg-white rounded-lg border border-alabaster hover:border-[#33cccc] hover:shadow-md transition-all cursor-pointer"
-          aria-label="Pay with Payme">
-          <img src="/logos/payme.svg" alt="Payme" class="h-8" loading="lazy">
-        </button>
-      </div>
+      @if (a.isPaid) {
+        <div class="flex items-center justify-center gap-2 px-6 py-5 bg-[#fafaf8] border-t border-alabaster/40 text-sm font-medium text-emerald-600">
+          <i class="pi pi-check-circle" aria-hidden="true"></i>
+          {{ 'cabinet.payment.paid' | translate }}
+        </div>
+      } @else if (payment()) {
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 px-6 py-5 bg-[#fafaf8] border-t border-alabaster/40">
+          <button
+            type="button"
+            (click)="payWithClick()"
+            class="flex items-center justify-center px-5 py-3 bg-white rounded-lg border border-alabaster hover:border-[#0065FF] hover:shadow-md transition-all cursor-pointer"
+            [attr.aria-label]="'cabinet.payment.pay_click' | translate">
+            <img src="/logos/click.svg" alt="Click" class="h-8" loading="lazy">
+          </button>
+          <button
+            type="button"
+            (click)="payWithPayme()"
+            class="flex items-center justify-center px-5 py-3 bg-white rounded-lg border border-alabaster hover:border-[#33cccc] hover:shadow-md transition-all cursor-pointer"
+            [attr.aria-label]="'cabinet.payment.pay_payme' | translate">
+            <img src="/logos/payme.svg" alt="Payme" class="h-8" loading="lazy">
+          </button>
+        </div>
+      } @else {
+        <div class="flex justify-center px-6 py-5 bg-[#fafaf8] border-t border-alabaster/40">
+          <button
+            type="button"
+            (click)="createPayment()"
+            [disabled]="creating()"
+            class="inline-flex items-center gap-2 px-5 py-3 bg-dusk text-white text-sm font-semibold rounded-lg hover:bg-prussian transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+            <i class="pi text-sm" [class.pi-spinner]="creating()" [class.pi-spin]="creating()" [class.pi-credit-card]="!creating()" aria-hidden="true"></i>
+            {{ 'cabinet.payment.create' | translate }}
+          </button>
+        </div>
+      }
     </div>
   }
 </div>

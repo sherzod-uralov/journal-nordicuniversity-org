@@ -53,9 +53,17 @@ export class HomeComponent implements OnInit {
     return [...featured, ...home].slice(0, 3);
   });
 
+  /** Grid articles minus those already shown in the featured block. */
+  readonly gridArticles = computed(() => {
+    const shown = new Set([this.featuredMain()?.id, ...this.featuredSidebar().map(a => a.id)]);
+    return this.articleStore.homeArticles().filter(a => !shown.has(a.id)).slice(0, 6);
+  });
+
   constructor() {
     afterNextRender(() => {
       let interval: ReturnType<typeof setInterval> | null = null;
+      // The slider is `hidden lg:block` — only animate it while it's visible
+      const desktop = window.matchMedia('(min-width: 1024px)');
 
       const startSlider = () => {
         if (interval) return;
@@ -74,13 +82,15 @@ export class HomeComponent implements OnInit {
         }
       };
 
-      const onVisibility = () => document.hidden ? stopSlider() : startSlider();
-      document.addEventListener('visibilitychange', onVisibility);
-      startSlider();
+      const syncSlider = () => !document.hidden && desktop.matches ? startSlider() : stopSlider();
+      document.addEventListener('visibilitychange', syncSlider);
+      desktop.addEventListener('change', syncSlider);
+      syncSlider();
 
       this.destroyRef.onDestroy(() => {
         stopSlider();
-        document.removeEventListener('visibilitychange', onVisibility);
+        document.removeEventListener('visibilitychange', syncSlider);
+        desktop.removeEventListener('change', syncSlider);
       });
     });
   }

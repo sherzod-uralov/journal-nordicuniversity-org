@@ -1,4 +1,6 @@
-import { Component, inject, OnInit, signal, computed , ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy, DestroyRef, WritableSignal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ArticleApiService } from '@services/api/article-api.service';
@@ -15,6 +17,7 @@ import { TextareaInputComponent } from '@shared/components/textarea-input/textar
 import { SelectInputComponent } from '@shared/components/select-input/select-input.component';
 import { FileInputComponent } from '@shared/components/file-input/file-input.component';
 import { TagInputComponent } from '@shared/components/tag-input/tag-input.component';
+import { ErrorStateComponent } from '@shared/components/error-state/error-state.component';
 
 @Component({
   selector: 'app-submit-article',
@@ -28,6 +31,7 @@ import { TagInputComponent } from '@shared/components/tag-input/tag-input.compon
     SelectInputComponent,
     FileInputComponent,
     TagInputComponent,
+    ErrorStateComponent,
   ],
   templateUrl: './submit-article.component.html',
   styleUrl: './submit-article.component.css',
@@ -41,9 +45,11 @@ export class SubmitArticleComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly uiStore = inject(UiStore);
   private readonly authStore = inject(AuthStore);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly categories = signal<Category[]>([]);
   readonly allSubcategories = signal<SubCategory[]>([]);
+  readonly categoriesError = signal(false);
   readonly loading = signal(false);
   readonly errors = signal<Record<string, string | undefined>>({});
 
@@ -55,12 +61,14 @@ export class SubmitArticleComponent implements OnInit {
   selectedCategory = signal<number | null>(null);
   selectedSubcategory = signal<number | null>(null);
 
-  articleFile: File | null = null;
-  imageFile: File | null = null;
+  readonly articleFile = signal<File | null>(null);
+  readonly imageFile = signal<File | null>(null);
   readonly articleFileId = signal<string | null>(null);
   readonly imageFileId = signal<string | null>(null);
   readonly uploadingArticle = signal(false);
   readonly uploadingImage = signal(false);
+  private articleUpload: Subscription | null = null;
+  private imageUpload: Subscription | null = null;
 
   readonly filteredSubcategories = computed(() => {
     const catId = this.selectedCategory();
@@ -80,8 +88,19 @@ export class SubmitArticleComponent implements OnInit {
     if (!this.authStore.profile()) {
       this.authStore.loadProfile();
     }
-    this.categoryApi.getAll().subscribe(c => this.categories.set(c));
-    this.subcategoryApi.getAll().subscribe(s => this.allSubcategories.set(s));
+    this.loadCategories();
+  }
+
+  loadCategories(): void {
+    this.categoriesError.set(false);
+    this.categoryApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: c => this.categories.set(c),
+      error: () => this.categoriesError.set(true),
+    });
+    this.subcategoryApi.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: s => this.allSubcategories.set(s),
+      error: () => this.categoriesError.set(true),
+    });
   }
 
   onCategoryChange(val: number | null): void {
@@ -90,43 +109,43 @@ export class SubmitArticleComponent implements OnInit {
   }
 
   onArticleFileChange(file: File | null): void {
-    this.articleFile = file;
-    this.articleFileId.set(null);
-    if (file) {
-      this.uploadingArticle.set(true);
-      this.fileApi.upload(file).subscribe({
-        next: (res) => {
-          this.articleFileId.set(res.id);
-          this.uploadingArticle.set(false);
-          this.uiStore.addToast('cabinet.submit.file_uploaded', 'success');
-        },
-        error: () => {
-          this.uploadingArticle.set(false);
-          this.uiStore.addToast('cabinet.submit.error.upload_failed', 'error');
-          this.articleFile = null;
-        },
-      });
-    }
+    this.articleUpload?.unsubscribe();
+    this.articleUpload = this.startUpload(file, this.articleFile, this.articleFileId, this.uploadingArticle);
   }
 
   onImageFileChange(file: File | null): void {
-    this.imageFile = file;
-    this.imageFileId.set(null);
-    if (file) {
-      this.uploadingImage.set(true);
-      this.fileApi.upload(file).subscribe({
-        next: (res) => {
-          this.imageFileId.set(res.id);
-          this.uploadingImage.set(false);
-          this.uiStore.addToast('cabinet.submit.file_uploaded', 'success');
-        },
-        error: () => {
-          this.uploadingImage.set(false);
-          this.uiStore.addToast('cabinet.submit.error.upload_failed', 'error');
-          this.imageFile = null;
-        },
-      });
-    }
+    this.imageUpload?.unsubscribe();
+    this.imageUpload = this.startUpload(file, this.imageFile, this.imageFileId, this.uploadingImage);
+  }
+
+  /**
+   * Uploads `file` and stores its id. The caller cancels the previous upload first,
+   * so a stale response can never overwrite the id of a newer (or removed) file.
+   */
+  private startUpload(
+    file: File | null,
+    fileSig: WritableSignal<File | null>,
+    idSig: WritableSignal<string | null>,
+    uploadingSig: WritableSignal<boolean>,
+  ): Subscription | null {
+    fileSig.set(file);
+    idSig.set(null);
+    uploadingSig.set(false);
+    if (!file) return null;
+
+    uploadingSig.set(true);
+    return this.fileApi.upload(file).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (res) => {
+        idSig.set(res.id);
+        uploadingSig.set(false);
+        this.uiStore.addToast('cabinet.submit.file_uploaded', 'success');
+      },
+      error: () => {
+        uploadingSig.set(false);
+        fileSig.set(null);
+        this.uiStore.addToast('cabinet.submit.error.upload_failed', 'error');
+      },
+    });
   }
 
   validate(): boolean {
@@ -182,7 +201,8 @@ export class SubmitArticleComponent implements OnInit {
 
     if (this.imageFileId()) body['image_id'] = this.imageFileId();
     if (this.referenceItems().length > 0) {
-      body['references'] = this.referenceItems().join(', ');
+      // One reference per line — references themselves contain commas.
+      body['references'] = this.referenceItems().join('\n');
     }
 
     this.articleApi.create(body).subscribe({

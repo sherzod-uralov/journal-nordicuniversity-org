@@ -37,7 +37,7 @@
         <!-- Cover -->
         <div class="featured-cover">
           @if (vol.image?.file_path) {
-            <app-image [src]="vol.image!.file_path" [alt]="vol.title" [priority]="true" />
+            <app-image [src]="vol.image!.file_path" [alt]="vol.title" [priority]="true" sizes="(min-width: 1024px) 352px, (min-width: 768px) 288px, 100vw" />
           } @else {
             <div class="featured-fallback">
               <svg class="w-12 h-12 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -56,7 +56,7 @@
               <span>{{ vol.articleCount }} {{ 'volumes.articles_count' | translate }}</span>
             }
             @if (vol.createdAt) {
-              <span>{{ vol.createdAt | date:'MMMM yyyy' }}</span>
+              <span>{{ vol.createdAt | dateLocale:'long' }}</span>
             }
           </div>
 
@@ -89,7 +89,7 @@
               <!-- Cover thumbnail -->
               <div class="archive-cover">
                 @if (vol.image?.file_path) {
-                  <app-image [src]="vol.image!.file_path" [alt]="vol.title" />
+                  <app-image [src]="vol.image!.file_path" [alt]="vol.title" ratio="3/4" sizes="(min-width: 640px) 72px, 64px" />
                 } @else {
                   <div class="archive-cover-fallback">
                     <span class="font-heading text-xs font-bold text-white">{{ vol.title }}</span>
@@ -105,7 +105,7 @@
                     <span>{{ vol.articleCount }} {{ 'volumes.articles_count' | translate }}</span>
                   }
                   @if (vol.createdAt) {
-                    <span>{{ vol.createdAt | date:'MMM yyyy' }}</span>
+                    <span>{{ vol.createdAt | dateLocale:'short' }}</span>
                   }
                 </div>
               </div>

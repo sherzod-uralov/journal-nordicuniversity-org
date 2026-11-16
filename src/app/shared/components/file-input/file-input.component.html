@@ -22,10 +22,10 @@
     </div>
     <div class="drop-text">
       <span class="drop-action">{{ label() }}</span>
-      <span class="drop-hint">or drag and drop</span>
+      <span class="drop-hint">{{ 'file_input.drag_drop' | translate }}</span>
     </div>
     @if (acceptHint || hint()) {
-      <p class="drop-accept">{{ hint() || acceptHint }} &middot; Max {{ maxSize() }}MB</p>
+      <p class="drop-accept">{{ hint() || acceptHint }} &middot; {{ maxSizeText() }}</p>
     }
   </div>
 } @else {
@@ -61,7 +61,7 @@
       <p class="file-name">{{ fileName }}</p>
       <p class="file-size">{{ fileSize }}</p>
     </div>
-    <button type="button" class="file-remove" (click)="remove()" [disabled]="isDisabled()" aria-label="Remove file">
+    <button type="button" class="file-remove" (click)="remove()" [disabled]="isDisabled()" [attr.aria-label]="'file_input.remove' | translate">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <line x1="18" y1="6" x2="6" y2="18"/>
         <line x1="6" y1="6" x2="18" y2="18"/>
@@ -70,8 +70,8 @@
   </div>
 }
 
-@if (error()) {
-  <p class="file-error">{{ error() }}</p>
+@if (errorText()) {
+  <p class="file-error" role="alert">{{ errorText() }}</p>
 }
 
 <input

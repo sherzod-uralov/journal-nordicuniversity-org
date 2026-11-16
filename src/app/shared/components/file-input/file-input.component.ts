@@ -1,9 +1,12 @@
-import { Component, forwardRef, input, signal, output , ChangeDetectionStrategy } from '@angular/core';
+import { Component, forwardRef, input, signal, output, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { LanguageService } from '@core/services/language.service';
+import { TranslatePipe } from '@shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-file-input',
   standalone: true,
+  imports: [TranslatePipe],
   templateUrl: './file-input.component.html',
   styleUrl: './file-input.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,7 +27,15 @@ export class FileInputComponent implements ControlValueAccessor {
   readonly file = signal<File | null>(null);
   readonly isDragging = signal(false);
   readonly isDisabled = signal(false);
-  readonly error = signal('');
+  private readonly languageService = inject(LanguageService);
+
+  /** i18n key + params, translated at render time so it follows language switches. */
+  readonly error = signal<{ key: string; params: Record<string, string> } | null>(null);
+  readonly errorText = computed(() => {
+    const e = this.error();
+    return e ? this.format(e.key, e.params) : '';
+  });
+  readonly maxSizeText = computed(() => this.format('file_input.max_size', { size: String(this.maxSize()) }));
 
   readonly fileSelected = output<File>();
 
@@ -106,12 +117,12 @@ export class FileInputComponent implements ControlValueAccessor {
 
   remove(): void {
     this.file.set(null);
-    this.error.set('');
+    this.error.set(null);
     this.onChange(null);
   }
 
   private processFile(file: File): void {
-    this.error.set('');
+    this.error.set(null);
 
     // Check accept
     if (this.accept()) {
@@ -121,14 +132,14 @@ export class FileInputComponent implements ControlValueAccessor {
         a.startsWith('.') ? a === ext : file.type.startsWith(a.replace('*', ''))
       );
       if (!typeMatch) {
-        this.error.set(`Only ${this.acceptHint} files are allowed`);
+        this.error.set({ key: 'file_input.invalid_type', params: { types: this.acceptHint } });
         return;
       }
     }
 
     // Check size
     if (file.size > this.maxSize() * 1024 * 1024) {
-      this.error.set(`File size must be less than ${this.maxSize()} MB`);
+      this.error.set({ key: 'file_input.too_large', params: { size: String(this.maxSize()) } });
       return;
     }
 
@@ -136,5 +147,12 @@ export class FileInputComponent implements ControlValueAccessor {
     this.onChange(file);
     this.fileSelected.emit(file);
     this.onTouched();
+  }
+
+  private format(key: string, params: Record<string, string>): string {
+    return Object.entries(params).reduce(
+      (text, [name, value]) => text.replace(`{${name}}`, value),
+      this.languageService.translate(key),
+    );
   }
 }

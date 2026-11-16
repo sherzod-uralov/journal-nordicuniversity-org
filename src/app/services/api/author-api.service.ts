@@ -10,9 +10,11 @@ export interface UpdateAuthorPayload {
   full_name?: string;
   phone_number?: string;
   science_degree?: string;
-  birthday?: string;
+  /** `null` clears the field (`undefined` is dropped by JSON.stringify). */
+  birthday?: string | null;
   job?: string;
-  OrcID?: string;
+  /** `null` clears the field (`undefined` is dropped by JSON.stringify). */
+  OrcID?: string | null;
   place_position?: string;
   password?: string;
   source_id?: string;
@@ -31,7 +33,7 @@ export class AuthorApiService {
   }
 
   getById(id: string): Observable<Author> {
-    return this.http.get<Author>(`${this.baseUrl}/${id}`);
+    return this.http.get<Author>(`${this.baseUrl}/${encodeURIComponent(id)}`);
   }
 
   login(phone_number: string, password: string): Observable<AuthorLoginResponse> {

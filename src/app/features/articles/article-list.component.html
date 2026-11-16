@@ -10,7 +10,7 @@
       type="text"
       [value]="searchQuery()"
       (input)="onSearchInput($event)"
-      (keyup.enter)="doSearch(1)"
+      (keyup.enter)="submitSearch()"
       (focus)="searchFocused.set(true)"
       (blur)="searchFocused.set(false)"
       [placeholder]="'articles.search' | translate"
@@ -283,16 +283,23 @@
             <p-skeleton height="200px" borderRadius="12px" />
           }
         </div>
+      } @else if (articleStore.error()) {
+        <app-empty-state
+          [title]="'common.error' | translate"
+          [message]="'common.load_error_desc' | translate"
+        >
+          <button type="button" (click)="retrySearch()" class="text-sm font-medium text-dusk hover:text-ink transition-colors cursor-pointer">{{ 'common.retry' | translate }}</button>
+        </app-empty-state>
       } @else if (articleStore.articles().length === 0) {
         <app-empty-state
           [title]="'articles.no_results' | translate"
-          [message]="'Try adjusting your search or filters'"
+          [message]="'articles.no_results_desc' | translate"
         />
       } @else {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          @for (article of articleStore.articles(); track article.id) {
+          @for (article of articleStore.articles(); track article.id; let i = $index) {
             <div appScrollAnimate="fade-up">
-              <app-article-card [article]="article" />
+              <app-article-card [article]="article" [priority]="i < 2" />
             </div>
           }
         </div>

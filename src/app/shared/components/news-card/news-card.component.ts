@@ -16,4 +16,6 @@ import { TranslatePipe } from '@shared/pipes/translate.pipe';
 })
 export class NewsCardComponent {
   readonly news = input.required<NewsItem>();
+  /** Eager/high-priority image for the first above-the-fold card (LCP). */
+  readonly priority = input(false);
 }

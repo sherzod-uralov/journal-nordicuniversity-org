@@ -1,7 +1,8 @@
-import { Component, computed, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
 import { ArticleStore } from '@store/article.store';
 import { CategoryStore } from '@store/category.store';
 import { VolumeStore } from '@store/volume.store';
@@ -20,6 +21,16 @@ import { Skeleton } from 'primeng/skeleton';
 import { PaginationComponent } from '@shared/components/pagination/pagination.component';
 import { ToggleSwitchComponent } from '@shared/components/toggle-switch/toggle-switch.component';
 import { DatepickerComponent } from '@shared/components/datepicker/datepicker.component';
+import { parseLocalDate, toLocalDateString } from '@core/utils/date.util';
+
+type SortValue = 'newest' | 'oldest' | 'most_viewed';
+const SORT_VALUES: SortValue[] = ['newest', 'oldest', 'most_viewed'];
+
+/** "1,2,3" → [1, 2, 3] (invalid entries dropped). */
+function parseIds(value: string | null): number[] {
+  if (!value) return [];
+  return value.split(',').map(Number).filter((n) => Number.isInteger(n) && n > 0);
+}
 
 @Component({
   selector: 'app-article-list',
@@ -42,6 +53,8 @@ export class ArticleListComponent implements OnInit {
   private readonly subcategoryApi = inject(SubcategoryApiService);
   private readonly seo = inject(SeoService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly searchService = inject(SearchService);
 
   // Filter signals
@@ -52,10 +65,11 @@ export class ArticleListComponent implements OnInit {
   readonly existDoi = signal(false);
   readonly dateStart = signal<Date | null>(null);
   readonly dateEnd = signal<Date | null>(null);
-  readonly sortValue = signal<'newest' | 'oldest' | 'most_viewed'>('newest');
+  readonly sortValue = signal<SortValue>('newest');
 
   // Data
   readonly subcategories = signal<SubCategory[]>([]);
+  private lastPage = 1;
 
   // UI state
   readonly searchFocused = signal(false);
@@ -111,21 +125,32 @@ export class ArticleListComponent implements OnInit {
   ngOnInit(): void {
     this.seo.update({ title: 'Articles', description: 'Browse peer-reviewed scientific articles' });
 
-    const q = this.route.snapshot.queryParamMap.get('q');
-    if (q) {
-      this.searchQuery.set(q);
-    }
+    // The URL is the source of truth for search, filters and page: header search
+    // (/articles?q=…) and Back/Forward both re-run the search. Emits synchronously
+    // on subscribe, so the first search starts during the initial render.
+    this.route.queryParamMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        const page = this.applyQueryParams(params);
+        this.doSearch(page);
+      });
 
-    this.doSearch(1);
     this.categoryStore.loadCategories();
     this.volumeStore.loadVolumes();
-    this.subcategoryApi.getAll().subscribe(subs => this.subcategories.set(subs));
+    this.subcategoryApi.getAll()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(subs => this.subcategories.set(subs));
   }
 
   onSearchKeydown(event: KeyboardEvent): void {
     if (event.key === 'Enter') {
-      this.doSearch(1);
+      this.updateUrl(1);
     }
+  }
+
+  /** Search box submit. */
+  submitSearch(): void {
+    this.updateUrl(1);
   }
 
   onSearchInput(event: Event): void {
@@ -134,7 +159,7 @@ export class ArticleListComponent implements OnInit {
 
   clearSearch(): void {
     this.searchQuery.set('');
-    this.doSearch(1);
+    this.updateUrl(1);
   }
 
   toggleCategory(id: number): void {
@@ -146,7 +171,7 @@ export class ArticleListComponent implements OnInit {
     } else {
       this.selectedCategories.set([...current, id]);
     }
-    this.doSearch(1);
+    this.updateUrl(1);
   }
 
   toggleSubCategory(id: number): void {
@@ -156,7 +181,7 @@ export class ArticleListComponent implements OnInit {
     } else {
       this.selectedSubCategories.set([...current, id]);
     }
-    this.doSearch(1);
+    this.updateUrl(1);
   }
 
   toggleVolume(id: number): void {
@@ -166,28 +191,29 @@ export class ArticleListComponent implements OnInit {
     } else {
       this.selectedVolumes.set([...current, id]);
     }
-    this.doSearch(1);
+    this.updateUrl(1);
   }
 
   onDoiChange(): void {
-    this.doSearch(1);
+    this.updateUrl(1);
   }
 
   onDateStartChange(): void {
-    this.doSearch(1);
+    this.updateUrl(1);
   }
 
   onDateEndChange(): void {
-    this.doSearch(1);
+    this.updateUrl(1);
   }
 
-  onSortChange(value: 'newest' | 'oldest' | 'most_viewed'): void {
+  onSortChange(value: SortValue): void {
     this.sortValue.set(value);
-    this.doSearch(1);
+    this.updateUrl(1);
   }
 
   onPageChange(page: number): void {
-    this.doSearch(page);
+    // New history entry per page, so Back returns to the previous page
+    this.updateUrl(page, false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -200,12 +226,43 @@ export class ArticleListComponent implements OnInit {
     this.dateStart.set(null);
     this.dateEnd.set(null);
     this.sortValue.set('newest');
-    this.doSearch(1);
+    this.updateUrl(1);
   }
 
-  private formatDate(d: Date | null): string {
-    if (!d) return '';
-    return d.toISOString().split('T')[0];
+  /** Re-runs the current search (after an error). */
+  retrySearch(): void {
+    this.doSearch(this.lastPage);
+  }
+
+  /** Sets the filter signals from the URL; returns the requested page. */
+  private applyQueryParams(params: ParamMap): number {
+    const sort = params.get('sort') as SortValue | null;
+    this.searchQuery.set(params.get('q') ?? '');
+    this.selectedCategories.set(parseIds(params.get('cat')));
+    this.selectedSubCategories.set(parseIds(params.get('sub')));
+    this.selectedVolumes.set(parseIds(params.get('vol')));
+    this.existDoi.set(params.get('doi') === '1');
+    this.dateStart.set(parseLocalDate(params.get('from')));
+    this.dateEnd.set(parseLocalDate(params.get('to')));
+    this.sortValue.set(sort && SORT_VALUES.includes(sort) ? sort : 'newest');
+    const page = Number(params.get('page'));
+    return Number.isInteger(page) && page > 1 ? page : 1;
+  }
+
+  /** Mirrors the filters + page into the URL; the queryParamMap subscription runs the search. */
+  private updateUrl(page: number, replaceUrl = true): void {
+    const queryParams: Params = {
+      q: this.searchQuery().trim() || null,
+      cat: this.selectedCategories().join(',') || null,
+      sub: this.selectedSubCategories().join(',') || null,
+      vol: this.selectedVolumes().join(',') || null,
+      doi: this.existDoi() ? '1' : null,
+      from: toLocalDateString(this.dateStart()) || null,
+      to: toLocalDateString(this.dateEnd()) || null,
+      sort: this.sortValue() !== 'newest' ? this.sortValue() : null,
+      page: page > 1 ? page : null,
+    };
+    this.router.navigate([], { relativeTo: this.route, queryParams, replaceUrl });
   }
 
   private buildFilterBody(): ArticleFilterBody {
@@ -228,8 +285,8 @@ export class ArticleListComponent implements OnInit {
         existDoi: this.existDoi(),
       },
       dateFilter: {
-        start: this.formatDate(this.dateStart()),
-        end: this.formatDate(this.dateEnd()),
+        start: toLocalDateString(this.dateStart()),
+        end: toLocalDateString(this.dateEnd()),
       },
       sort,
     };
@@ -250,10 +307,11 @@ export class ArticleListComponent implements OnInit {
   clearDates(): void {
     this.dateStart.set(null);
     this.dateEnd.set(null);
-    this.doSearch(1);
+    this.updateUrl(1);
   }
 
-  doSearch(page: number): void {
+  private doSearch(page: number): void {
+    this.lastPage = page;
     const query = this.searchQuery();
     if (query.trim() && page === 1) {
       this.searchService.addToHistory(query);

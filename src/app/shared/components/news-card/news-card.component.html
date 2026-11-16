@@ -10,6 +10,8 @@
         [src]="news().source!.file_path"
         [alt]="news().title"
         ratio="16/9"
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        [priority]="priority()"
         class="block transition-transform duration-500 group-hover:scale-105"
       />
     </div>

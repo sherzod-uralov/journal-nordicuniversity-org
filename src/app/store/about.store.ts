@@ -1,6 +1,5 @@
 import { inject } from '@angular/core';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
-import { withTransferState } from '@core/utils/transfer-state.util';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap } from 'rxjs';
 import { tapResponse } from '@ngrx/operators';
@@ -37,5 +36,4 @@ export const AboutStore = signalStore(
       )
     ),
   })),
-  withTransferState('about-store'),
 );

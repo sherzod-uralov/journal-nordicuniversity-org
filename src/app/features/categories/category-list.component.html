@@ -31,7 +31,7 @@
             <div class="category-header">
               @if (cat.file?.file_path) {
                 <div class="category-image">
-                  <app-image [src]="cat.file!.file_path" [alt]="cat.name" />
+                  <app-image [src]="cat.file!.file_path" [alt]="cat.name" [width]="56" [height]="56" />
                 </div>
               }
               <div class="flex-1 min-w-0">

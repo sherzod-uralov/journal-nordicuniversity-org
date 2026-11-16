@@ -15,8 +15,13 @@
     </a>
   </div>
 
+  <!-- Load error -->
+  @if (loadFailed() && !showSkeleton() && cabinetStore.myArticles().length === 0) {
+    <app-error-state (retry)="retry()" />
+  }
+
   <!-- Loading skeleton -->
-  @if (cabinetStore.loading()) {
+  @if (showSkeleton()) {
     <div class="space-y-4">
       @for (i of [1, 2, 3]; track i) {
         <div class="bg-white rounded-xl border border-alabaster/60 p-6 animate-pulse">
@@ -42,7 +47,7 @@
   }
 
   <!-- Empty state -->
-  @if (cabinetStore.myArticles().length === 0 && !cabinetStore.loading()) {
+  @if (cabinetStore.myArticles().length === 0 && !showSkeleton() && !loadFailed()) {
     <app-empty-state
       [title]="'cabinet.articles.no_articles' | translate"
       [message]="'cabinet.articles.no_articles_desc' | translate">
@@ -55,7 +60,7 @@
   }
 
   <!-- Articles list -->
-  @if (cabinetStore.myArticles().length > 0 && !cabinetStore.loading()) {
+  @if (cabinetStore.myArticles().length > 0 && !showSkeleton()) {
     <div class="space-y-4">
       @for (article of cabinetStore.myArticles(); track article.id) {
         <a [routerLink]="['/cabinet/articles', article.id]"

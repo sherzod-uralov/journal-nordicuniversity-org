@@ -1,4 +1,4 @@
-import { Component, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthStore } from '@store/auth.store';
@@ -6,6 +6,7 @@ import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { PhoneInputComponent } from '@shared/components/phone-input/phone-input.component';
 import { PasswordInputComponent } from '@shared/components/password-input/password-input.component';
 import { Button } from 'primeng/button';
+import { AuthorFormErrors, AuthorFormField, hasErrors, validateLoginForm, withoutError } from '@shared/validators/author-form.validators';
 
 @Component({
   selector: 'app-login',
@@ -23,12 +24,17 @@ export class LoginComponent {
 
   phone = '';
   password = '';
+  readonly errors = signal<AuthorFormErrors>({});
 
   onSubmit(): void {
     const phone = this.phone.trim();
-    const pass = this.password;
-    if (phone.length >= 9 && phone.length <= 15 && /^\+?\d+$/.test(phone) && pass.length >= 6) {
-      this.authStore.login({ phone_number: phone, password: pass });
-    }
+    const errors = validateLoginForm({ phone, password: this.password });
+    this.errors.set(errors);
+    if (hasErrors(errors)) return;
+    this.authStore.login({ phone_number: phone, password: this.password });
+  }
+
+  clearError(field: AuthorFormField): void {
+    this.errors.update(errors => withoutError(errors, field));
   }
 }
